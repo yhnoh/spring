@@ -1,7 +1,6 @@
 ### Querydsl 사용 이유
 
 ---
-
 JPA를 활용하여 **동적쿼리나 복접한 쿼리를 사용하는데 분명한 한계**가 존재한다.
 > 1. 쿼리를 JPQL문법으로 작성을 해야한다.
 > 2. JPQL 문법으로 작성하는 것은 결구에는 문자열을 활용하는 것이기 때문에 IDE가 문법오류를 찾기 힘들다.
@@ -15,7 +14,7 @@ Querydsl을 활용하면 JPA 동적쿼리,복잡한 쿼리의 한계를 극복�
 
 ### Querydsl 환경설정
 
-
+---
 >- org.springframework.boot = 2.6.11
 >- gradle = 7.5 
 
@@ -66,3 +65,36 @@ public class QuerydslConfig {
 
 >- [gradle 환경설정](https://tychejin.tistory.com/388)
 >- [gradle 동작원리](https://kotlinworld.com/321)
+
+### Querydsl 기본 사용
+
+---
+
+1. 프로젝트 빌드를 통해서 생성된 Q클래스를 생성한다.
+   - Q클래스 인스턴스를 사용하는 2가지 방법
+   ```java
+   QMember qMember = new QMember("m");
+   QMember qMember = QMember.member; 
+   ```
+   
+2. JPAQueryFactory를 활용해 질의한다.
+```java
+@Test
+void startQuerydsl() {
+    //insert
+    Member member = new Member("member1");
+    entityManager.persist(member);
+
+    //Querydsl의 Q 타입 사용
+    QMember qMember = QMember.member;
+
+    //JPAQueryFactory를 가져와서 질의
+    JPAQueryFactory query = new JPAQueryFactory(entityManager);
+    Member findMember = query.selectFrom(qMember)
+            .fetchOne();
+
+    Assertions.assertEquals(1, findMember.getId());
+    Assertions.assertEquals("member1", findMember.getUsername());
+
+}
+```

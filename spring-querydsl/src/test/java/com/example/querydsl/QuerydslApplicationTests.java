@@ -1,5 +1,7 @@
 package com.example.querydsl;
 
+import com.example.querydsl.entity.Member;
+import com.example.querydsl.entity.QMember;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,20 +16,24 @@ import javax.persistence.EntityManager;
 class QuerydslApplicationTests {
 
     @Autowired
-    EntityManager em;
+    EntityManager entityManager;
 
     @Test
-    void contextLoads() {
-        Member member = new Member();
-        em.persist(member);
+    void startQuerydsl() {
+        //insert
+        Member member = new Member("member1");
+        entityManager.persist(member);
 
-        JPAQueryFactory query = new JPAQueryFactory(em);
+        //Querydsl의 Q 타입 사용
         QMember qMember = QMember.member;
 
+        //JPAQueryFactory를 가져와서 질의
+        JPAQueryFactory query = new JPAQueryFactory(entityManager);
         Member findMember = query.selectFrom(qMember)
                 .fetchOne();
 
         Assertions.assertEquals(1, findMember.getId());
+        Assertions.assertEquals("member1", findMember.getUsername());
 
     }
 
