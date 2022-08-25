@@ -1,6 +1,8 @@
-package com.example.querydsl.entity;
+package com.example.querydsl.basic;
 
 
+import com.example.querydsl.entity.Member;
+import com.example.querydsl.entity.Team;
 import com.example.querydsl.repository.MemberJpaRepository;
 import com.example.querydsl.repository.TeamJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;

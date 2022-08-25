@@ -1,15 +1,27 @@
-package com.example.querydsl.entity;
+package com.example.querydsl.basic;
 
+import com.example.querydsl.entity.Member;
+import com.example.querydsl.entity.QMember;
+import com.example.querydsl.entity.Team;
 import com.example.querydsl.repository.MemberJpaRepository;
 import com.example.querydsl.repository.TeamJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+
 import java.util.Arrays;
 
-public class PagingQuerydsl {
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+@Transactional
+public class StartQuerydsl {
 
     @Autowired
     JPAQueryFactory queryFactory;
@@ -44,4 +56,27 @@ public class PagingQuerydsl {
 
     }
 
+    @Test
+    public void startJPQL(){
+        String jpql = "select m from Member m where m.username = :username";
+
+        Member findMember = em.createQuery(jpql, Member.class)
+                .setParameter("username", "member1")
+                .getSingleResult();
+
+        assertEquals("member1", findMember.getUsername());
+
+    }
+
+    @Test
+    public void startQuerydsl(){
+        QMember m = QMember.member;
+        Member findMember = queryFactory.select(m)
+                .from(m)
+                .where(m.username.eq("member1"))
+                .fetchOne();
+
+        assertEquals("member1", findMember.getUsername());
+
+    }
 }

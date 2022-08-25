@@ -1,8 +1,10 @@
-package com.example.querydsl.entity;
+package com.example.querydsl.basic;
 
+import com.example.querydsl.entity.Member;
+import com.example.querydsl.entity.QMember;
+import com.example.querydsl.entity.Team;
 import com.example.querydsl.repository.MemberJpaRepository;
 import com.example.querydsl.repository.TeamJpaRepository;
-import com.querydsl.core.NonUniqueResultException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,10 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.example.querydsl.entity.QMember.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class SearchQuerydsl {
+public class PagingQuerydsl {
 
     @Autowired
     JPAQueryFactory queryFactory;
@@ -54,35 +55,19 @@ public class SearchQuerydsl {
 
     }
 
-    /**
-     * 검색 조건은 and, or 를 메서드 체인으로 연결할 수 있다.
-     * JPQL이 제공하는 모든 검색조건을 제공해준다.
-     */
     @Test
-    @DisplayName("and, or 검색조건")
-    public void search1(){
-        Member findMember = queryFactory
+    @DisplayName("페이징 처리")
+    public void paging1(){
+        List<Member> members = queryFactory
                 .selectFrom(member)
-                .where(member.username.eq("member1")
-                        .and(member.age.eq(10)))
-                .fetchOne();
+                .orderBy(member.username.desc())
+                .offset(0)
+                .limit(2)
+                .fetch();
 
-        assertEquals("member1", findMember.getUsername());
+        Assertions.assertEquals(2, members.size());
+        Assertions.assertEquals("member4", members.get(0).getUsername());
+        Assertions.assertEquals("member3", members.get(1).getUsername());
     }
-
-    /**
-     * where에 파라미터로 검색조건을 추가할 수 있다.
-     */
-    @Test
-    @DisplayName("AND 조건을 파라미터러 처리")
-    public void search2(){
-        Member findMember = queryFactory
-                .selectFrom(member)
-                .where(member.username.eq("member1"),member.age.eq(10))
-                .fetchOne();
-
-        assertEquals("member1", findMember.getUsername());
-    }
-
 
 }
