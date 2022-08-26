@@ -98,3 +98,106 @@ void startQuerydsl() {
 
 }
 ```
+
+### 검색 조건 쿼리
+
+---
+
+- 기본적인 검색 쿼리를 제공해준다.
+   ```java
+    qtype.field.eq("")
+    qtype.field.ne("")
+    qtype.field.in("", "", ...)
+    qtype.field.notIn("", "", ...)
+    qtype.field.between("", "")
+    qtype.field.isNotNull()
+    qtype.field.goe("", "") // >=
+    qtype.field.gt("", "") // >=
+    qtype.field.loe("", "") // <=
+    qtype.field.lt("", "") // <
+    qtype.field.like("")  // SQL like문과 동일
+    qtype.field.contains("")  // like문의 '%문자열%'과 동일
+    qtype.field.startWith("") // like문의 '문자열%'과 동일 
+    
+   ```
+- and, or을 활용하여 검색조건을 추가할 수 있다.
+   - 검색 조건은 메서드 체인으로도 연결할 수 있다.
+   ```java
+    Member findMember = queryFactory
+        .selectFrom(member)
+        .where(member.username.eq("member1")
+        .and(member.age.eq(10)))
+        .fetchOne();
+
+   ```
+- where절에 파라미터로 검색조건을 추가하면 and 조건이 추가된다.
+- [연습](./src/test/java/com/example/querydsl/basic/SearchQuerydsl.java)
+
+### 결과 조회
+
+---
+- Querydsl을 통해서 질을한 내용을 단건 또는 리스트로 가져올 수 있다.
+   - fetch()
+     - 리스트 조회, 데이터가 없으면 빈 리스트 반환
+   - fetchOne()
+     - 결과가 없으면 null을 반환
+     - 결과가 둘 이상이면 com.querydsl.core.NonUniqueResultException 에러 발생
+   - fetchFirst()
+     - 가장 최상단의 하나만 조회
+- [연습](./src/test/java/com/example/querydsl/basic/ResultQuerydsl.java)
+
+### 정렬
+
+---
+
+- orderBy()를 활용해 정렬을 할 수 있다.
+   ```java
+    List<Member> members = queryFactory
+        .selectFrom(member)
+        .orderBy(member.username.desc().nullsFirst())
+        .fetch();
+   ```
+- desc(), asc()를 통해서 정렬이 가능하다.
+- nullLast(), nullFirst()를 이용해 null 데이터의 순서를 부여 가능하다.
+- [연습](./src/test/java/com/example/querydsl/basic/SortQuerydsl.java)
+
+### 페이징 처리
+
+---
+
+- offest()과 limit()을 활용하여 페이징처리를 손쉽게 할 수 있다.
+- limit()는 페이지 사이즈이며, offset()은 선택한 페이지이다.
+- offset()의 첫 페이지는 0부터 시작한다.
+
+- [연습](./src/test/java/com/example/querydsl/basic/PagingQuerydsl.java)
+
+### 집합
+
+---
+
+- SQL에서 제공해주는 기본 집합함수를 활용가능하다.
+  - ex) 합계, 카운트, 최소, 최대...
+  ```java
+   List<Tuple> tuples = queryFactory
+        .select(
+            member.count(),
+            member.age.sum(),                        
+            member.age.avg(),
+            member.age.max(),
+            member.age.min()
+        )
+        .from(member)
+        .fetch();
+   ```
+- 그룹화된 결과를 가져와주는 GroupBy()와 그룹화된 결과에 조건을 걸 수 있는 having()을 이용하여 결과를 가져올 수 있다.
+   ```java
+    List<Tuple> tuples = queryFactory
+        .select(team.name, member.age.avg())
+        .from(member)
+        .join(member.team, team)
+        .groupBy(team.name)
+        .having(member.age.avg().gt(30))
+        .fetch();
+   ```
+- [연습](./src/test/java/com/example/querydsl/basic/AggregationQuerydsl.java)
+  
