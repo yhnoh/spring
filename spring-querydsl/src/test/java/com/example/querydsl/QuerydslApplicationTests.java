@@ -21,7 +21,7 @@ class QuerydslApplicationTests {
     @Test
     void startQuerydsl() {
         //insert
-        Member member = new Member("member1");
+        Member member = new Member("member10");
         entityManager.persist(member);
 
         //Querydsl의 Q 타입 사용
@@ -30,10 +30,11 @@ class QuerydslApplicationTests {
         //JPAQueryFactory를 가져와서 질의
         JPAQueryFactory query = new JPAQueryFactory(entityManager);
         Member findMember = query.selectFrom(qMember)
+                .where(qMember.username.eq("member10"))
                 .fetchOne();
 
-        Assertions.assertEquals(1, findMember.getId());
-        Assertions.assertEquals("member1", findMember.getUsername());
+        Assertions.assertNotNull(findMember.getId());
+        Assertions.assertEquals("member10", findMember.getUsername());
 
     }
 

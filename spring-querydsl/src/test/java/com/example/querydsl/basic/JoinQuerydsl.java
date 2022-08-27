@@ -157,7 +157,7 @@ public class JoinQuerydsl {
                 .where(QMember.member.username.eq("member1"))
                 .fetchOne();
 
-        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(team);
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
         assertThat(loaded).isFalse();
     }
 
