@@ -1,4 +1,4 @@
-package com.example.querydsl.entity;
+package com.example.querydsl.entity.dto;
 
 
 import com.querydsl.core.annotations.QueryProjection;

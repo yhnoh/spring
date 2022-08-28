@@ -1,8 +1,11 @@
 package com.example.querydsl.basic;
 
 import com.example.querydsl.entity.*;
-import com.example.querydsl.repository.MemberJpaRepository;
-import com.example.querydsl.repository.TeamJpaRepository;
+import com.example.querydsl.entity.dto.AliasMemberDto;
+import com.example.querydsl.entity.dto.MemberDto;
+import com.example.querydsl.entity.dto.QMemberDto;
+import com.example.querydsl.repository.MemberRepository;
+import com.example.querydsl.repository.TeamRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
@@ -33,29 +36,29 @@ public class ProjectionQuerydsl {
     EntityManager em;
 
     @Autowired
-    MemberJpaRepository memberJpaRepository;
+    MemberRepository memberRepository;
 
     @Autowired
-    TeamJpaRepository teamJpaRepository;
+    TeamRepository teamRepository;
 
 
     @BeforeEach
     public void setup(){
 
-        memberJpaRepository.deleteAll();
-        teamJpaRepository.deleteAll();
+        memberRepository.deleteAll();
+        teamRepository.deleteAll();
 
         Team teamA = new Team("teamA");
         Team teamB = new Team("teamB");
 
-        teamJpaRepository.saveAll(Arrays.asList(teamA, teamB));
+        teamRepository.saveAll(Arrays.asList(teamA, teamB));
 
         Member member1 = new Member("member1", 10, teamA);
         Member member2 = new Member("member2", 20, teamA);
         Member member3 = new Member("member3", 30, teamB);
         Member member4 = new Member("member4", 40, teamB);
 
-        memberJpaRepository.saveAll(Arrays.asList(member1, member2, member3, member4));
+        memberRepository.saveAll(Arrays.asList(member1, member2, member3, member4));
 
     }
 
@@ -102,7 +105,7 @@ public class ProjectionQuerydsl {
     @Test
     @DisplayName("결과를 DTO로 반환 - JPQL을 이용")
     public void jpql_mapping_entity_to_dto(){
-        List<MemberDto> members = em.createQuery("select new com.example.querydsl.projection.MemberDto(m.username, m.age) from Member m", MemberDto.class)
+        List<MemberDto> members = em.createQuery("select new com.example.querydsl.entity.dto.MemberDto(m.username, m.age) from Member m", MemberDto.class)
                 .getResultList();
 
         Assertions.assertThat(members)
@@ -241,7 +244,7 @@ public class ProjectionQuerydsl {
     @DisplayName("결과를 DTO로 반환 - @QueryProjection 활용")
     public void querydsl_mapping_queryprojection_entity_to_dto(){
 
-        List<com.example.querydsl.entity.MemberDto> members = queryFactory
+        List<MemberDto> members = queryFactory
                 .select(new QMemberDto(member.username, member.age))
                 .from(member)
                 .fetch();

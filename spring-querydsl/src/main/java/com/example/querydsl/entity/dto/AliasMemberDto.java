@@ -1,4 +1,4 @@
-package com.example.querydsl.entity;
+package com.example.querydsl.entity.dto;
 
 public class AliasMemberDto {
     private String name;
