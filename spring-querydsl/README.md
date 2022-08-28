@@ -201,3 +201,93 @@ void startQuerydsl() {
    ```
 - [연습](./src/test/java/com/example/querydsl/basic/AggregationQuerydsl.java)
   
+### 조인
+
+---
+
+- Querydsl 조인의 기본 문법은 첫번째 파라미터에 조인 대상을 지정하고, 두 번째 파리머티에 별칭을 사용한다.
+    ```java
+        join(조인 대상, 별칭으로 사용할 Q타입)
+    ```
+- inner join
+    ```java
+        List<Member> members = queryFactory
+                .selectFrom(member)
+                .join(member.team, team)
+                .where(team.name.eq("teamA"))
+                .fetch();
+    
+    ```
+- outer join : left 조인 및 right join 제공해준다.
+    ```java
+        List<Tuple> tuples = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(member.team, team)
+                .fetch();
+    
+    ```  
+- theta join : 연관관계가 없는 필드로 조인
+    ```java
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+    
+        List<Member> members = queryFactory.select(member)
+                .from(member, team)
+                .where(member.username.eq(team.name))
+                .fetch();
+        
+    ```
+- on 절을 활용하여 join절에 필터링을 걸 수 있다.
+    ```java
+        List<Tuple> tuples = queryFactory
+                .select(member, team)
+                .from(member)
+                .join(member.team, team)
+                .on(team.name.eq("teamA"))
+                .fetch();
+    
+    ```
+  - inner join으로 사용할 경우에는 거의 where 절과 동일한 기능으로 제공된다.
+  - 그러므로 inner join을 사용할때는 where절로 해결하는것이 더 코드를 이해하기 쉽다.
+- on절을 이용해 연관관계가 없는 필드로 외부 조인
+    ```java
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+        
+        List<Tuple> tuples = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(team)
+                .on(member.username.eq(team.name))
+                .fetch();
+    ```
+  - 일반 조인과 다르게 on 조인의 경우 leftJoin() 함수 파라미터로 team 엔티티 하나만 들어간다.
+  - on 절을 이용하여 관계없는 필드 끼리 조인을 진행한다.
+- on절을 이용해 연관관계가 있는 필드로 외부 조인
+    ```java
+        List<Tuple> tuples = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(team)
+                .on(member.team.eq(team))
+                .fetch();
+    ```
+  - 일반 조인과 다르게 on 조인의 경우 leftJoin() 함수 파라미터로 team 엔티티 하나만 들어간다.
+  - 일반적인 외부 조인과 동일한 기능을 가진다.
+  - SQL을 자주 사용하던 사람들은 위 형식처럼 사용하는 것이 더 익숙할 수 있다.
+- 페치 조인
+    ```java
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .join(member.team, team).fetchJoin()
+                .where(member.username.eq("member1"))
+                .fetchOne();
+        
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
+        assertThat(loaded).isTrue();
+    ```
+  - 페치조인은 SQL에서 제공해주는 기능이 아니다.
+  - SQL 조인을 활용해서 **연관된 엔티티를 SQL 한번에 조회하는 기능**이다.
+  - join(), leftJoin() 등 조인 기능 뒤에 fetchJoin()이라고 추가하면 된다.
+- [연습](./src/test/java/com/example/querydsl/basic/JoinQuerydsl.java)

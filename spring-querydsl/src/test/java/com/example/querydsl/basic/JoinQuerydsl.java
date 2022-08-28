@@ -101,7 +101,7 @@ public class JoinQuerydsl {
 
     @Test
     @DisplayName("외부 조인 on절 사용하여 대상 필터링")
-    public void outer_join_on(){
+    public void on_outer_join(){
 
         List<Tuple> tuples = queryFactory
                 .select(member, team)
@@ -125,7 +125,7 @@ public class JoinQuerydsl {
      */
     @Test
     @DisplayName("내부 조인 on절 사용하여 대상 필터링")
-    public void inner_join_on(){
+    public void on_inner_join(){
 
         List<Tuple> tuples = queryFactory
                 .select(member, team)
@@ -145,14 +145,59 @@ public class JoinQuerydsl {
     }
 
     @Test
+    @DisplayName("on절 사용하여 연관관계 없는 외부조인하기")
+    public void on_no_relation_inner_join() {
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+
+        List<Tuple> tuples = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(team)
+                .on(member.username.eq(team.name))
+                .fetch();
+
+        assertThat(tuples.size()).isEqualTo(2);
+
+        for (Tuple tuple : tuples) {
+            Member member = tuple.get(QMember.member);
+            Team team = tuple.get(QTeam.team);
+            System.out.println("member = " + member +  ", team = " + team);
+        }
+
+    }
+
+    @Test
+    @DisplayName("on절 사용하여 연관관계 있는 외부조인하기")
+    public void on_relation_inner_join() {
+
+        List<Tuple> tuples = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(team)
+                .on(member.team.eq(team))
+                .fetch();
+
+        assertThat(tuples.size()).isEqualTo(4);
+
+        for (Tuple tuple : tuples) {
+            Member member = tuple.get(QMember.member);
+            Team team = tuple.get(QTeam.team);
+            System.out.println("member = " + member +  ", team = " + team);
+        }
+
+    }
+
+
+    @Test
     @DisplayName("페치 조인 사용안함")
     public void no_fetch_join(){
         em.flush();
         em.clear();
 
         Member findMember = queryFactory
-                .selectFrom(QMember.member)
-                .where(QMember.member.username.eq("member1"))
+                .selectFrom(member)
+                .where(member.username.eq("member1"))
                 .fetchOne();
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
@@ -163,15 +208,15 @@ public class JoinQuerydsl {
      * SQL 조인을 활용하여 연관된 엔티티를 SQL 한번에 조회하는 기능
      */
     @Test
-    @DisplayName("페치 조인 사용안함")
+    @DisplayName("페치 조인")
     public void fetch_join(){
         em.flush();
         em.clear();
 
         Member findMember = queryFactory
-                .selectFrom(QMember.member)
+                .selectFrom(member)
                 .join(member.team, team).fetchJoin()
-                .where(QMember.member.username.eq("member1"))
+                .where(member.username.eq("member1"))
                 .fetchOne();
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
