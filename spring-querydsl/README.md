@@ -15,11 +15,11 @@ Querydsl을 활용하면 JPA 동적쿼리,복잡한 쿼리의 한계를 극복�
 ### Querydsl 환경설정
 
 ---
->- org.springframework.boot = 2.6.11
->- gradle = 7.5 
-
+> - org.springframework.boot = 2.6.11
+>- gradle = 7.5
 
 1. Gradle 환경 설정https://tychejin.tistory.com/388)
+
 ```groovy
 //...
 dependencies {
@@ -45,7 +45,9 @@ clean {
 
 2. Gradle Build 이후 프로젝트에서 ./build/generated/annotationProcessor..내에 Q클래스 생성 확인
 3. Querydsl 빈 객체로 설정하기
+
 ```java
+
 @Configuration
 public class QuerydslConfig {
 
@@ -53,17 +55,17 @@ public class QuerydslConfig {
     private EntityManager em;
 
     @Bean
-    public JPAQueryFactory jpaQueryFactory(){
+    public JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(em);
     }
 }
 ```
+
 - Querydsl을 사용하려면 쿼리를 Build하기 위해서 JPAQueryFactory가 필요하다.
 - Querydsl을 사용면 EntityManager를 통해서 질의를 한다.
 - JPAQueryFactory를 bean으로 등록한 이유는 repository에서 필요할때마다 생성해서 쓰는게 아니라 바로 가져와서 사용한다.
 
-
->- [gradle 환경설정](https://tychejin.tistory.com/388)
+> - [gradle 환경설정](https://tychejin.tistory.com/388)
 >- [gradle 동작원리](https://kotlinworld.com/321)
 
 ### Querydsl 기본 사용
@@ -71,32 +73,33 @@ public class QuerydslConfig {
 ---
 
 1. 프로젝트 빌드를 통해서 생성된 Q클래스를 생성한다.
-   - Q클래스 인스턴스를 사용하는 2가지 방법
+	- Q클래스 인스턴스를 사용하는 2가지 방법
    ```java
    QMember qMember = new QMember("m");
    QMember qMember = QMember.member; 
    ```
-   
+
 2. JPAQueryFactory를 활용해 질의한다.
+
 ```java
 @Test
-void startQuerydsl() {
-    //insert
-    Member member = new Member("member1");
-    entityManager.persist(member);
+void startQuerydsl(){
+        //insert
+        Member member=new Member("member1");
+        entityManager.persist(member);
 
-    //Querydsl의 Q 타입 사용
-    QMember qMember = QMember.member;
+        //Querydsl의 Q 타입 사용
+        QMember qMember=QMember.member;
 
-    //JPAQueryFactory를 가져와서 질의
-    JPAQueryFactory query = new JPAQueryFactory(entityManager);
-    Member findMember = query.selectFrom(qMember)
-            .fetchOne();
+        //JPAQueryFactory를 가져와서 질의
+        JPAQueryFactory query=new JPAQueryFactory(entityManager);
+        Member findMember=query.selectFrom(qMember)
+        .fetchOne();
 
-    Assertions.assertEquals(1, findMember.getId());
-    Assertions.assertEquals("member1", findMember.getUsername());
+        Assertions.assertEquals(1,findMember.getId());
+        Assertions.assertEquals("member1",findMember.getUsername());
 
-}
+        }
 ```
 
 ### 검색 조건 쿼리
@@ -121,7 +124,7 @@ void startQuerydsl() {
     
    ```
 - and, or을 활용하여 검색조건을 추가할 수 있다.
-   - 검색 조건은 메서드 체인으로도 연결할 수 있다.
+	- 검색 조건은 메서드 체인으로도 연결할 수 있다.
    ```java
     Member findMember = queryFactory
         .selectFrom(member)
@@ -136,14 +139,15 @@ void startQuerydsl() {
 ### 결과 조회
 
 ---
+
 - Querydsl을 통해서 질을한 내용을 단건 또는 리스트로 가져올 수 있다.
-   - fetch()
-     - 리스트 조회, 데이터가 없으면 빈 리스트 반환
-   - fetchOne()
-     - 결과가 없으면 null을 반환
-     - 결과가 둘 이상이면 com.querydsl.core.NonUniqueResultException 에러 발생
-   - fetchFirst()
-     - 가장 최상단의 하나만 조회
+	- fetch()
+		- 리스트 조회, 데이터가 없으면 빈 리스트 반환
+	- fetchOne()
+		- 결과가 없으면 null을 반환
+		- 결과가 둘 이상이면 com.querydsl.core.NonUniqueResultException 에러 발생
+	- fetchFirst()
+		- 가장 최상단의 하나만 조회
 - [연습](./src/test/java/com/example/querydsl/basic/ResultQuerydsl.java)
 
 ### 정렬
@@ -176,7 +180,7 @@ void startQuerydsl() {
 ---
 
 - SQL에서 제공해주는 기본 집합함수를 활용가능하다.
-  - ex) 합계, 카운트, 최소, 최대...
+	- ex) 합계, 카운트, 최소, 최대...
   ```java
    List<Tuple> tuples = queryFactory
         .select(
@@ -200,7 +204,7 @@ void startQuerydsl() {
         .fetch();
    ```
 - [연습](./src/test/java/com/example/querydsl/basic/AggregationQuerydsl.java)
-  
+
 ### 조인
 
 ---
@@ -248,8 +252,8 @@ void startQuerydsl() {
                 .fetch();
     
     ```
-  - inner join으로 사용할 경우에는 거의 where 절과 동일한 기능으로 제공된다.
-  - 그러므로 inner join을 사용할때는 where절로 해결하는것이 더 코드를 이해하기 쉽다.
+	- inner join으로 사용할 경우에는 거의 where 절과 동일한 기능으로 제공된다.
+	- 그러므로 inner join을 사용할때는 where절로 해결하는것이 더 코드를 이해하기 쉽다.
 - on절을 이용해 연관관계가 없는 필드로 외부 조인
     ```java
         em.persist(new Member("teamA"));
@@ -262,8 +266,8 @@ void startQuerydsl() {
                 .on(member.username.eq(team.name))
                 .fetch();
     ```
-  - 일반 조인과 다르게 on 조인의 경우 leftJoin() 함수 파라미터로 team 엔티티 하나만 들어간다.
-  - on 절을 이용하여 관계없는 필드 끼리 조인을 진행한다.
+	- 일반 조인과 다르게 on 조인의 경우 leftJoin() 함수 파라미터로 team 엔티티 하나만 들어간다.
+	- on 절을 이용하여 관계없는 필드 끼리 조인을 진행한다.
 - on절을 이용해 연관관계가 있는 필드로 외부 조인
     ```java
         List<Tuple> tuples = queryFactory
@@ -273,9 +277,9 @@ void startQuerydsl() {
                 .on(member.team.eq(team))
                 .fetch();
     ```
-  - 일반 조인과 다르게 on 조인의 경우 leftJoin() 함수 파라미터로 team 엔티티 하나만 들어간다.
-  - 일반적인 외부 조인과 동일한 기능을 가진다.
-  - SQL을 자주 사용하던 사람들은 위 형식처럼 사용하는 것이 더 익숙할 수 있다.
+	- 일반 조인과 다르게 on 조인의 경우 leftJoin() 함수 파라미터로 team 엔티티 하나만 들어간다.
+	- 일반적인 외부 조인과 동일한 기능을 가진다.
+	- SQL을 자주 사용하던 사람들은 위 형식처럼 사용하는 것이 더 익숙할 수 있다.
 - 페치 조인
     ```java
         Member findMember = queryFactory
@@ -287,9 +291,9 @@ void startQuerydsl() {
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
         assertThat(loaded).isTrue();
     ```
-  - 페치조인은 SQL에서 제공해주는 기능이 아니다.
-  - SQL 조인을 활용해서 **연관된 엔티티를 SQL 한번에 조회하는 기능**이다.
-  - join(), leftJoin() 등 조인 기능 뒤에 fetchJoin()이라고 추가하면 된다.
+	- 페치조인은 SQL에서 제공해주는 기능이 아니다.
+	- SQL 조인을 활용해서 **연관된 엔티티를 SQL 한번에 조회하는 기능**이다.
+	- join(), leftJoin() 등 조인 기능 뒤에 fetchJoin()이라고 추가하면 된다.
 - [연습](./src/test/java/com/example/querydsl/basic/JoinQuerydsl.java)
 
 ### 서브 쿼리
@@ -327,9 +331,9 @@ void startQuerydsl() {
 - com.querydsl.jpa.JPAExpressions를 사용한다.
 - JPQL은 from절의 서브쿼리를 지원하지 않는다. 그러므로 Querydsl도 지원하지 않는다.
 - from 절의 서브쿼리 해결 방안
-  1. 서브쿼리를 join으로 변경한다. (가능한 상황도 있고 불가능한 상황도 있다. )
-  2. 애플리케이션에서 쿼리를 2번 분리한다.
-  3. nativeSQL을 사용한다.
+	1. 서브쿼리를 join으로 변경한다. (가능한 상황도 있고 불가능한 상황도 있다. )
+	2. 애플리케이션에서 쿼리를 2번 분리한다.
+	3. nativeSQL을 사용한다.
 - [연습](./src/test/java/com/example/querydsl/basic/SubQuerydsl.java)
 
 ### Case문
@@ -357,7 +361,7 @@ void startQuerydsl() {
             .fetch();
   ```
 - case문을 활용하여 우선순위 정하기
-  - orderBy절을 활용한다.
+	- orderBy절을 활용한다.
   ```java
     NumberExpression<Integer> ageRank = new CaseBuilder()
             .when(member.age.between(0, 20)).then(2)
@@ -373,4 +377,129 @@ void startQuerydsl() {
 - [연습](./src/test/java/com/example/querydsl/basic/CaseQuerydsl.java)
 
 ### Querydsl 함수 활용
+
 ---
+
+- com.querydsl.core.types.dsl.Expressions 을 활용하여 Q타입내에서의 필드가 아닌, 자체 필드를 구성할 수 있다.
+	- select 절에 상수 사용
+  ```java
+    Tuple tuple = queryFactory
+            .select(member.username, Expressions.constant("A"))
+            .from(member)
+            .fetchFirst();
+  ```
+- Q타입 필드를 활용하여 내장 함수를 사용할 수 있다.
+	- 문자열 더하기
+  ```java
+  String username = queryFactory
+          .select(member.username.concat("_").concat(member.age.stringValue()))
+          .from(member)
+          .where(member.username.eq("member1"))
+          .fetchOne();
+  
+  ```
+- [연습](./src/test/java/com/example/querydsl/basic/FunctionQuerydsl.java)
+
+### 프로젝션 : select 대상 지정
+
+---
+
+- 프로젝션 대상이 하나면 타입을 명확하게 지정하여 반환할 수 있다.
+- 프로젝션 대상이 둘 이상이면 튜플이나 DTO로 반환할 수 있다.
+- 프로젝션 대상이 하나일 경우
+  ```java
+    List<String> usernames = queryFactory
+            .select(member.username)
+            .from(member)
+            .fetch();
+  ```
+- 프로젝션 대상이 둘 이상일 때 튜플로 반환
+  ```java
+    List<Tuple> tuples = queryFactory
+            .select(member.username, member.age)
+            .from(member)
+            .fetch();
+    
+    for (Tuple tuple : tuples) {
+        String username = tuple.get(member.username);
+        Integer age = tuple.get(member.age);
+    
+        System.out.println("username = " + username + ", age = " + age);
+    }
+  
+  ```
+- 순수 JPA를 이용하여 DTO를 반환
+
+  ```jpaql
+    select new com.example.querydsl.entity.dto.MemberDto(m.username, m.age) from Member m
+  ```
+
+	- 패키지 명을 다 적어줘야 하기 때문에 불편하다.
+	- 생성자 방식만 지원한다.
+- Querydsl를 이용하여 DTO로 반환
+	1. 프로퍼티 접근
+		- DTO 클래스의 setter 메소드를 활용하여 DTO를 반환한다.
+		- 기본 생성자 필요
+		- setter 메서드를 이용할때는 dto 필드와 entity 필드가 일치해야한다.
+	   ```java
+		  List<MemberDto> members = queryFactory
+				  .select(Projections.bean(MemberDto.class,
+						  member.username,
+						  member.age
+				  ))
+				  .from(member)
+				  .fetch();
+	   ```
+	2. 필드 직접 접근
+		- DTO클래스의 필드를 활용하여 DTO를 반환한다.
+		- dto 필드와 entity 필드가 일치해야한다.
+	   ```java
+		List<MemberDto> members = queryFactory
+			.select(Projections.fields(MemberDto.class,
+					member.username,
+					member.age
+			))
+			.from(member)
+			.fetch();
+	   ```
+	3. dto 필드와 entity 필드가 다를 때 별칭 사용
+		- 별칭을 사용하여 필드명을 일치시킨다.
+		- 별칭은 `필드.as(alias)`, `ExpressionUtils.as(source, alias)`를 활용한다.
+        ```java
+        QMember memberSub = new QMember("memberSub");
+        List<AliasMemberDto> members = queryFactory
+                .select(Projections.fields(AliasMemberDto.class,
+                        member.username.as("name"),
+                        ExpressionUtils.as(
+                                JPAExpressions.select(memberSub.age.max())
+                                        .from(memberSub)
+                                ,"age"
+                        )
+                ))
+                .from(member)
+                .fetch();
+        ```
+  4. 생성자 사용
+      - 생성자를 사용해 DTO로 반환할 수 있다.
+      - 생성자 위치와 타입이 동일해야한다.
+      ```java
+      List<MemberDto> members = queryFactory
+              .select(Projections.constructor(MemberDto.class,
+                      member.username,
+                      member.age
+              ))
+              .from(member)
+              .fetch();
+      ```
+  5. @QueryProjection 활용
+      - DTO 생성자에 @QueryProjection 어노테이션 추가한다.
+      - maven 또는 gradle을 통해서 build하여 Q타입의 DTO를 생성한다.
+      ```java
+        List<MemberDto> members = queryFactory
+                .select(new QMemberDto(member.username, member.age))
+                .from(member)
+                .fetch();
+
+      ```
+      - 타입 체크를 할 수 있는 가장 안전한 방법이다.
+      - 다만 DTO에 Querydsl 어노테이션을 유지해야하는 점과 DTO까지 Q파일을 생성해야하는 단점이 있다.
