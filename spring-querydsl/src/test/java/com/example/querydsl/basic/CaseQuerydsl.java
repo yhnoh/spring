@@ -81,13 +81,12 @@ public class CaseQuerydsl {
     @Test
     @DisplayName("case문 - CaseBuilder 사용")
     public void complex_case_query(){
-        StringExpression ageCase = new CaseBuilder()
-                .when(member.age.between(0, 20)).then("0~20살")
-                .when(member.age.between(21, 30)).then("21~30살")
-                .otherwise("기타");
 
         List<String> list = queryFactory
-                .select(ageCase)
+                .select(new CaseBuilder()
+                        .when(member.age.between(0, 20)).then("0~20살")
+                        .when(member.age.between(21, 30)).then("21~30살")
+                        .otherwise("기타"))
                 .from(member)
                 .fetch();
 

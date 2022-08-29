@@ -291,3 +291,86 @@ void startQuerydsl() {
   - SQL 조인을 활용해서 **연관된 엔티티를 SQL 한번에 조회하는 기능**이다.
   - join(), leftJoin() 등 조인 기능 뒤에 fetchJoin()이라고 추가하면 된다.
 - [연습](./src/test/java/com/example/querydsl/basic/JoinQuerydsl.java)
+
+### 서브 쿼리
+
+---
+
+- where 절에 서브쿼리 사용
+  ```java
+    QMember memberSub = new QMember("memberSub");
+    
+    List<Member> members = queryFactory
+            .selectFrom(member)
+            .where(member.age.eq(
+                    JPAExpressions
+                            .select(memberSub.age.max())
+                            .from(memberSub)
+            ))
+            .fetch();
+  
+  ```
+- select 절에 서브쿼리 사용
+  ```java
+    QMember memberSub = new QMember("memberSub");
+    
+    List<Tuple> tuples = queryFactory
+            .select(member.username,
+                    JPAExpressions
+                            .select(memberSub.age.avg())
+                            .from(memberSub)
+            )
+            .from(member)
+            .fetch();
+  
+  ```
+- com.querydsl.jpa.JPAExpressions를 사용한다.
+- JPQL은 from절의 서브쿼리를 지원하지 않는다. 그러므로 Querydsl도 지원하지 않는다.
+- from 절의 서브쿼리 해결 방안
+  1. 서브쿼리를 join으로 변경한다. (가능한 상황도 있고 불가능한 상황도 있다. )
+  2. 애플리케이션에서 쿼리를 2번 분리한다.
+  3. nativeSQL을 사용한다.
+- [연습](./src/test/java/com/example/querydsl/basic/SubQuerydsl.java)
+
+### Case문
+
+---
+
+- Q타입 클래스 필드를 활용한 case문
+  ```java
+    List<String> list = queryFactory
+            .select(member.age
+                    .when(10).then("열살")
+                    .when(20).then("스무살")
+                    .otherwise("기타"))
+            .from(member)
+            .fetch();
+  ```
+- CaseBuilder를 활용한 case문 활용
+  ```java
+    List<String> list = queryFactory
+            .select(new CaseBuilder()
+                    .when(member.age.between(0, 20)).then("0~20살")
+                    .when(member.age.between(21, 30)).then("21~30살")
+                    .otherwise("기타"))
+            .from(member)
+            .fetch();
+  ```
+- case문을 활용하여 우선순위 정하기
+  - orderBy절을 활용한다.
+  ```java
+    NumberExpression<Integer> ageRank = new CaseBuilder()
+            .when(member.age.between(0, 20)).then(2)
+            .when(member.age.between(21, 30)).then(1)
+            .otherwise(3);
+    
+    List<Tuple> tuples = queryFactory
+            .select(member.username, member.age, ageRank)
+            .from(member)
+            .orderBy(ageRank.desc())
+            .fetch();
+  ```
+- [연습](./src/test/java/com/example/querydsl/basic/CaseQuerydsl.java)
+
+### Querydsl 함수 활용
+---
