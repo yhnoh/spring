@@ -503,3 +503,4 @@ void startQuerydsl(){
       ```
       - 타입 체크를 할 수 있는 가장 안전한 방법이다.
       - 다만 DTO에 Querydsl 어노테이션을 유지해야하는 점과 DTO까지 Q파일을 생성해야하는 단점이 있다.
+- [연습](./src/test/java/com/example/querydsl/basic/ProjectionQuerydsl.java)
