@@ -20,7 +20,7 @@ import static com.example.querydsl.entity.QTeam.team;
 import static org.springframework.util.StringUtils.hasText;
 
 @RequiredArgsConstructor
-public class MemberRepositoryImpl implements MemberRepositoryCustom {
+public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override

@@ -504,3 +504,98 @@ void startQuerydsl(){
       - 타입 체크를 할 수 있는 가장 안전한 방법이다.
       - 다만 DTO에 Querydsl 어노테이션을 유지해야하는 점과 DTO까지 Q파일을 생성해야하는 단점이 있다.
 - [연습](./src/test/java/com/example/querydsl/basic/ProjectionQuerydsl.java)
+
+### 동적 쿼리
+
+---
+
+- 검색을 할때 어떤 조건을 검색을 하거나 일부분은 필터링하고 검색하는 동적 쿼리가 필요하다.
+
+- BooleanBuilder를 활용한 동적 쿼리
+    ```java
+    String usernameParam = "member1";
+    Integer ageParam = 10;
+    
+    BooleanBuilder builder = new BooleanBuilder();
+    if(usernameParam != null){
+        builder.and(member.username.eq(usernameParam));
+    }
+    
+    if(ageParam != null){
+        builder.and(member.age.eq(ageParam));
+    }
+    
+    List<Member> findMembers = queryFactory.selectFrom(member)
+            .where(builder)
+            .fetch();
+    ```
+    - `com.querydsl.core.BooleanBuilder`에 or절이나 and절 등을 활용하여 조건을 추가 삭제하 수 있다. 
+
+- 다중 파라미터를 이용한 where절 동적 쿼리
+    ```java
+    String usernameParam = "member1";
+    Integer ageParam = 10;
+    
+    BooleanExpression usernameEq = usernameParam != null ? member.username.eq(usernameParam) : null;
+    BooleanExpression ageEq = ageParam != null ? member.age.eq(ageParam) : null;
+    
+    List<Member> findMembers = queryFactory.selectFrom(member)
+            .where(usernameEq, ageEq)
+            .fetch();
+    ```
+    - where 조건에 null 값은 무시하는 것을 활용하여 동적 쿼리를 사용할 수 있다.
+    - BooleanExpression을 메소드로 추출하여 재활용을 할 수 있다.
+    - 메소드 추출을 통하여 메소드에 네이밍을 줄 수 있으니 쿼리 자체에 대한 가독성이 높아진다.
+    - 추출한 메소드들 끼리 and, or.. 메소드 체이닝을 통해서 조합이 가능하다.
+
+### 사용자 정의 repository
+
+---
+
+- 사용자 정의 repository는 기존 Spring data JPA repository에 사용자가 직접 기능을 추가할 수 있는 기능이다.
+- 사용자 정의 레파지토리 만들기
+    1. 사용자 정의 repository 인터페이스 만들기 및 구현 메소드 선언
+        ```java
+        public interface MemberRepositoryCustom {
+        
+            List<MemberTeamDto> searchByBuilder(MemberSearchCondition condition);
+        
+            List<MemberTeamDto> searchByParameters(MemberSearchCondition condition);
+        
+            Page<MemberTeamDto> searchPaging(MemberSearchCondition condition, Pageable pageable);
+        }
+        ```
+    2. 사용자 정의 repository 구현체 만들기
+        ```java
+        @RequiredArgsConstructor
+        public class MemberRepositoryImpl implements MemberRepositoryCustom {
+            private final JPAQueryFactory queryFactory;
+        
+            List<MemberTeamDto> searchByBuilder(MemberSearchCondition condition){
+                //...
+            }
+        
+            List<MemberTeamDto> searchByParameters(MemberSearchCondition condition){
+                //...
+            }
+        
+            Page<MemberTeamDto> searchPaging(MemberSearchCondition condition, Pageable pageable){
+                //...
+            }
+            
+        }
+        ```
+        - 사용자 정의 repository의 구현체 이름은 `사용자 정의 repository + Impl`로 해준다.
+        - 메서드를 오버라이딩 한 이후 기능을 구현한다.
+    
+  3. JpaRepository 인터페이스에 상속받은 인터페이스에 같이 상속해준다.
+      ```java
+      public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+      }
+      ```
+  > 사용자 정의 repository를 기존 **JPA rpository에 추가하여 하고자 하는 로직(JPA, Querydsl, Mybatis)을 분리함과 동시에 인터페이스 하나로 통합하여 사용**할 수 있는 장점이 있다.  
+  > 하지만 Querydsl이 필요한 경우는 보통 복잡한 쿼리, 비지니스 로직을 위한 쿼리, 화면을 위한 쿼리등 매우 복잡한 쿼리를 활용하는 경우가 많다.  
+  > **특히 화면을 위한 쿼리는 화면이 변경되면 쿼리도 변경해야하고, 화면을 위한 기능도 많아지니 하나의 repository에 통합되어 있을 경우 해당 repository를 더 복잡하게 할 수 있다.**  
+  > 따라서 항상 사용자 정의 repository를 통해 구현해야할 필요는 없다.
+-[연습](./src/main/java/com/example/querydsl/repository)
+
