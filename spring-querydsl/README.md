@@ -175,6 +175,46 @@ void startQuerydsl(){
 
 - [연습](./src/test/java/com/example/querydsl/basic/PagingQuerydsl.java)
 
+
+- org.springframework.data.support.PageableExecutionUtils를 활용한 페이징 처리
+    ```java
+    @Override
+    public Page<MemberTeamDto> searchPaging(MemberSearchCondition condition, Pageable pageable){
+	
+        List<MemberTeamDto> contents = selectQuery(condition
+                ,new QMemberTeamDto(
+                        member.id,
+                        member.username,
+                        member.age,
+                        team.id,
+                        team.name
+                ))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+	
+        JPAQuery<Long> countQuery = selectQuery(condition, member.count());
+	
+        return PageableExecutionUtils.getPage(contents, pageable, countQuery::fetchOne);
+    }
+	
+    private <T> JPAQuery<T> selectQuery(MemberSearchCondition condition, Expression<T> expression) {
+            return queryFactory
+            .select(expression)
+            .from(member)
+            .leftJoin(member.team, team)
+            .where(usernameEq(condition.getUsername()),
+            teamNameEq(condition.getTeamName()),
+            ageGoe(condition.getAgeGoe()),
+            ageLoe(condition.getAgeLoe())
+            );
+    }
+    ```
+- `PageableExecutionUtils`를 활용해서 `Page`객체로 반환할 수 있다.
+- `Page`를 반환하기 때문에 `paging.getTotalPages()` 함수를 실행하면 카운팅 쿼리가 실행된다.
+- 페이징 처리에서 카운팅 쿼리가 필요하지 않은 경우도 있기 때문에, 성능 최적화에 활용할 수 있다.
+- [연습](./src/test/java/com/example/querydsl/repository/MemberJpaRepositoryTest.java)
+
 ### 집합
 
 ---
@@ -597,5 +637,5 @@ void startQuerydsl(){
   > 하지만 Querydsl이 필요한 경우는 보통 복잡한 쿼리, 비지니스 로직을 위한 쿼리, 화면을 위한 쿼리등 매우 복잡한 쿼리를 활용하는 경우가 많다.  
   > **특히 화면을 위한 쿼리는 화면이 변경되면 쿼리도 변경해야하고, 화면을 위한 기능도 많아지니 하나의 repository에 통합되어 있을 경우 해당 repository를 더 복잡하게 할 수 있다.**  
   > 따라서 항상 사용자 정의 repository를 통해 구현해야할 필요는 없다.
--[연습](./src/main/java/com/example/querydsl/repository)
+- [연습](./src/main/java/com/example/querydsl/repository)
 
