@@ -32,15 +32,21 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:$lombok_version"
 }
 //4. 빌드 시 test -> asciidoctor -> bootJar 순으로 실행
-tasks.named('test') {
+test {
     outputs.dir snippetsDir
     useJUnitPlatform()
 }
 
-tasks.named('asciidoctor') {
+asciidoctor {
     inputs.dir snippetsDir
     dependsOn test
 }
+
+// static/docs 폴더 비우기
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
 
 //5. gradle build 시 ${asciidoctor.outputDir}/html5로 부터 static/docs에 html 파일이 생성
 bootJar {

@@ -10,21 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MemberController.class)
@@ -50,6 +41,7 @@ public class MemberDocumentTest {
 
         ResultActions perform = mockMvc.perform(post("/v1/members")
                         .contentType(MediaType.APPLICATION_JSON)
+
                 .content(objectMapper.writeValueAsString(memberJoinRequest)));
 
         perform.andExpect(status().isOk())
@@ -60,6 +52,7 @@ public class MemberDocumentTest {
                                 fieldWithPath("password").description("패스워드")
                         ),
                         responseFields(
+                                beneathPath("data").withSubsectionId("data"),
                                 fieldWithPath("userId").description("회원 ID"),
                                 fieldWithPath("username").description("회원 이름")
                         )

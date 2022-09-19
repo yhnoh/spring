@@ -1,7 +1,9 @@
 package com.example.springrestdocs.common;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public class CustomResponse<T> {
     private int status;
     private T data;
