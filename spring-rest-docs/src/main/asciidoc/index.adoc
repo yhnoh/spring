@@ -1,0 +1,14 @@
+= index
+:dcotype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+:docinfo: shared-head
+
+include::{snippets}/common/response/common-response-fields.adoc[]
+
+[[API-List]]
+== APIs
+=== MemberAPI
