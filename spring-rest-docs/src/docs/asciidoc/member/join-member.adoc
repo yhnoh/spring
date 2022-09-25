@@ -1,0 +1,36 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+= 회원가입
+
+=== request
+include::{snippets}/member-document-test/join-member/http-request.adoc[]
+
+===== request-fields
+include::{snippets}/member-document-test/join-member/request-fields.adoc[]
+
+=== response
+include::{snippets}/member-document-test/join-member/http-response.adoc[]
+
+===== response-fields
+include::{snippets}/member-document-test/join-member/request-fields.adoc[]
+
+
+////
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+////
+
+
+
+//include::{snippets}/common/response/common-response-fields.adoc[]
+
+

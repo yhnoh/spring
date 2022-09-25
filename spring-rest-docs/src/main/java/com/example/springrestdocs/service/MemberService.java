@@ -4,7 +4,7 @@ import com.example.springrestdocs.entity.Member;
 import com.example.springrestdocs.repository.MemberRepository;
 import com.example.springrestdocs.request.MemberChangePasswordRequest;
 import com.example.springrestdocs.request.MemberJoinRequest;
-import com.example.springrestdocs.response.MemberJoinResponse;
+import com.example.springrestdocs.response.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public MemberJoinResponse joinMember(MemberJoinRequest request){
+    public MemberResponse joinMember(MemberJoinRequest request){
 
         Optional<Member> findMember = memberRepository.findOne(request.getUserId());
         if(findMember.isPresent()){
@@ -33,11 +33,10 @@ public class MemberService {
 
         memberRepository.save(joinMember);
 
-        return MemberJoinResponse.builder()
+        return MemberResponse.builder()
                  .userId(joinMember.getUserId())
                  .username(joinMember.getUsername())
                  .build();
-
     }
 
     public boolean deleteMember(String userId, String password){
@@ -66,23 +65,23 @@ public class MemberService {
         return true;
     }
 
-    public List<MemberJoinResponse> findMembers(){
+    public List<MemberResponse> findMembers(){
         return memberRepository.findAll().stream()
-                .map(member -> MemberJoinResponse.builder()
+                .map(member -> MemberResponse.builder()
                         .userId(member.getUserId())
                         .username(member.getUsername())
                         .build())
                 .collect(Collectors.toList());
     }
 
-    public MemberJoinResponse findMember(String userId){
+    public MemberResponse findMember(String userId){
         Optional<Member> findMember = memberRepository.findOne(userId);
         if(!findMember.isPresent()){
             return null;
         }
 
         Member member = findMember.get();
-        return MemberJoinResponse.builder()
+        return MemberResponse.builder()
                 .userId(member.getUserId())
                 .username(member.getUsername())
                 .build();

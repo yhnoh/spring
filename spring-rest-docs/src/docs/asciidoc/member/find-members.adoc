@@ -1,0 +1,20 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+= 회원 전체 조회
+
+=== request
+include::{snippets}/member-document-test/find-members/http-request.adoc[]
+
+=== response
+include::{snippets}/member-document-test/find-members/http-response.adoc[]
+
+===== response-fields
+include::{snippets}/member-document-test/find-members/response-fields-data.adoc[]

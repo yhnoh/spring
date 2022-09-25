@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-public class MemberJoinResponse {
+public class MemberResponse {
     private String userId;
     private String username;
 }

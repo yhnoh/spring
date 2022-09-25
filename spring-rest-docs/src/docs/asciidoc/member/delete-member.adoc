@@ -1,0 +1,23 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+= 회원 삭제
+
+=== request
+include::{snippets}/member-document-test/delete-member/http-request.adoc[]
+
+===== request-path-parameters
+include::{snippets}/member-document-test/delete-member/path-parameters.adoc[]
+
+===== request-parameters
+include::{snippets}/member-document-test/delete-member/request-parameters.adoc[]
+
+=== response
+include::{snippets}/member-document-test/delete-member/http-response.adoc[]

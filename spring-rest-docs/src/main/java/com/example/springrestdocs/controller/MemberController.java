@@ -3,7 +3,7 @@ package com.example.springrestdocs.controller;
 import com.example.springrestdocs.common.CustomResponse;
 import com.example.springrestdocs.request.MemberJoinRequest;
 import com.example.springrestdocs.request.MemberChangePasswordRequest;
-import com.example.springrestdocs.response.MemberJoinResponse;
+import com.example.springrestdocs.response.MemberResponse;
 import com.example.springrestdocs.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,18 +18,19 @@ public class MemberController {
     public final MemberService memberService;
 
     @GetMapping
-    public CustomResponse<List<MemberJoinResponse>> findMembers(){
+    public CustomResponse<List<MemberResponse>> findMembers(){
         return CustomResponse.success(memberService.findMembers());
     }
 
     @GetMapping("/{userId}")
-    public CustomResponse<MemberJoinResponse> findMember(@PathVariable String userId){
+    public CustomResponse<MemberResponse> findMember(@PathVariable String userId){
         return CustomResponse.success(memberService.findMember(userId));
     }
 
     @PostMapping
-    public CustomResponse<MemberJoinResponse> joinMember(@RequestBody MemberJoinRequest memberJoinRequest){
-        return CustomResponse.success(memberService.joinMember(memberJoinRequest));
+    public CustomResponse<MemberResponse> joinMember(@RequestBody MemberJoinRequest memberJoinRequest){
+        MemberResponse data = memberService.joinMember(memberJoinRequest);
+        return CustomResponse.success(data);
     }
 
     @PutMapping("/{userId}")
@@ -42,12 +43,5 @@ public class MemberController {
         return CustomResponse.success(memberService.deleteMember(userId, password));
     }
 
-//    @PostMapping
-//    public MemberJoinResponse joinMember(@RequestBody MemberJoinRequest memberJoinRequest){
-//        return MemberJoinResponse.builder()
-//                .userId(memberJoinRequest.getUsername())
-//                .username(memberJoinRequest.getUsername())
-//                .build();
-//    }
 
 }
