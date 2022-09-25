@@ -1,0 +1,2 @@
+- [@Scheduled를 활용한 Spring Scheduler](https://velog.io/@kimh4nkyul/Scheduled%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-Spring-Scheduler)
+- [Spring Scheduler](https://data-make.tistory.com/699)
