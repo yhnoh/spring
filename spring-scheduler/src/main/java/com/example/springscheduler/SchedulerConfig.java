@@ -10,6 +10,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 public class SchedulerConfig implements SchedulingConfigurer {
 
     private static final int POOL_SIZE = 10;
+
     private ThreadPoolTaskScheduler threadPoolTaskScheduler(){
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(POOL_SIZE);

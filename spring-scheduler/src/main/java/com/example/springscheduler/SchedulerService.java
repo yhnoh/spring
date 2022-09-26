@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Component
-@EnableScheduling
 public class SchedulerService {
 
     private String now(){
