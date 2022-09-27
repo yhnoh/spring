@@ -1,13 +1,15 @@
 package com.example.springscheduler;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
+import java.util.concurrent.Executor;
+
 @Configuration
-public class SchedulerConfig implements SchedulingConfigurer {
+public class SchedulerConfig implements SchedulingConfigurer, AsyncConfigurer {
 
     private static final int POOL_SIZE = 10;
 
@@ -17,6 +19,11 @@ public class SchedulerConfig implements SchedulingConfigurer {
         scheduler.setThreadNamePrefix("SCHEDULER-");
         scheduler.initialize();
         return scheduler;
+    }
+
+    @Override
+    public Executor getAsyncExecutor() {
+        return this.threadPoolTaskScheduler();
     }
 
     @Override

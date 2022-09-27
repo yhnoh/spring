@@ -1,6 +1,7 @@
-package com.example.springscheduler;
+package com.example.springscheduler.basic;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
-@Component
 public class SchedulerService {
 
     private String now(){
@@ -19,11 +19,10 @@ public class SchedulerService {
     // fixedRate : 작업의 시작부터 시간을 카운트
     // 단위 : ms
     @Scheduled(fixedRate = 1000)
-    public void fixedRateScheduler(){
+    public void fixedRateScheduler() throws InterruptedException {
         log.info("fixedRate now = {}", now());
     }
 
-/*
     @Scheduled(fixedDelay = 1000)
     public void fixedDelayScheduler(){
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -36,7 +35,6 @@ public class SchedulerService {
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         log.info("cron now = {}", now);
     }
-*/
 }
 
 
