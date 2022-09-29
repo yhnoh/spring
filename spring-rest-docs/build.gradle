@@ -1,8 +1,8 @@
 plugins {
     id 'org.springframework.boot' version '2.7.3'
     id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+    //gradle 7 부터는 'org.asciidoctor.convert'이 아닌 org.asciidoctor.jvm.convert 사용
     id "org.asciidoctor.jvm.convert" version "3.3.2"
-//    id 'org.asciidoctor.convert' version '1.5.8' //1. AsciiDoc 파일을 컨버팅하고 Build 폴더에 복사하기 위한 플러그인
     id 'java'
 }
 
@@ -28,7 +28,7 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    //3. mockmvc 를 restdocs 에 사용할수 있게 하는 라이브러리
+    //3. mockmvc를 통해서 rest-docs 작성하기 위한 라이브러리
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
     compileOnly "org.projectlombok:lombok:$lombok_version"
@@ -37,38 +37,44 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:$lombok_version"
 }
 
-//4. 빌드 시 test -> asciidoctor -> bootJar 순으로 실행
+// test -> asciidoctor -> bootJar
+
+// 4. 스니펫(Snippet)저장경로(build/generated-snippets)에 JunitTest 처리를 실행
 test {
     outputs.dir snippetsDir
     useJUnitPlatform()
 }
 
+// 5. asciidoctor 시작할 때, static/docs 폴더 비우기
+// 가끔 문서가 수정이 안되는 경우가 발생하기 때문에 선언
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+//6. 처리된 결과를 Asciidoctor형식으로 2번에 지정해 준 스니펫(Snippet)경로에 인입
 asciidoctor {
     inputs.dir snippetsDir
     dependsOn test
 }
 
-// static/docs 폴더 비우기
-asciidoctor.doFirst {
-    delete file('src/main/resources/static/docs')
-}
-
-
-//5. gradle build 시 ${asciidoctor.outputDir}/html5로 부터 static/docs에 html 파일이 생성
-bootJar {
-    dependsOn asciidoctor
-    copy {
-        from "build/docs/asciidoc"
-        into "src/main/resources/static/docs"
-    }
-}
-
+// 7. build task 시 build/docs/asciidoc 파일을 src/main/resources/static/docs로 복사
 task copyDocument(type: Copy) {
     dependsOn asciidoctor
     from file("build/docs/asciidoc")
     into file("src/main/resources/static/docs")
 }
 
+//8. build 시 7번 작업 진행
 build {
     dependsOn copyDocument
+}
+
+//9. bootJar task 시,  build/docs/asciidoc 파일을 BOOT-INF/classes/static/docs로 복사
+bootJar {
+    dependsOn asciidoctor
+    copy {
+        from "${asciidoctor.outputDir}"
+        into 'BOOT-INF/classes/static/docs'
+    }
+
 }

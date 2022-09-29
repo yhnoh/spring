@@ -445,7 +445,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
-<ul class="sectlevel1">
+<ul class="sectlevel4">
+<li><a href="#_공통응답">공통응답</a></li>
 <li><a href="#API-List">APIs</a>
 <ul class="sectlevel2">
 <li><a href="#_memberapi">MemberAPI</a></li>
@@ -455,19 +456,59 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>Unresolved directive in index.adoc - include::{snippets}/common/response/common-response-fields.adoc[]</p>
-</div>
-</div>
+<div class="sect4">
+<h5 id="_공통응답"><a class="link" href="#_공통응답">공통응답</a></h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">필드명</th>
+<th class="tableblock halign-left valign-top">설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">응답 코드</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">데이터</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>message</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">응답 메시지</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect1">
 <h2 id="API-List"><a class="link" href="#API-List">APIs</a></h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_memberapi"><a class="link" href="#_memberapi">MemberAPI</a></h3>
-
+<div class="ulist">
+<ul>
+<li>
+<p><a href="./member/find-member.html">회원 한명 조회</a></p>
+</li>
+<li>
+<p><a href="./member/find-members.html">회원 전체 조회</a></p>
+</li>
+<li>
+<p><a href="./member/join-member.html">회원가입</a></p>
+</li>
+<li>
+<p><a href="./member/change-password.html">비밀번호 변경</a></p>
+</li>
+<li>
+<p><a href="./member/delete-member.html">회원 삭제</a></p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -475,7 +516,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-09-21 23:41:01 +0900
+Last updated 2022-09-25 16:42:48 +0900
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
