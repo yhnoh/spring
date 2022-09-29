@@ -1,0 +1,20 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+= hello world
+
+=== request
+include::{snippets}/hello-world/http-request.adoc[]
+
+=== response
+include::{snippets}/hello-world/http-response.adoc[]
+
+=== response-fields
+include::{snippets}/hello-world/response-fields.adoc[]
