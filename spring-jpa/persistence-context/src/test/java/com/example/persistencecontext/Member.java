@@ -26,4 +26,7 @@ public class Member {
         return member;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
