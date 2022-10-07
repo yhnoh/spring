@@ -21,7 +21,8 @@
 - 영속성 컨텍스트에서 관리되는 상태이다.
 - ORM 기능을 활용 가능한 상태이다.
 - 영속 상태 만들기
-	- `entityManager.persist(member);`
+    - `entityManager.persist(entity);`
+    - `entityManager.find(Entity.class, id)`
 ```java
         //비영속 상태
         Member member = Member.createMember("username");
