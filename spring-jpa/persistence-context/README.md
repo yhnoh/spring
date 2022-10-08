@@ -98,6 +98,33 @@
 
 ![](./img/persistence-context-lifecycle.png)
 
+### 영속성 컨텍스트 특징
+ 
+1. 1차 캐시
+2. 동일성 보장
+3. 트랜잭션을 지원하는 쓰기 지연
+#### 4. 변경 감지
+- ORM은 객체지향 관점에서 데이터 베이스를 다루는 기술이다.
+- 그러므로 객체의 필드 변경이 곧 SQL의 업데이트문과 같다.
+  - EntityManager에는 update문을 위한 메소드가 없다.
+  - entityManger.merge(entity)조금 다르다.
+    ```java
+        Member member = Member.createMember("username");
+        entityManager.persist(member);
+        entityManager.flush();
+        entityManager.clear();
+		
+        //변경 감지
+        Member findMember = entityManager.find(Member.class, 1l);
+        findMember.setUsername("username2");
+		
+        transaction.commit();
+    ```
+
+
+
+
 > **Reference**
 > - [Hibernate-Reference](https://docs.jboss.org/hibernate/orm/5.6/userguide/html_single/Hibernate_User_Guide.html#pc)
 > - [JPA 영속성 컨텍스트란?](https://velog.io/@neptunes032/JPA-%EC%98%81%EC%86%8D%EC%84%B1-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8%EB%9E%80)
+

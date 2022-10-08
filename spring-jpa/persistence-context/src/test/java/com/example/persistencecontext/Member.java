@@ -16,12 +16,12 @@ import javax.persistence.Id;
 public class Member {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     private String username;
 
-    public static Member createMember(String username){
+    public static Member createMember(String id, String username){
         Member member = new Member();
+        member.id = id;
         member.username = username;
         return member;
     }

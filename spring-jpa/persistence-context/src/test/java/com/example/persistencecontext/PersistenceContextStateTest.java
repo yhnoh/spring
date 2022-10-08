@@ -1,15 +1,14 @@
 package com.example.persistencecontext;
 
 import org.hibernate.Session;
-import org.hibernate.internal.SessionImpl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +22,7 @@ public class PersistenceContextStateTest {
     @Test
     @DisplayName("비영속")
     public void transientTest() {
-        assertEquals("username", Member.createMember("username").getUsername());
+        assertEquals("username", Member.createMember("id","username").getUsername());
     }
 
     @Test
@@ -38,7 +37,7 @@ public class PersistenceContextStateTest {
 
         try {
             //비영속 상태
-            Member member = Member.createMember("username");
+            Member member = Member.createMember("id","username");
             //영속 상태 : 영속 컨텍스트에 관리
             entityManager.persist(member);
             entityManager.flush();
@@ -81,7 +80,7 @@ public class PersistenceContextStateTest {
 
         try {
             //비영속 상태
-            Member member = Member.createMember("username");
+            Member member = Member.createMember("id","username");
 
             //영속 상태 : 영속 컨텍스트에 관리
             entityManager.persist(member);
@@ -123,7 +122,7 @@ public class PersistenceContextStateTest {
 
         try {
             //비영속 상태
-            Member member = Member.createMember("username");
+            Member member = Member.createMember("id","username");
             //영속 상태 : 영속 컨텍스트에 관리
             entityManager.persist(member);
             entityManager.flush();

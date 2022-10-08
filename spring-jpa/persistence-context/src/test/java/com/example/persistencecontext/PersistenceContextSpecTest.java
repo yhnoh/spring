@@ -1,7 +1,5 @@
 package com.example.persistencecontext;
 
-import org.hibernate.Session;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,9 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PersistenceContextSpecTest {
 
@@ -35,18 +31,15 @@ public class PersistenceContextSpecTest {
         try {
             transaction.begin();
 
-            //비영속 상태
-            Member member = Member.createMember("username");
-            //영속 상태 : 영속 컨텍스트에 관리
+            Member member = Member.createMember("id", "username");
             entityManager.persist(member);
-//            entityManager.flush();
 
             //select 문 실행 안하고 1차캐시에서 조회한다.
-            Member findMember = entityManager.find(Member.class, 1l);
+            Member findMember = entityManager.find(Member.class, "id");
 
             //영속성 컨텍스트에서 관리되고 있는 엔티티가 아니기 때문에
             //select 문 실행하고 DB에서 데이터를 조회한다.
-            Member findMember2 = entityManager.find(Member.class, 2l);
+            Member findMember2 = entityManager.find(Member.class, "id2");
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
@@ -74,14 +67,14 @@ public class PersistenceContextSpecTest {
             transaction.begin();
 
             //비영속 상태
-            Member member = Member.createMember("username");
+            Member member = Member.createMember("id", "username");
             //영속 상태 : 영속 컨텍스트에 관리
             entityManager.persist(member);
             entityManager.flush();
 
             //동일성 보장
-            Member sameMember1 = entityManager.find(Member.class, 1l);
-            Member sameMember2 = entityManager.find(Member.class, 1l);
+            Member sameMember1 = entityManager.find(Member.class, "id");
+            Member sameMember2 = entityManager.find(Member.class, "id");
 
             assertEquals(sameMember1, sameMember2);
             transaction.commit();
@@ -103,8 +96,8 @@ public class PersistenceContextSpecTest {
         try {
             transaction.begin();
 
-            Member member1 = Member.createMember("username1");
-            Member member2 = Member.createMember("username2");
+            Member member1 = Member.createMember("id1", "username1");
+            Member member2 = Member.createMember("id2", "username2");
 
             //영속 컨텍스트에 관리된 상태이며 데이터베이스에 INSERT하지 않는다.
             entityManager.persist(member1);
@@ -138,14 +131,13 @@ public class PersistenceContextSpecTest {
         try {
             transaction.begin();
 
-            Member member = Member.createMember("username");
+            Member member = Member.createMember("id","username");
             entityManager.persist(member);
             entityManager.flush();
             entityManager.clear();
 
-
             //변경 감지
-            Member findMember = entityManager.find(Member.class, 1l);
+            Member findMember = entityManager.find(Member.class, "id");
             findMember.setUsername("username2");
 
             transaction.commit();
