@@ -1,0 +1,2 @@
+- [spring-application-properties](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
+- [스프링부트는 어떻게 다중 유저 요청을 처리할까?](https://velog.io/@sihyung92/how-does-springboot-handle-multiple-requests)
