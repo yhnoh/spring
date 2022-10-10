@@ -4,10 +4,7 @@ server:
     threads:
       max: 2
       min-spare: 1
-
     accept-count: 1
-server:
-  tomcat:
-    threads:
+
 
 
