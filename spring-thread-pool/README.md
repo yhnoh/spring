@@ -243,7 +243,7 @@ spring:
 
 - 직접 ThreadPoolTaskExecutor를 생성하는 것도 가능하다.
 
-#### @Async 메소드 선언하기
+#### 1. @Async 메소드 선언하기
 ```java
 @Slf4j
 public class AsyncService {
@@ -257,7 +257,7 @@ public class AsyncService {
 }
 ```
 
-#### 비동기 설젇하기
+#### 2. 비동기 설정하기
 ```java
 @Slf4j
 @Configuration
