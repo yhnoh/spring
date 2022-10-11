@@ -127,9 +127,174 @@ public class SpringThreadPoolTest {
 
 ### NIO Connector
 
-### Spring 비동기 처리
+### Spring에서 비동기 처리를 하는 이유
+--- 
+
+- 클라이언트 요청 이후 비지니스 로직을 수행하던 도중 특정 로직의 경우, 끝날때 까지 기다려 주는 동기 처리 방식이 아닌 비동기 처리 방식으로 진행해야할 일이 가끔 발생한다.
+    - 특정 로직의 시간이 너무 오래 걸리는 경우
+    - 비지니스 로직과는 관련은 없지만 수행해야하는 경우
+    - 비지니스 로직과는 관련 있지만 비동기 처리를 하더라도 클라이언트에게 지장이 없는 경우
+    - 특정 로직이 실패 하더라도 비지니스 로직을 계속해서 수행해야하는 경우
+        - try-catch로 잡는 방법도 존재
+    - 등등..
+- 위의 경우를 대비하여 스프링은 비동기 처리를 위한 방법을 제공한다.
+> 키워드 : ThreadPoolTaskExecutor, @Aysnc, @EnableAsync
+
+### ThreadPoolTaskExecutor
+---
+
+- ThreadPoolTaskExecutor 클래스는 쓰레드풀을 이용하여 멀티 스레드를 쉽게 구현해주는 스프링에서 지원하는 클래스이다.
+- @Aysnc, @EnableAsync을 사용하면 간단하게 비동기 프로그래밍을 할 수 있다.
+- 기본적으로 Spring에서 ThreadPoolTaskExecutor를 Bean으로 만들어주기 때문에 사용자가 직접 Bean으로 만들어도 되고 이미 만들어진 것을 사용해도 된다.
+
+### ThreadPoolTaskExecutor 예제
+---
+
+#### 1. 메소드 비동기로 호출하기 위한 @Async 선언
+```java
+@Slf4j
+public class DefaultAsyncService {
+    @Async
+    public void defaultAsync() throws InterruptedException {
+        log.info("default async task start");
+        Thread.sleep(1000);
+        log.info("default async task end");
+    }
+}
+```
+- 1초 이후에 작업이 완료된다.
+
+#### 2. 비동기 설정을 위한 @EnableAsync 선언
+```java
+@Slf4j
+@Configuration
+@EnableAsync
+public class DefaultAsyncConfig {
+
+    @Bean
+    public DefaultAsyncService defaultAsyncService(){
+        return new DefaultAsyncService();
+    }
+}
+```
+
+#### 3. Controller 만들기
+```java
+@RestController
+@RequiredArgsConstructor
+@Slf4j
+public class DefaultAsyncController {
+
+    private final DefaultAsyncService defaultAsyncService;
+
+    @GetMapping("/default-async")
+    public String defaultAsync() throws InterruptedException {
+        defaultAsyncService.defaultAsync();
+        log.info("default async task complete");
+        return "hello world";
+    }
+}
+```
+
+#### 4. /default-async 호출하기
+```java
+    @Test
+    public void defaultAsyncRequestTest() throws InterruptedException {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/default-async";
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+    }
+```
+- 해당 엔드포인트 호출 시 `default async task complete` -> `default async task end` 일 것으로 기대한다.
+
+#### 결과
+![](./img/default-async-result.png)
+- 기대하던 대로 결과물이 나왔다.
+
+### ThreadPoolTaskExecutor 주요 속성
+---
+
+- 위에서 스레드풀에 대한 설명을 했기때문에 주요 속성에 대해서만 간단하게 알아보겠다.
+
+|속성|내용|기본값|
+|---|---|---|
+coreSize|쓰레드 풀의 최소 사이즈|8|
+maxSize|쓰레드 풀의 최대 사이즈, 작업 대기 큐의 사이즈가 가득 찬다면 새로운 스레드가 생상되고 maxSize를 초과하여 생성하지 않는다.|Integer.MAX_VALUE|
+queueCapacity|작업 대기 큐의 사이즈, coreSize 개수를 넘어서는 task가 들어왔을 때 queue에 task들이 대기한다.|Integer.MAX|
+allowCoreThreadTimeout|keepAlive 시간만큼 coreThread가 일을하고 있지 않는다면 coreThread도 제거를 한다.|false|
+keepAlive|coreSize보다 많은 스레드가 생성되었다면 초과된 스레드들은 keppAlive 시간보다 하는 일이 없다면 제거된다.|60s|
+<br/>
+
+#### default ThreadPoolTaskExecutor .yml파일에서 셋팅
+```groovy
+spring:
+  task:
+    execution:
+      pool:
+        core-size: 1
+        max-size: 2
+        queue-capacity: 1
+        allow-core-thread-timeout: false
+        keep-alive: 60s
+```
+
+### ThreadPoolTaskExecutor 직접 생성하기
+---
+
+- 직접 ThreadPoolTaskExecutor를 생성하는 것도 가능하다.
+
+#### @Async 메소드 선언하기
+```java
+@Slf4j
+public class AsyncService {
+
+    @Async
+    public void async() throws InterruptedException {
+        log.info("async start");
+        Thread.sleep(1000);
+        log.info("async end");
+    }
+}
+```
+
+#### 비동기 설젇하기
+```java
+@Slf4j
+@Configuration
+@EnableAsync
+public class AsyncConfig {
+
+    @Bean("asyncThreadPoolTaskExecutor")
+    public Executor asyncThreadPoolTaskExecutor(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(1);
+        executor.setThreadNamePrefix("ASYNC-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean
+    public AsyncService asyncService(){
+        return new AsyncService();
+    }
+
+}
+```
+
+### Async 메소드 내에서 에러가 발생한 경우
+### 최대 스레드 초과와 작업 대기 큐를 초과한 경우
+- org.springframework.core.task.TaskRejectedException
 
 
+### @Async 작동원리
+> @Async는 AOP를 기반으로 작동하며 해당 어노테이션을 찾아 비동기 처리를 지원해 준다.
+
+1. 애플리케이션 시작 시 @Async 어노테이션을 찾아 AsyncAnnotationAdvisor.class를 생성한다.
+2. AsyncAnnotationBeanPostProcessor.class에서 @Async AOP처리를 위한 
+
+AsyncAnnotationAdvisor 클래스에서 
 
 > **Reference**
 > - [spring-application-properties](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
@@ -139,3 +304,5 @@ public class SpringThreadPoolTest {
 > - [@Async에서 사용하는 ThreadPoolTaskExecutor 최적화하기](https://sabarada.tistory.com/215)
 > - [ThreadPoolTaskExecutor를 이용하여 성능 개선하기](https://kim-jong-hyun.tistory.com/104)
 > - [ThreadPoolTaskExecutor의 RejectedExecutionHandler 설정](https://jessyt.tistory.com/171)
+> - [결제 시스템 성능, 부하, 스트레스 테스트](https://techblog.woowahan.com/2572/)
+> - [Spring Referenc > Task Execution and Scheduling](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.task-execution-and-scheduling)

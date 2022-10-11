@@ -2,9 +2,16 @@
 server:
   tomcat:
     threads:
-      max: 2
+      max: 20
       min-spare: 1
     accept-count: 1
-
-
+spring:
+  task:
+    execution:
+      pool:
+        core-size: 8
+        max-size: 20
+        queue-capacity: 100
+        allow-core-thread-timeout: true
+        keep-alive: 60s
 

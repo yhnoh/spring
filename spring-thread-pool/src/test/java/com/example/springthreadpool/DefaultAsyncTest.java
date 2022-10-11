@@ -12,26 +12,31 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
-//@ContextConfiguration(classes = AsyncConfig.class)
-public class SpringThreadPoolTest {
+@ContextConfiguration(classes = DefaultAsyncConfig.class)
+public class DefaultAsyncTest {
 
+    @Autowired
+    DefaultAsyncService defaultAsyncService;
 
     @Test
-    public void tomcatThreadTest() throws InterruptedException {
-
-
-        RestTemplate restTemplate = new RestTemplate();
+    public void asyncTest() throws InterruptedException {
         for (int i = 0; i < 5; i++) {
             Thread thread = new Thread(() -> {
-
-                String url = "http://localhost:8080";
-                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+                try {
+                    defaultAsyncService.defaultAsync();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             });
             thread.start();
         }
-
         Thread.sleep(10000);
     }
 
+    @Test
+    public void defaultAsyncRequestTest() {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/default-async";
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+    }
 }
