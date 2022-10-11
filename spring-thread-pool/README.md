@@ -300,12 +300,12 @@ public class AsyncConfig {
 AsyncAnnotationAdvisor 클래스에서 
 
 > **Reference**
-> - [spring-application-properties](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
 > - [스프링부트는 어떻게 다중 유저 요청을 처리할까?](https://velog.io/@sihyung92/how-does-springboot-handle-multiple-requests)
+> - [Spring Thread Pool](https://velog.io/@tritny6516/Spring-Thread-Pool)
 > - [Core pool size vs maximum pool size in ThreadPoolExecutor](https://stackoverflow.com/questions/17659510/core-pool-size-vs-maximum-pool-size-in-threadpoolexecutor)
+> - [Spring Reference > application-properties](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
 > - [Spring Boot Embeded Tomcat 내장 톰캣 application.properties 설정](https://aljjabaegi.tistory.com/601)
 > - [@Async에서 사용하는 ThreadPoolTaskExecutor 최적화하기](https://sabarada.tistory.com/215)
-> - [ThreadPoolTaskExecutor를 이용하여 성능 개선하기](https://kim-jong-hyun.tistory.com/104)
 > - [ThreadPoolTaskExecutor의 RejectedExecutionHandler 설정](https://jessyt.tistory.com/171)
 > - [결제 시스템 성능, 부하, 스트레스 테스트](https://techblog.woowahan.com/2572/)
-> - [Spring Referenc > Task Execution and Scheduling](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.task-execution-and-scheduling)
+> - [Spring Reference > Task Execution and Scheduling](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.task-execution-and-scheduling)
