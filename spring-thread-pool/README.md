@@ -33,20 +33,23 @@
 > 스레드가 너무 많으면 너무 많은 스레드가 cpu의 자원을 두고 경합하게 되므로 처리속도가 느려질 수 있기 때문에 적절한 수로 유지되는 것이 가장 좋다. <br/>
 > 키워드 : `스레드풀 전략`,`적정 스레드 개수`
 
-#### 스레드 풀 관련 Property
+#### tomcat 스레드 풀 관련 Property
 
 ```groovy
-//application.yml
+# application.yml
 server:
   tomcat:
     threads:
-      max: 200          // 생성할 수 있는 최대 스레드 수
-      min-spare: 10     // 최소 유지되어야하는 스레드 수
-    accept-count: 100   // 작업 큐 사이즈
+      max: 200          ## 생성할 수 있는 최대 스레드 수
+      min-spare: 10     ## 최소 유지되어야하는 스레드 수
+    accept-count: 100   ## 작업 큐 사이즈
+    max-connections: 8192     ## 수립가능한 connection의 총 개수
+    accept-count: 100         ## 작업큐의 사이즈
+    connection-timeout: 20000 ## timeout 판단 기준 시간, 20초    
 ```
 
 
-### 스레드 풀 테스트
+### tomcat 스레드 풀 테스트
 ---
 
 - 스레드 개수와 작업 큐의 개수를 최소한으로 잡아서 실제로 유저요청이 거절되는지 확인해보자.
