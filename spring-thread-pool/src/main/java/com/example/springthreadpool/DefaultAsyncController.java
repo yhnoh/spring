@@ -15,7 +15,7 @@ public class DefaultAsyncController {
     @GetMapping("/default-async")
     public String defaultAsync() throws InterruptedException {
         defaultAsyncService.defaultAsync();
-        log.info("default async task complete");
+        log.info("default sync task complete");
         return "hello world";
     }
 }

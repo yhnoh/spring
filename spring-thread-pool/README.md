@@ -54,7 +54,7 @@ server:
 
 - 스레드 개수와 작업 큐의 개수를 최소한으로 잡아서 실제로 유저요청이 거절되는지 확인해보자.
 
-#### application.yml에서 스레드풀 설정
+#### application.yml에서 tomcat 스레드풀 설정
 
 ```groovy
 server:
@@ -141,7 +141,7 @@ public class SpringThreadPoolTest {
         - try-catch로 잡는 방법도 존재
     - 등등..
 - 위의 경우를 대비하여 스프링은 비동기 처리를 위한 방법을 제공한다.
-> 키워드 : ThreadPoolTaskExecutor, @Aysnc, @EnableAsync
+> 키워드 : `ThreadPoolTaskExecutor`, `@Aysnc`, `@EnableAsync`
 
 ### ThreadPoolTaskExecutor
 ---
@@ -287,8 +287,139 @@ public class AsyncConfig {
 ```
 
 ### Async 메소드 내에서 에러가 발생한 경우
+---
+- 비동기 메소드 내에서 에러가 발생해도 요청했던 비지니스 로직이 정상 동작하는지 확인해보자.
+
+#### 1. 비동기 메소드 만들기
+
+```java
+    @Async
+    public void asyncThrows() {
+        log.info("async start");
+        throw new RuntimeException("비동기 메소드 오류");
+    }
+```
+- 비동기 메소드에서 RuntimeException 에러를 발생 시킨다.
+
+#### 2. 동기적으로 로직을 수행할 컨트롤러 제작
+```java
+    @GetMapping("/async-throws")
+    public String asyncThrows() throws InterruptedException {
+        asyncService.asyncThrows();
+        Thread.sleep(1000);
+        log.info("async task complete");
+        return "hello world";
+    }
+```
+- 비지니스 로직이 1초정도 수행될것이라 생각하고 비동기 메소드에서 에러가 발생하더라도 `async task complete` 메시지가 정상적으로 출력되어야 한다.
+
+#### 3. 결과
+
+![](./img/async-throw-result.png)
+
+- 비동기 메소드 에러가 발생하여도 `async task complete` 메시지가 정상적으로 출력된것을 확인할 수 있다.
+
 ### 최대 스레드 초과와 작업 대기 큐를 초과한 경우
-- org.springframework.core.task.TaskRejectedException
+---
+
+- 톰캣에 대한 요청 시, `최대 스레드 + 작업 대기 큐의 수`를 초과하여도 어느정도 요청이 가능했다.
+- 그렇다면 ThreadPoolTaskExecutor의 스레드 풀은 `최대 스레드 + 작업 대기 큐의 수`를 초과하여도 비동기 로직이 정상 작동을 할까?
+
+#### 1. ThreadPoolTaskExecutor Bean으로 등록
+
+```java
+    @Bean("asyncThreadPoolTaskExecutor")
+    public Executor asyncThreadPoolTaskExecutor(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(1);
+        executor.setThreadNamePrefix("ASYNC-");
+        executor.initialize();
+        return executor;
+    }
+```
+- coreSize는 1이고 MaxSize는 2이니 최대 2개의 스레드를 생성할 수 있다.
+- queueCapacity는 1로 설정해 두었으니 스레드 2개가 작업을 진행하는 동안 1개가 기다릴 수 있다.
+- 해당 스레드 풀은 총 3개의 작업의 요청을 받아 들일 수 있다.
+
+#### 2. 비동기 메소드 제작
+```java
+    @Async
+    public void asyncOverThread() throws InterruptedException {
+        log.info("async start");
+        Thread.sleep(1000);
+        log.info("async end");
+
+    }
+```
+
+- 비동기 메소드는 1초간 작업을 진행한다.
+- 3초안에 3개를 초과한 작업이 들어오면 어떤 현상이 발생하는지 확인해보자.
+
+#### 3. Contrller 제작
+
+```java
+    @GetMapping("/async-over-thread")
+    public String asyncOverThread() throws InterruptedException {
+        asyncService.asyncOverThread();
+        log.info("sync task complete");
+        return "hello world";
+    }
+```
+
+#### 4. RestTemplate을 활용한 5번 연속 요청
+
+```java
+    @Test
+    public void asyncOverThreadTest() throws InterruptedException {
+        RestTemplate restTemplate = new RestTemplate();
+        for (int i = 0; i < 5; i++) {
+            Thread thread = new Thread(() -> {
+
+                String url = "http://localhost:8080/async-over-thread";
+                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            });
+            thread.start();
+        }
+
+        Thread.sleep(1000);
+
+    }
+
+```
+
+
+#### 5. 결과
+
+![](./img/async-thread-over-result.png)
+
+- 결과를 확인해보니 3개를 초과한 요청에 대해서는 `java.util.concurrent.RejectedExecutionException` 에러가 발생했다.
+- 뿐만아니라 `sync task complete` 메시지가 2건은 출력되지 않았다.
+    - 비동기 메소드를 사용했지만 실제 비지니스 로직에까지 영향을 끼치는 로직이 되고 말았다.
+
+### RejectedExecutionHandler
+---
+
+- `RejectedExecutionHandler` 는 `ThreadPoolTaskExecutor` 에서 `최대 스레드 + 작업 대기 큐` 가 꽉 찾을 경우 어떻게 처리할지를 결정할 수 있다.
+    - `ThreadPoolTaskExecutor.setRejectedExecutionHandler(RejectedExecutionHandler)`
+- `RejectedExecutionHandler` 에 대한 기본 정책의 구현체가 `ThreadPoolExecutor` 에 존재한다.
+
+##### ThreadPoolExecutor.AbortPolicy
+- `maxSize + queueCapacity`를 초과하는 요청이 들어 올 경우 `java.util.concurrent.RejectedExecutionException`이 발생하며 요청을 무시한다.
+- `ThreadPoolTaskExecutor`에서 `RejectedExecutionHandler`의 기본 정책이다.
+
+##### ThreadPoolExecutor.DiscardPolicy
+- `maxSize + queueCapacity`를 초과하는 요청이 들어온 경우 Exception을 발생시키지 않고 무시한다.
+##### ThreadPoolExecutor.DiscardOldestPolicy
+- 가장 오래된 요청은 삭제하고 다시 
+##### ThreadPoolExecutor.CallerRunsPolicy
+- 해당 스레드풀을을 사용하는 메소드를 호출한 스레드에서 작업을 직접 실행한다.
+    - 만약 Tomcat 서버에서 호출했다면 처리되지 않은 작업은 Tomcat Threead가 처리한다. <br/><br/>
+    ![](./img/caller-runs-policy-result.png)
+##### ThreadPoolExecutor.DiscardOldestPolicy
+- 처리되지 않은 가장 오래된 요청을 종료한 다음 재시도 한다.
+
 
 
 ### @Async 작동원리

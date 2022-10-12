@@ -61,8 +61,24 @@ public class AsyncTest {
     @Test
     public void asyncThrowsRequestTest() throws InterruptedException {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8080/async";
+        String url = "http://localhost:8080/async-throws";
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+    }
+
+    @Test
+    public void asyncOverThreadTest() throws InterruptedException {
+        RestTemplate restTemplate = new RestTemplate();
+        for (int i = 0; i < 5; i++) {
+            Thread thread = new Thread(() -> {
+
+                String url = "http://localhost:8080/async-over-thread";
+                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            });
+            thread.start();
+        }
+
+        Thread.sleep(1000);
 
     }
 

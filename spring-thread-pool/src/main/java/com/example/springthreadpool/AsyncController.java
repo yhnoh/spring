@@ -15,14 +15,22 @@ public class AsyncController {
     @GetMapping("/async")
     public String async() throws InterruptedException {
         asyncService.async();
-        log.info("async task complete");
+        log.info("sync task complete");
         return "hello world";
     }
 
     @GetMapping("/async-throws")
     public String asyncThrows() throws InterruptedException {
         asyncService.asyncThrows();
-        log.info("async task complete");
+        Thread.sleep(1000);
+        log.info("sync task complete");
+        return "hello world";
+    }
+
+    @GetMapping("/async-over-thread")
+    public String asyncOverThread() throws InterruptedException {
+        asyncService.asyncOverThread();
+        log.info("sync task complete");
         return "hello world";
     }
 }

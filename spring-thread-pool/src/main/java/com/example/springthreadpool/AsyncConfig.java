@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Slf4j
 @Configuration
@@ -22,13 +23,7 @@ public class AsyncConfig {
         executor.setQueueCapacity(1);
         executor.setThreadNamePrefix("ASYNC-");
 
-//        executor.setRejectedExecutionHandler(new RejectedExecutionHandler() {
-//            @Override
-//            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-//
-//                log.info("thread name2 = {}, thread state = {}", Thread.currentThread().getName(), Thread.currentThread().getState());
-//            }
-//        });
+        //executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;
     }

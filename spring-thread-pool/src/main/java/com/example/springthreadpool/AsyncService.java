@@ -14,10 +14,16 @@ public class AsyncService {
     }
 
     @Async
-    public void asyncThrows() throws InterruptedException {
+    public void asyncThrows() {
         log.info("async start");
-        Thread.sleep(1000);
-        throw new RuntimeException("메시지 오류");
+        throw new RuntimeException("비동기 메소드 오류");
     }
 
+    @Async
+    public void asyncOverThread() throws InterruptedException {
+        log.info("async start");
+        Thread.sleep(1000);
+        log.info("async end");
+
+    }
 }
