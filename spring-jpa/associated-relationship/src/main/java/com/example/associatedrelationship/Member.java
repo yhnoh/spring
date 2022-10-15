@@ -1,10 +1,11 @@
 package com.example.associatedrelationship;
 
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import lombok.Getter;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 public class Member {
 
     @Id
@@ -24,5 +25,14 @@ public class Member {
         member.team = team;
         team.addMember(member);
         return member;
+    }
+
+    public static Member createMemberNotAddMemberInTeam(String username, Team team){
+        Member member = new Member();
+        member.username = username;
+        member.team = team;
+        //team.addMember(member); 호출 안함
+        return member;
+
     }
 }
