@@ -1,4 +1,4 @@
-package com.example.associatedrelationship;
+package com.example.associatedrelationship.relationship;
 
 import lombok.Getter;
 
