@@ -25,7 +25,7 @@ public class Goods {
     private double discountPrice;
 
     @OneToMany(mappedBy = "goods")
-    private List<Order> goodsOrders = new ArrayList<>();
+    private List<GoodsOrder> goodOrders = new ArrayList<>();
 
     public static Goods createGoods(String name, int totalQuantity, double price, double discountPrice){
         Goods goods = new Goods();
@@ -37,11 +37,11 @@ public class Goods {
         return goods;
     }
 
-    public void addGoodsOrder(Order goodsOrder){
+    public void addGoodsOrder(GoodsOrder goodsOrder){
         if(goodsOrder == null){
             throw new NotFoundDataException("goodsOrder is null when call addGoodsOrder");
         }
-        goodsOrders.add(goodsOrder);
+        this.goodOrders.add(goodsOrder);
     }
     public void minusTotalQuantity(int quantity){
         if(quantity > remainQuantity){

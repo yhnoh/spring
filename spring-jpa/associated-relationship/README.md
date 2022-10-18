@@ -266,14 +266,77 @@ public class Member {
 ```
 
 ### 연관관계 매핑
+
+---
+
 - `ORM은 객체간의 관계를 바탕으로 관계형 데이터 베이스를 매핑한다.`라고 이야기 했고 위의 예제 코드를 통해서 어떻게 매핑하는지를 알 수 있었다.
-- 데이터베이스에서는 하나의 외래키를 통해서 양방향으로 조회가 가능하지만, 객체의 경우 양방향 조회가 불가능하므로 서로 관련있는 엔티티들 끼리 관계를 매핑하여 단방향으로 조회가 가능하게끔 설정해두어야 한다.
+- 데이터베이스에서는 하나의 외래키를 통해서 양방향으로 조회가 가능하지만, 객체의 경우 양방향 조회가 불가능하므로 서로 관련있는 엔티티들이 관계를 매핑하여 단방향으로 조회가 가능하게끔 설정해두어야 한다.
 - Hibernate에서 제공해주는 관계 매핑은 크게 4가지이다.
-1. @OneToMany
-2. @ManyToOne
-3. @OneToOne
+![](./img/mapping_erd.png)
+
+#### 1. @ManyToOne
+- 주로 외래키를 관리하는 엔티티이다.
+    - GoodsOrder와 Goods의 관계를 보면 GoodsOrder에서 외래키를 관리하고 있다.
+    ```java
+    @Entity
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public class GoodsOrder {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "goods_order_id")
+        private Long id;
+        private String goodsName;
+        private int orderQuantity;
+        private double price;
+        private double discountPrice;
+        private double orderPrice;
+
+        @ManyToOne
+        @JoinColumn(name = "goods_id")
+        private Goods goods;
+        //...
+    }    
+    ```
+- 외래키를 관리하기 때문에 @JoinColumn을 활용하여 외래키명을 적어주어여한다.
+- @ManyToOne으로 관계가 맺어진 엔티티의 데이터를 읽어들이는 기본전략은 `FetchType.EAGER`이다.
+    - `FetchType.EAGER` DB에서 데이터의 정보를 미리 읽어들여 Entity에 매핑을 하기 때문에 N + 1 문제가 발생할 수 있다.
+    - `FetchType.LAZY`로 전략을 변경하는 것이 좋다.
+#### 2. @ManyToOne
+- @OneToMany에서는 하나의 데이터를 매핑하는 관계라면 @ManyToOne은 N개의 데이터를 매핑하는 관계이다.
+    - Goods와 GoodsOrder의 관계에서 Goods는 GoodsOrder를 List로로 가지고 있다.
+    ```java
+    @Entity
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public class Goods {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "goods_id")
+        private Long id;
+        private String name;
+        private int totalQuantity;
+        private int remainQuantity;
+        private double price;
+        private double discountPrice;
+
+        @OneToMany(mappedBy = "goods")
+        private List<GoodsOrder> goodOrders = new ArrayList<>();  
+        //...
+    }  
+    ```
+- 주로 외래키를 관리하지 않고, 읽기 전용으로 만들어지기 때문에 `mappedBy`문에 연관관계 주인인 필드명을 작성해주어야한다.
+    - 해석하자면 연관관계 주인`(GoodsOrder)`의 필드`(private Goods goods;)`와 관련된 모든 GoodsOrder를 매핑하겠다는 의미다.
+- 주로 @OneToMany와 양방향으로 매핑을 하기 때문에 연관관계 편의 메소드를 통해서 관리해주는 것이 좋다.
+
+#### 3. @OneToOne
+- 일대일 매핑을 할때 사용을 한다.
+- 외래키를 지정한 곳이 연관관계의 주인이 되며, 양방향으로 관계를 설정시 1:1의 관계를 가지게 된다.
+- 대상 테이블에 외래키가 존재하며
 4. @ManyToMany
 
 
 > **Reference**
-> - https://velog.io/@conatuseus/%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84-%EB%A7%A4%ED%95%91-%EA%B8%B0%EC%B4%88-2-%EC%96%91%EB%B0%A9%ED%96%A5-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%99%80-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%9D%98-%EC%A3%BC%EC%9D%B8
+> - ()[https://velog.io/@conatuseus/%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84-%EB%A7%A4%ED%95%91-%EA%B8%B0%EC%B4%88-2-%EC%96%91%EB%B0%A9%ED%96%A5-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%99%80-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%9D%98-%EC%A3%BC%EC%9D%B8]
