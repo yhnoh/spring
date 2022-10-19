@@ -272,6 +272,7 @@ public class Member {
 - `ORM은 객체간의 관계를 바탕으로 관계형 데이터 베이스를 매핑한다.`라고 이야기 했고 위의 예제 코드를 통해서 어떻게 매핑하는지를 알 수 있었다.
 - 데이터베이스에서는 하나의 외래키를 통해서 양방향으로 조회가 가능하지만, 객체의 경우 양방향 조회가 불가능하므로 서로 관련있는 엔티티들이 관계를 매핑하여 단방향으로 조회가 가능하게끔 설정해두어야 한다.
 - Hibernate에서 제공해주는 관계 매핑은 크게 4가지이다.
+<br/>
 ![](./img/mapping_erd.png)
 
 #### 1. @ManyToOne
@@ -402,4 +403,5 @@ public class Member {
 - 때문에 @OneToMany, @ManyToOne을 활용하여 명확하게 연결테이블 엔티티를 정의하고 사용하는 것이 좋다.
 
 > **Reference**
-> - ()[https://velog.io/@conatuseus/%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84-%EB%A7%A4%ED%95%91-%EA%B8%B0%EC%B4%88-2-%EC%96%91%EB%B0%A9%ED%96%A5-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%99%80-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%9D%98-%EC%A3%BC%EC%9D%B8]
+> - [양방향 연관관계](https://velog.io/@conatuseus/%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84-%EB%A7%A4%ED%95%91-%EA%B8%B0%EC%B4%88-2-%EC%96%91%EB%B0%A9%ED%96%A5-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%99%80-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%9D%98-%EC%A3%BC%EC%9D%B8)
+> - [OneToOne 관계](https://wave1994.tistory.com/156)
