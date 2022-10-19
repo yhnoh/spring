@@ -275,6 +275,7 @@ public class Member {
 ![](./img/mapping_erd.png)
 
 #### 1. @ManyToOne
+- 하나의 객체를 매핑하기 위해서 사용한다.
 - 주로 외래키를 관리하는 엔티티이다.
     - GoodsOrder와 Goods의 관계를 보면 GoodsOrder에서 외래키를 관리하고 있다.
     ```java
@@ -305,7 +306,7 @@ public class Member {
     - `FetchType.LAZY`로 전략을 변경하는 것이 좋다.
 #### 2. @ManyToOne
 - @OneToMany에서는 하나의 데이터를 매핑하는 관계라면 @ManyToOne은 N개의 데이터를 매핑하는 관계이다.
-    - Goods와 GoodsOrder의 관계에서 Goods는 GoodsOrder를 List로로 가지고 있다.
+    - Goods와 GoodsOrder의 관계에서 Goods는 GoodsOrder를 List로 가지고 있다.
     ```java
     @Entity
     @Getter
@@ -332,11 +333,73 @@ public class Member {
 - 주로 @OneToMany와 양방향으로 매핑을 하기 때문에 연관관계 편의 메소드를 통해서 관리해주는 것이 좋다.
 
 #### 3. @OneToOne
-- 일대일 매핑을 할때 사용을 한다.
+- 일대일 매핑을 할때 사용을 하며 @OneToOne은 연관관계의 주인이될 수도 있고, mappedBy를 활용해서 관계를 설정할 수도 있다.
 - 외래키를 지정한 곳이 연관관계의 주인이 되며, 양방향으로 관계를 설정시 1:1의 관계를 가지게 된다.
-- 대상 테이블에 외래키가 존재하며
-4. @ManyToMany
+    - 외래키에 유니크 제약조건을 가진것과 같다.
+- 연관관계의 주인인 엔티티에서는 지연로딩이 동작하지만 mappedBy로 연결된 반대편 테이블은 지연로딩을 설정해두어도 동작하지 않고 N + 1 문제가 발생한다.
+    - order
+        ```java
+        @Entity
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PROTECTED)
+        @Table(name = "orders")
+        public class Order {
 
+            @Id
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            @Column(name = "order_id")
+            private Long id;
+            private String name;
+            private double price;
+            private double discountPrice;
+            private double orderPrice;
+
+            @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+            private OrderUserInfo orderUserInfo;
+            //...
+        }
+        ```
+    - 실행
+        ```java
+        @Test
+        public void oneToOneNPlusOneTest(){
+            Order order = orderJpaRepository.findById(1l).get();
+        }
+        ```
+    - 결과
+        ```sql
+        Hibernate: 
+        select
+            order0_.order_id as order_id1_3_0_,
+            order0_.discount_price as discount2_3_0_,
+            order0_.name as name3_3_0_,
+            order0_.order_price as order_pr4_3_0_,
+            order0_.price as price5_3_0_ 
+        from
+            orders order0_ 
+        where
+            order0_.order_id=?
+        Hibernate: 
+            select
+                orderuseri0_.order_user_info_id as order_us1_4_0_,
+                orderuseri0_.address as address2_4_0_,
+                orderuseri0_.order_id as order_id4_4_0_,
+                orderuseri0_.username as username3_4_0_ 
+            from
+                order_user_info orderuseri0_ 
+            where
+                orderuseri0_.order_id=?
+        ```
+    > 지연 로딩을 활용할때는 주로 하이버네이트에서 해당 필드를 프록시 객체로 만들어 필드의 값을 가지고 올때 매핑할 수 있도록 해준다.<br/>
+    > 많은 레퍼런스에서의 달려있는 글들에 따르면 order 엔티티에서 orderUserInfo의 값을 알기 위해서는 무조건 조회를 해야 알 수 있기 때문에 프록시 객체를 만들필요가 없다고 한다.<br/>
+    > 내가 이해를 못해서 그러는 건지는 모르겠지만 그렇게 따지면 @ManyToOne에서도 동일한 현상이 일어나야 하는 것이 아닌가 싶은데 여튼 그렇다 한다.
+    - 해결방법
+        1. EntityGraph 사용
+        2. QueryDsl, JPQL Fetch Join
+4. @ManyToMany
+- 주로 1:N:1 구조에서 2개의 테이블을 연결해주는 연결테이블 역할에서 많이 사용한다.
+- 하지만 보통 외래키만 저장해놓는 테이블들은 잘 없다. 생성시간이라던지 누가 해당 데이터를 수정했는지 등등 다양한 컬럼들이 추가될 수 있기때문에 사용하는 것을 권장하지 않는다.
+- 때문에 @OneToMany, @ManyToOne을 활용하여 명확하게 연결테이블 엔티티를 정의하고 사용하는 것이 좋다.
 
 > **Reference**
 > - ()[https://velog.io/@conatuseus/%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84-%EB%A7%A4%ED%95%91-%EA%B8%B0%EC%B4%88-2-%EC%96%91%EB%B0%A9%ED%96%A5-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%99%80-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%9D%98-%EC%A3%BC%EC%9D%B8]

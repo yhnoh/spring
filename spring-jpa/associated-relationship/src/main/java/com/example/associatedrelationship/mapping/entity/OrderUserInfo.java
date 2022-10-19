@@ -17,7 +17,7 @@ public class OrderUserInfo {
     private String username;
     private String address;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 

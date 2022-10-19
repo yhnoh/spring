@@ -4,10 +4,12 @@ package com.example.associatedrelationship;
 import com.example.associatedrelationship.mapping.GoodsService;
 import com.example.associatedrelationship.mapping.OrderDTO;
 import com.example.associatedrelationship.mapping.entity.Goods;
+import com.example.associatedrelationship.mapping.entity.OrderUserInfo;
 import com.example.associatedrelationship.mapping.repository.GoodsJpaRepository;
 import com.example.associatedrelationship.mapping.entity.Order;
 import com.example.associatedrelationship.mapping.repository.GoodsOrderJpaRepository;
 import com.example.associatedrelationship.mapping.repository.OrderJpaRepository;
+import com.example.associatedrelationship.mapping.repository.OrderUserInfoJpaRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +39,9 @@ public class RelationshipMappingTest {
     GoodsJpaRepository goodsJpaRepository;
     @Autowired
     OrderJpaRepository orderJpaRepository;
+
+    @Autowired
+    OrderUserInfoJpaRepository orderUserInfoJpaRepository;
     @Test
     public void registerGoodsTest(){
         Goods goods = goodsService.registerGoods("상품3", 100, 200, 10);
@@ -69,7 +74,7 @@ public class RelationshipMappingTest {
     }
 
     @Test
-    public void findByOrderTest(){
+    public void oneToOneNPlusOneTest(){
         Order order = orderJpaRepository.findById(1l).get();
     }
 }

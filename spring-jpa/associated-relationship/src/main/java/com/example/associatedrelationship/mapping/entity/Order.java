@@ -25,7 +25,7 @@ public class Order {
     private double discountPrice;
     private double orderPrice;
 
-    @OneToOne(mappedBy = "order")
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
     private OrderUserInfo orderUserInfo;
 
     @OneToMany(mappedBy = "order")
