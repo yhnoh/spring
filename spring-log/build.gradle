@@ -28,3 +28,17 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+/*sourceSets {
+    main {
+        resources {
+            srcDirs('src/main/resources')
+        }
+    }
+}*/
+
+/*
+bootRun {
+    String activeProfile = System.properties['spring.profiles.active']
+    systemProperty('spring.profiles.active', activeProfile)
+}*/
