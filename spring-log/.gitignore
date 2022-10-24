@@ -17,6 +17,8 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+### docker
+docker/elasticsearch/data/
 ### IntelliJ IDEA ###
 .idea
 *.iws
