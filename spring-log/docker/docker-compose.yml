@@ -1,0 +1,11 @@
+version: "3.0"
+
+services:
+  logstash:
+    build:
+      context: ./logstash
+      dockerfile: Dockerfile
+    ports:
+      - "5044:5044"
+    volumes:
+      - ./pipeline:
