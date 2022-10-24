@@ -423,6 +423,8 @@ public class AsyncConfig {
 
 
 ### @Async 작동원리
+---
+
 > @Async는 AOP를 기반으로 작동하며 해당 어노테이션을 찾아 비동기 처리를 지원해 준다.
 
 1. 애플리케이션 시작 시 @Async 어노테이션을 찾아 AsyncAnnotationAdvisor.class를 생성한다.

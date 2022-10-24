@@ -175,8 +175,9 @@ logging:
 
 
 ### prod 환경에 맞는 logback.xml 작성하기
-
+- prod 환경에서는 elk 스택을 활용하여 로그 기록을 남긴다.
 > **Reference**
 > - [logback > setting](https://loosie.tistory.com/829)
 > - [logback > properties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot/src/main/resources/org/springframework/boot/logging/logback/defaults.xml)
 > - [logback > RollingFileAppender](https://ckddn9496.tistory.com/82)
+> - [logstash > docker](https://www.elastic.co/guide/en/logstash/current/docker-config.html)
