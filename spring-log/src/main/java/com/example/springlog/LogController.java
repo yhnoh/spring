@@ -16,4 +16,31 @@ public class LogController {
         log.warn("warn message");
         log.error("error message");
     }
+
+    @GetMapping("/logs/trace")
+    public void trace(){
+        log.trace("trace message");
+    }
+
+    @GetMapping("/logs/debug")
+    public void debug(){
+        log.debug("debug message");
+    }
+
+    @GetMapping("/logs/info")
+    public void info(){
+        log.info("info message");
+    }
+
+    @GetMapping("/logs/warn")
+    public void warn(){
+        log.warn("warn message");
+    }
+
+    @GetMapping("/logs/error")
+    public void error(){
+        log.error("error message");
+    }
+
+
 }

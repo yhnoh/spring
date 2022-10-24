@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+    <!-- logback-properties.xml 파일 포함-->
+    <include resource="logback-properties.xml"></include>
+    <!-- 로그 파일 입력할 절대 경로 -->
+    <property name="LOGS_ABSOLUTE_PATH" value="./logs"></property>
+    <!-- 콘솔(STDOUT) -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </layout>
+    </appender>
+
+
+    <!-- 파일(FILE) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- log 기록할 파일 위치 설정 -->
+        <file>${LOGS_ABSOLUTE_PATH}/info.log</file>
+        <!--     log 기록 타입 인코딩 -->
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOGS_ABSOLUTE_PATH}/info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <maxFileSize>100MB</maxFileSize>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 파일(FILE) -->
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- log 기록할 파일 위치 설정 -->
+        <file>${LOGS_ABSOLUTE_PATH}/error.log</file>
+        <!-- 로깅 레벺 필터 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <!--     log 기록 타입 인코딩 -->
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOGS_ABSOLUTE_PATH}/error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <maxFileSize>100MB</maxFileSize>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="FILE_ERROR"/>
+    </root>
+</configuration>

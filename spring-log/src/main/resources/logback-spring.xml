@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
 
+    <!-- logback-properties.xml 파일 포함-->
+    <include resource="logback-properties.xml"></include>
+
+    <!-- 콘솔(STDOUT) -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </layout>
+    </appender>
+    <!-- root 로깅 레벨 설정-->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
     <!-- 로그 패턴에 색상 적용 %clr(pattern){color} -->
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
 
-    <springProfile name="local, dev, prod">
+    <springProfile name="dev, prod">
         <proeprty resource="application.yml"></proeprty>
     </springProfile>
 
