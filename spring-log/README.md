@@ -182,3 +182,5 @@ logging:
 > - [logback > RollingFileAppender](https://ckddn9496.tistory.com/82)
 > - [logstash > docker](https://www.elastic.co/guide/en/logstash/current/docker-config.html)
 > - [elasticsearch > docker](https://www.elastic.co/guide/en/elasticsearch/reference/8.4/docker.html)
+> - [kibana > docker](https://www.elastic.co/guide/en/kibana/current/docker.html)
+> - [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder)

@@ -3,18 +3,65 @@
     <!--scanPeriod="30 seconds"-->
     <!-- logback-properties.xml 파일 포함-->
     <include resource="logback-properties.xml"></include>
+    <springProperty name="APPLCATION_NAME" source= "spring.application.name"></springProperty>
+    <springProperty name="PROFILE_NAME" source= "spring.profiles.active"></springProperty>
 
     <!-- 콘솔(STDOUT) -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
-        </layout>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc />
+                <pattern>
+                    <!-- 아래와 같은 키밸류 타입이 들어가면서 나중에 키바나에서 찾기 수월함-->
+                    <pattern>
+                        {
+                        "APPLCATION":"${APPLCATION_NAME}",
+                        "PROFILE":"${PROFILE_NAME}"
+                        }
+                    </pattern>
+                </pattern>
+                <timestamp />
+                <version />
+                <context />
+                <threadName />
+                <logLevel />
+                <message />
+                <loggerName />
+                <logstashMarkers />
+                <stackTrace />
+                <callerData />
+            </providers>
+        </encoder>
     </appender>
 
     <!-- Log Stash 사용시 사용할 TCP 통신 정보 -->
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>127.0.0.1:4560</destination>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"></encoder>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc />
+                <pattern>
+                    <!-- 아래와 같은 키밸류 타입이 들어가면서 나중에 키바나에서 찾기 수월함-->
+                    <pattern>
+                        {
+                        "APPLCATION":"${APPLCATION_NAME}",
+                        "PROFILE":"${PROFILE_NAME}"
+                        }
+                    </pattern>
+                </pattern>
+                <timestamp />
+                <version />
+                <context />
+                <threadName />
+                <logLevel />
+                <message />
+                <loggerName />
+                <logstashMarkers />
+                <stackTrace />
+                <callerData />
+            </providers>
+        </encoder>
+        <!--<encoder class="net.logstash.logback.encoder.LogstashEncoder"></encoder>-->
     </appender>
 
     <!-- root레벨 설정 -->

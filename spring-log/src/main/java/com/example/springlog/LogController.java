@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class LogController {
 
-    @GetMapping("/log")
+    @GetMapping("/logs")
     public void log(){
         log.trace("trace message");
         log.debug("debug message");
@@ -42,5 +42,6 @@ public class LogController {
         log.error("error message");
     }
 
-
+    @GetMapping("exception")
+    public void exception(){ throw new RuntimeException("예외 발생");}
 }

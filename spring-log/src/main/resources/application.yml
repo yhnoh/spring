@@ -1,7 +1,8 @@
 spring:
   profiles:
     active: local
-
+  application:
+    name: LOG_SERVICE_API
 #logging:
 #  file:
 #    path: ./logs/${spring.profiles.active}
@@ -10,3 +11,5 @@ spring:
 #    rollingpolicy:
 #      max-file-size: 10MB
 #      total-size-cap: 1GB
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml
