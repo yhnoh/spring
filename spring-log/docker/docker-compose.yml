@@ -31,11 +31,11 @@ services:
         source: ./logstash/pipeline
         target: /usr/share/logstash/pipeline
         read_only: true
-#      - type: bind
-#        source: ../logs
-#        target: /usr/share/logstash/pipeline
-#        read_only: true
-#      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - type: bind
+        source: ../logs
+        target: /usr/share/logstash/logs
+        read_only: false
+    #      - ./logstash/pipeline:/usr/share/logstash/pipeline
 #      - ./logstash/config:/usr/share/logstash/config
     networks:
       - elk
