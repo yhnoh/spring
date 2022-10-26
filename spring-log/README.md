@@ -172,11 +172,6 @@ logging:
 </configuration>
 ```
 
-- 정리할 것
-- 도커 네트워크, 도커 볼륨 알아보기
-- 파일 비트 이용 하여 로그 구축하기
-- MSA 환경에서 ELK 로그 적용
-- MS
 
 ### prod 환경에 맞는 logback.xml 작성하기
 - prod 환경에서는 elk 스택을 활용하여 로그 기록을 남긴다.
@@ -328,7 +323,14 @@ output {
 ![](./img/kibana-dataview.png)
 <br/><br/>
 
-> **Reference**
+#### 진행하면서 느낀점
+> - docker network와 volume에 대해 정리 필요
+> - filebeat를 이용하여 file 기반으로 데이터 수집하는 방법 알 필요 존재
+> - MSA 환경에서의 elk 구축은 어떻게 진행하는지 확인 필요
+>   - 예를 들어 각각의 도메인을 호출하는 과정에서 고객 한명의 요청 flow를 어떻게 확인할 수 있나?
+> - 다양한 로그 전략을 세우는 아키텍쳐 알 필요성 존재
+
+#### Reference
 > - [logback > setting](https://loosie.tistory.com/829)
 > - [logback > properties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot/src/main/resources/org/springframework/boot/logging/logback/defaults.xml)
 > - [logback > RollingFileAppender](https://ckddn9496.tistory.com/82)
