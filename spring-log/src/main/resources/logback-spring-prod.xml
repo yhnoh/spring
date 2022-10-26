@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true">
-    <!--scanPeriod="30 seconds"-->
-    <!-- logback-properties.xml 파일 포함-->
-    <include resource="logback-properties.xml"></include>
+<configuration scan="true" >
+    <!-- application.yml 설정 정보 읽어 오기-->
     <springProperty name="APPLCATION_NAME" source= "spring.application.name"></springProperty>
     <springProperty name="PROFILE_NAME" source= "spring.profiles.active"></springProperty>
 
@@ -12,7 +10,6 @@
             <providers>
                 <mdc />
                 <pattern>
-                    <!-- 아래와 같은 키밸류 타입이 들어가면서 나중에 키바나에서 찾기 수월함-->
                     <pattern>
                         {
                         "APPLCATION":"${APPLCATION_NAME}",

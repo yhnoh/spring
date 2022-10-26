@@ -1,0 +1,12 @@
+
+
+server:
+  tomcat:
+    basedir: .
+    accesslog:
+      enabled: true
+      directory: logs
+      suffix: .log
+      prefix: access_log
+      file-date-format: .yyyy-MM-dd
+      pattern: "[%{yyyy-MM-dd HH:mm:ss}t %s %r %a] %b %Dms %{User-Agent}i %{Referer}i"

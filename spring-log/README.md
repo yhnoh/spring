@@ -38,7 +38,7 @@
 - `src/main/resources/logback-spring.xml` 이 스프링 logback.xml 을 작성하는 기본 경로 및 파일 명이다. 일단 로컬환경에서는 logback 파일명을 변경해서 사용을 해보자.
 #### 1. application-local.yml
 - logback-spring-local.xml 파일에 작성된 로깅 설정 사용하기
-```groovy
+```yml
 logging:
     config: classpath:logback-spring-local.xml
 ```
@@ -86,7 +86,7 @@ logging:
 
 #### 1. application-dev.yml
 - logback-spring-dev.xml 파일에 작성된 로깅 설정 사용하기
-```groovy
+```yml
 logging:
     config: classpath:logback-spring-dev.xml
 ```
@@ -175,9 +175,159 @@ logging:
 - 정리할 것
 - 도커 네트워크, 도커 볼륨 알아보기
 - 파일 비트 이용 하여 로그 구축하기
+- MSA 환경에서 ELK 로그 적용
+- MS
 
 ### prod 환경에 맞는 logback.xml 작성하기
 - prod 환경에서는 elk 스택을 활용하여 로그 기록을 남긴다.
+  - logstash (로그 수집) -> elasticsearch (로그 저장) -> kibana (시각화)
+  - docker 환경에서 작업 진행, 실제 환경에서 elasticsearch는 docker로 활용안할 확률이 높다.
+- 확인을 위하여 콘솔에 로그 스태시에 전송할 로그와 동일한 로그를 출력한다.
+
+#### 1. docker 폴더 구조
+```text
+docker
+├── docker-compose.yml
+├── elasticsearch
+│   ├── Dockerfile
+│   ├── config  
+│   │   └── elasticsearch.yml
+│   └── data
+├── kibana
+│   ├── Dockerfile
+│   └── config
+│       └── kibana.yml
+└── logstash
+```
+- 각 config 폴더들은 해당 이미지의 설정 정보들이다.
+- docker-compose.yml, Dockerfile, config 정보는 깃허브에서 확인 가능하다.
+
+#### 2. application.yml 
+- 프로파일 설정이 늘어남으로 인해서 실행환경에 따라서 logback 설정을 자동으로 읽어올 수 있도록 변경하였다.
+- `spring.application.name`을 추가하여 나중에 kibana에서 해당 어플리케이션의 이름을 확인할 수 있도록 한다.
+```yml
+spring:
+  profiles:
+    active: local
+  application:
+    name: LOG_SERVICE_API
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml
+
+```
+
+#### 3. build.gradle logstash-logback-encoder 추가
+```groovy
+dependencies {
+    //...
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
+    //...
+}
+```
+-`logstash-logback-encoder`는 어플리케이션의 로그를 json형태로 출력해주는 다양한 logback appender, encoder, layout 들을 제공해 준다.
+- 이를 활용하여 로그를 json 형태로 쓰고, logstash에도 해당 로그를 전달할 수 있다.
+
+#### 4. xml 설정
+- 로그 스태시에 정보를 전달할 뿐아니라 해당 해당 내용을 눈으로 확인할 수 있게끔 콘솔에서도 확인해보자.
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" >
+    <!-- application.yml 설정 정보 읽어 오기-->
+    <springProperty name="APPLCATION_NAME" source= "spring.application.name"></springProperty>
+    <springProperty name="PROFILE_NAME" source= "spring.profiles.active"></springProperty>
+
+    <!-- 콘솔(STDOUT) -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc />
+                <pattern>
+                    <pattern>
+                        {
+                        "APPLCATION":"${APPLCATION_NAME}",
+                        "PROFILE":"${PROFILE_NAME}"
+                        }
+                    </pattern>
+                </pattern>
+                <timestamp />
+                <version />
+                <context />
+                <threadName />
+                <logLevel />
+                <message />
+                <loggerName />
+                <logstashMarkers />
+                <stackTrace />
+                <callerData />
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Log Stash 사용시 사용할 TCP 통신 정보 -->
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>127.0.0.1:4560</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc />
+                <pattern>
+                    <!-- 아래와 같은 키밸류 타입이 들어가면서 나중에 키바나에서 찾기 수월함-->
+                    <pattern>
+                        {
+                        "APPLCATION":"${APPLCATION_NAME}",
+                        "PROFILE":"${PROFILE_NAME}"
+                        }
+                    </pattern>
+                </pattern>
+                <timestamp />
+                <version />
+                <context />
+                <threadName />
+                <logLevel />
+                <message />
+                <loggerName />
+                <logstashMarkers />
+                <stackTrace />
+                <callerData />
+            </providers>
+        </encoder>
+        <!--<encoder class="net.logstash.logback.encoder.LogstashEncoder"></encoder>-->
+    </appender>
+
+    <!-- root레벨 설정 -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="LOGSTASH" />
+    </root>
+
+</configuration>
+```
+
+#### 5. logstash.conf 설정 정보
+- TCP 통신을 통해서 json 로그를 읽어들여 elasticsearch에 로그를 적재한다.
+- elasticsearch에서 `logstash-*`이라는 인덱스 템플릿을 생성한다.
+- 설정한 스프링 json 로그가 들어오면 elasticsearch가 해당 필드와 값에 대해 자동 매핑을 진행한다.
+```text
+input {
+    tcp {
+        port => 4560
+        codec => json_lines
+    }
+}
+
+output {
+  elasticsearch {
+    index => "logstash-%{+YYYY.MM.DD}"
+    hosts => ["http://elasticsearch-service:9200"]
+  }
+}
+```
+
+#### 6. kibana에서 확인
+- 해당 데이터가 시간순으로 들어오는지 확인할 수 있다.
+
+![](./img/kibana-dataview.png)
+<br/><br/>
+
 > **Reference**
 > - [logback > setting](https://loosie.tistory.com/829)
 > - [logback > properties](https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot/src/main/resources/org/springframework/boot/logging/logback/defaults.xml)
@@ -186,3 +336,4 @@ logging:
 > - [elasticsearch > docker](https://www.elastic.co/guide/en/elasticsearch/reference/8.4/docker.html)
 > - [kibana > docker](https://www.elastic.co/guide/en/kibana/current/docker.html)
 > - [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder)
+> - [filebeat > ](https://yonikim.tistory.com/22)

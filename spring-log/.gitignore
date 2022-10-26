@@ -16,7 +16,7 @@ logs
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-
+work
 ### docker
 docker/elasticsearch/data/
 ### IntelliJ IDEA ###

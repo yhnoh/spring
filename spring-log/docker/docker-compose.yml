@@ -35,8 +35,6 @@ services:
         source: ../logs
         target: /usr/share/logstash/logs
         read_only: false
-    #      - ./logstash/pipeline:/usr/share/logstash/pipeline
-#      - ./logstash/config:/usr/share/logstash/config
     networks:
       - elk
     depends_on:
