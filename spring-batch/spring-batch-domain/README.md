@@ -118,8 +118,86 @@ public Job helloJob() {
   - 실행중/종료시 상태, 실패시 발생한 에러, 생성/시작/종로/마지막수정 시간 정보
 - 작업이 실패된다면 동일 JobInstance로 새로운 JobExecution이 생길 수 있다.
 
+### Step
+---
+
+![](./img/job-step-hierarchy.png)
+
+- Step은 ***실제 배치 처리를 정의하고 제어하는데 필요한 정보***를 가지고 있다.
+- Step에서는 개발자가 직접 비지니스로직을 작성하기 때문에 내부 복잡도는 오로지 개발자의 역량에 달려 있다.
+- Job은 하나이상의 Step을 가지고 있다.
+- JobExecution관 상관관계에 있는 StepExecution이 있다.
+
+#### StepExecution
+- StepExecution은 ***Step의 실제 실행에 대한 정보를 나타내는 객체***이며 해당 Step이 실행될 때 생성된다.
+- StepExecution에는 JobExecution에 대한 참조와 커밋 및 롤백 횟수, 시작 및 종료 시간과 같은 트랜잭션과 관련된 데이터를 가지고 있다.
+  - 실행중/종료시 상태, 시작/종료 시간, ExecutionContext, 읽기/쓰기/필터/커밋/롤백 카운트, 읽기/쓰기/처리의 skip 카운트
+- 각 StepExecution에는 개발자가 Batch 실행에서 유지해야하는 데이터를 ExecutionContext가 가지고 있다.
+
+### ExecutionContext
+---
+- ExecutionContext는 ***각 Job마다, 혹은 각 Step에서 지정된 범위 내에서 데이터를 유지/연결 해주는 역할***을 한다.
+  - Job을 실행하면서 필요한 데이터를 지속 가능한 상태로 저장할 수 있다.
+  - 키/값의 컬렉션형태로 저장되어 있다.
+  - Job ExecutionContext는 해당 Job내에서 언제든지 값을 가지고올 수 있지만, Step ExecutionContext는 해당 Step내에서만 값을 가져올 수 있다.
+- 예를 들어 스프링 배치가 진행 도중에 오류가 발생했고, 실패한 시점부터 처리를 다시 시작해야할 때 ExecutionContext에 데이터를 보관하고 있으면 재시작이 용이하다.
+- Job과 Step은 ExecutionContext를 각각 가지고 있으며, Execution에 해당 참조를 가지고 있다.
+
+### JobRepository
+---
+
+- JobRepository는 배치 실행시 Job의 상태나 데이터 관리를 위한 정보들을 저장해준다.
+- JobRepository에 필요한 데이터를 개발자가 직접 CRUD해서 사용할 수 있다.
+![](./img/job-repository.png)
+
+### JobLauncher
+---
+
+- JobLauncher는 Job을 실행시키기위한 인터페이스다.
+- JobParameters의 정보를 같이 받아와서 Job을 실행시켜준다.
+
+```java
+public interface JobLauncher {
+
+	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException;
+
+}
+```
+
+### ItemReader
+---
+
+- ItemReader는 ***대량 데이터를 한번에 하나씩 읽을 수 있는 인터페이스***이다.
+- 하나의 Item을 리턴하거나 null을 리턴하는데 null일 경우 더이상 읽을 데이터가 없다는 것을 의미하다.
+- file, xml, dbms 등 다양한 데이터를 읽을 수 있다.
+
+```java
+public interface ItemReader<T> {   T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;}
+```
+
+### ItemWriter
+---
+
+- ItemWriter는 ***ItemReader를 통해서 읽어온 Item 들을 저장하기 위한 인터페이스***다.
+- file, xml, dbms 등 다양한 저장 매체에 저장할 수 있다.
+
+```java
+public interface ItemWriter<T> {   void write(List<? extends T> items) throws Exception;}
+```
+
+### ItemProcessor
+---
+
+- ItemProcessor는 ***ItemReader를 통해 읽어온 데이터에 비지니스로직을 넣어 가공하는 역할을 하는 인터페이스***다.
+- ItemReader를 통해서 읽어온 데이터가 유효하지 않으면 null을 리턴하여 해당 데이터를 ItemWriter가 처리하지 않게 한다.
+
+```java
+public interface ItemProcessor<I, O> {   O process(I item) throws Exception;}
+```
 
 
 #### Reference
 > - [Spring Batch Domain](https://docs.spring.io/spring-batch/docs/4.2.x/reference/html/domain.html#item-processor)
 > - [스프링 배치: Job, JobParameter, JobInstance, JobExecution](https://nankisu.tistory.com/69)
+> - [Spring Batch Meta Data](https://gngsn.tistory.com/179)
