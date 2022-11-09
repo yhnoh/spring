@@ -1,0 +1,1 @@
+- https://velog.io/@lxxjn0/Spring-Batch-Guide-05.-Spring-Batch-Scope-Job-Parameter

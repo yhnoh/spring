@@ -1,11 +1,11 @@
-package com.example.springbatchjob.job_parameters;
+package com.example.springbatchjob.job_parameters.validate.custom;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.util.StringUtils;
 
-public class ParameterValidator implements JobParametersValidator {
+public class FileNameJobParameterValidator implements JobParametersValidator {
 
     @Override
     public void validate(JobParameters parameters) throws JobParametersInvalidException {

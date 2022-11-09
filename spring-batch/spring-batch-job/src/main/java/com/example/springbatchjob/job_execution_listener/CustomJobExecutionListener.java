@@ -1,4 +1,4 @@
-package com.example.springbatchjob.Intercepting_job_execution;
+package com.example.springbatchjob.job_execution_listener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.BatchStatus;
@@ -6,7 +6,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 
 @Slf4j
-public class InterceptingJobExecutionListener implements JobExecutionListener {
+public class CustomJobExecutionListener implements JobExecutionListener {
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
