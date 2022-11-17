@@ -1,0 +1,7 @@
+POST http://localhost:8080/run
+Content-Type: application/json
+
+{
+  "name": "restApiJob",
+  "jobParameters": {"foo":  "bar"}
+}
