@@ -14,6 +14,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 @Configuration
@@ -25,7 +26,7 @@ public class GenerateAccountSummaryStepConfig {
     private final ApplyTransactionStepConfig applyTransactionStepConfig;
     @Bean
     @StepScope
-    public FlatFileItemWriter<AccountSummary> accountSummaryFileWriter(@Value("#{jobParamters['summaryFile']}") Resource resource){
+    public FlatFileItemWriter<AccountSummary> accountSummaryFileWriter(@Value("#{jobParameters['summaryFile']}") ClassPathResource resource){
         DelimitedLineAggregator<AccountSummary> lineAggregator = new DelimitedLineAggregator<>();
         BeanWrapperFieldExtractor<AccountSummary> fieldExtractor = new BeanWrapperFieldExtractor<>();
 

@@ -17,6 +17,7 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
@@ -35,7 +36,7 @@ public class ImportTransactionFileStepConfig {
 
     @Bean
     @StepScope
-    public ItemStreamReader<FieldSet> fileItemReader(@Value("#{jobParameters['trnasctionFile']}") Resource resource) {
+    public ItemStreamReader<FieldSet> fileItemReader(@Value("#{jobParameters['trnasctionFile']}") ClassPathResource resource) {
         return new FlatFileItemReaderBuilder<FieldSet>()
                 .name("fileItemReader")
                 .resource(resource)
@@ -48,9 +49,9 @@ public class ImportTransactionFileStepConfig {
     public JdbcBatchItemWriter<Transaction> transactionWriter(DataSource dataSource){
         return new JdbcBatchItemWriterBuilder<Transaction>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("INSERT INTO TRANSACTION " +
-                        "(ACCOUNT_SUMMARY_ID, TIMESTAMP, AMOUNT) " +
-                        "VALUES ((SELECT ID FROM ACCOUNT_SUMMARY WHERE ACCOUNT_NUMBER = :accountNumber))," +
+                .sql("insert into transaction " +
+                        "(account_summary_id, timestamp, amount) " +
+                        "values ((select id from account_summary where account_number = :accountNumber), " +
                         ":timestamp, :amount")
                 .dataSource(dataSource)
                 .build();
@@ -58,7 +59,7 @@ public class ImportTransactionFileStepConfig {
 
     @Bean
     public Step importTransactionFileStep(){
-        return this.stepBuilderFactory.get("importTranscationStep")
+        return this.stepBuilderFactory.get("importTransactionFileStep")
                 .<Transaction, Transaction>chunk(100)
                 .reader(transactionReader())
                 .writer(transactionWriter(null))
