@@ -1,4 +1,9 @@
 spring:
+  sql:
+    init:
+      data-locations: classpath:data-mysql.sql
+      schema-locations: classpath:schema-mysql.sql
+      mode: never
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     username: sa
