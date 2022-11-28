@@ -1,4 +1,4 @@
-package com.example.springbatchitemreader.flat_file_item_reader.delimited.delimited_quotation;
+package com.example.springbatchitemreader.flat_file_item_reader.delimited_fieldset_mapper;
 
 import lombok.*;
 
