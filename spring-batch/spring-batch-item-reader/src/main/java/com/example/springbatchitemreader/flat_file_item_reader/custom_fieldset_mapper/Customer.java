@@ -1,4 +1,4 @@
-package com.example.springbatchitemreader.flat_file_item_reader.delimited_tokenizer;
+package com.example.springbatchitemreader.flat_file_item_reader.custom_fieldset_mapper;
 
 import lombok.*;
 

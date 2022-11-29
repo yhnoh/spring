@@ -1,4 +1,4 @@
-package com.example.springbatchitemreader.flat_file_item_reader.delimited_tokenizer;
+package com.example.springbatchitemreader.flat_file_item_reader.custom_tokenizer;
 
 import org.springframework.batch.item.file.transform.DefaultFieldSetFactory;
 import org.springframework.batch.item.file.transform.FieldSet;

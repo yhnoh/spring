@@ -1,4 +1,4 @@
-package com.example.springbatchitemreader.flat_file_item_reader.delimited_fieldset_mapper;
+package com.example.springbatchitemreader.flat_file_item_reader.custom_tokenizer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,26 +19,24 @@ import org.springframework.core.io.Resource;
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-public class DelimitedQuotationReaderJobConfig {
-
+public class DelimitedTokenizerReaderJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
-
     @Bean
-    public Job delimitedQuotationReaderJob(){
-        return jobBuilderFactory.get("delimitedQuotationReaderJob")
+    public Job delimitedTokenizerReaderJob(){
+        return jobBuilderFactory.get("delimitedTokenizerReaderJob")
                 .incrementer(new RunIdIncrementer())
-                .start(delimitedQuotationReaderStep())
+                .start(delimitedTokenizerReaderStep())
                 .build();
     }
 
     @Bean
-    public Step delimitedQuotationReaderStep(){
-        return stepBuilderFactory.get("delimitedQuotationReaderStep")
+    public Step delimitedTokenizerReaderStep(){
+        return stepBuilderFactory.get("delimitedTokenizerReaderStep")
                 .<Customer, Customer>chunk(10)
-                .reader(delimitedQuotationItemReader(null))
-                .writer(delimitedQuotationItemWriter())
+                .reader(delimitedTokenizerItemReader(null))
+                .writer(delimitedTokenizerItemWriter())
                 .build();
     }
 
@@ -49,25 +47,17 @@ public class DelimitedQuotationReaderJobConfig {
      */
     @Bean
     @StepScope
-    public FlatFileItemReader<Customer> delimitedQuotationItemReader(@Value("#{jobParameters['customerFile']}") Resource inputFile){
+    public FlatFileItemReader<Customer> delimitedTokenizerItemReader(@Value("#{jobParameters['customerFile']}") Resource inputFile){
         return new FlatFileItemReaderBuilder<Customer>()
-                .name("delimitedQuotationItemReader")
+                .name("delimitedTokenizerItemReader")
+                .lineTokenizer(new DelimitedTokenizer())
                 .resource(inputFile)
-                .delimited()
-                .quoteCharacter('#')
-                .names(new String[]{"firstName",
-                        "middleInitial",
-                        "lastName",
-                        "street",
-                        "city",
-                        "state",
-                        "zipCode"})
-                .fieldSetMapper(new DelimitedQuotationFieldSetMapper())
+                .targetType(Customer.class)
                 .build();
     }
 
     @Bean
-    public ItemWriter<Customer> delimitedQuotationItemWriter(){
+    public ItemWriter<Customer> delimitedTokenizerItemWriter(){
         return items -> items.forEach(System.out::println);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.springbatchitemreader.flat_file_item_reader.delimited_fieldset_mapper;
+package com.example.springbatchitemreader.flat_file_item_reader.custom_fieldset_mapper;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
