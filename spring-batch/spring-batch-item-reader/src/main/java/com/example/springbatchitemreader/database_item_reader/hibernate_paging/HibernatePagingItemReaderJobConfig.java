@@ -1,6 +1,6 @@
 package com.example.springbatchitemreader.database_item_reader.hibernate_paging;
 
-import com.example.springbatchitemreader.database_item_reader.hibernate.Customer;
+import com.example.springbatchitemreader.database_item_reader.CustomerEntity;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.SessionFactory;
 import org.springframework.batch.core.Job;
@@ -36,24 +36,24 @@ public class HibernatePagingItemReaderJobConfig {
     @Bean
     public Step hibernatePagingItemReaderStep() {
         return stepBuilderFactory.get("hibernatePagingItemReaderStep")
-                .<Customer, Customer>chunk(100)
+                .<CustomerEntity, CustomerEntity>chunk(100)
                 .reader(hibernatePagingItemReader(null, null))
                 .writer(hibernatePagingItemWriter())
                 .build();
     }
 
-    private ItemWriter<Customer> hibernatePagingItemWriter() {
+    private ItemWriter<CustomerEntity> hibernatePagingItemWriter() {
         return items -> items.forEach(System.out::println);
     }
 
     @Bean
     @StepScope
-    public HibernatePagingItemReader<Customer> hibernatePagingItemReader(EntityManagerFactory entityManagerFactory,
-                                                                         @Value("#{jobParameters['city']}") String city) {
-        return new HibernatePagingItemReaderBuilder<Customer>()
+    public HibernatePagingItemReader<CustomerEntity> hibernatePagingItemReader(EntityManagerFactory entityManagerFactory,
+                                                                               @Value("#{jobParameters['city']}") String city) {
+        return new HibernatePagingItemReaderBuilder<CustomerEntity>()
                 .name("hibernatePagingItemReader")
                 .sessionFactory(entityManagerFactory.unwrap(SessionFactory.class))
-                .queryString("from Customer where city = :city")
+                .queryString("from CustomerEntity where city = :city")
                 .parameterValues(Collections.singletonMap("city", city))
                 .pageSize(10)
                 .build();

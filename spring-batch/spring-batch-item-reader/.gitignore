@@ -38,3 +38,4 @@ out/
 
 ### Customer
 /docker/mariadb/data
+/docker/mongodb/

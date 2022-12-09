@@ -1,4 +1,4 @@
-package com.example.springbatchitemreader.database_item_reader.hibernate;
+package com.example.springbatchitemreader.database_item_reader;
 
 import lombok.Getter;
 import lombok.ToString;
@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @Table(name = "customer")
 @Getter
 @ToString
-public class Customer {
+public class CustomerEntity {
 
     @Id
     private Long id;

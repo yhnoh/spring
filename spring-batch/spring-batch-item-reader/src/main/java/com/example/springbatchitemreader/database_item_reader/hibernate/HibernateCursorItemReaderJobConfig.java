@@ -1,5 +1,6 @@
 package com.example.springbatchitemreader.database_item_reader.hibernate;
 
+import com.example.springbatchitemreader.database_item_reader.CustomerEntity;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.SessionFactory;
 import org.springframework.batch.core.Job;
@@ -36,24 +37,24 @@ public class HibernateCursorItemReaderJobConfig {
     @Bean
     public Step hibernateCursorItemReaderStep() {
         return stepBuilderFactory.get("hibernateCursorItemReaderStep")
-                .<Customer, Customer>chunk(100)
+                .<CustomerEntity, CustomerEntity>chunk(100)
                 .reader(hibernateCursorItemReader(null, null))
                 .writer(hibernateCursorItemWriter())
                 .build();
     }
 
-    private ItemWriter<Customer> hibernateCursorItemWriter() {
+    private ItemWriter<CustomerEntity> hibernateCursorItemWriter() {
         return items -> items.forEach(System.out::println);
     }
 
     @Bean
     @StepScope
-    public HibernateCursorItemReader<Customer> hibernateCursorItemReader(EntityManagerFactory entityManagerFactory,
-                                                                         @Value("#{jobParameters['city']}") String city) {
-        return new HibernateCursorItemReaderBuilder<Customer>()
+    public HibernateCursorItemReader<CustomerEntity> hibernateCursorItemReader(EntityManagerFactory entityManagerFactory,
+                                                                               @Value("#{jobParameters['city']}") String city) {
+        return new HibernateCursorItemReaderBuilder<CustomerEntity>()
                 .name("hibernateCursorItemReader")
                 .sessionFactory(entityManagerFactory.unwrap(SessionFactory.class))
-                .queryString("from Customer where city = :city")
+                .queryString("from CustomerEntity where city = :city")
                 .parameterValues(Collections.singletonMap("city", city))
                 .build();
     }
