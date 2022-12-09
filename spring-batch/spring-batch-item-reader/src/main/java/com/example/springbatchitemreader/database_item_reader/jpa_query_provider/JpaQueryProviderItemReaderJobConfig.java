@@ -36,7 +36,8 @@ public class JpaQueryProviderItemReaderJobConfig {
                 .build();
     }
 
-    private Step jpaQueryProviderItemReaderStep() {
+    @Bean
+    public Step jpaQueryProviderItemReaderStep() {
         return stepBuilderFactory.get("jpaQueryProviderItemReaderStep")
                 .<CustomerEntity, CustomerEntity>chunk(100)
                 .reader(this.jpaQueryProviderItemReader(null, null))
@@ -50,7 +51,7 @@ public class JpaQueryProviderItemReaderJobConfig {
     public JpaPagingItemReader<CustomerEntity> jpaQueryProviderItemReader(EntityManager entityManager, @Value("#{jobParameters['city']}") String city) {
         JpaQueryProvider jpaQueryProvider = new JpaQueryProvider();
         jpaQueryProvider.setCityName(city);
-        
+
         return new JpaPagingItemReaderBuilder<CustomerEntity>()
                 .name("jpaQueryProviderItemReader")
                 .entityManagerFactory(entityManager.getEntityManagerFactory())
