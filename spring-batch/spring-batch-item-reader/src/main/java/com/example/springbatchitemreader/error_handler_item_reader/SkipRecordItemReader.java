@@ -1,4 +1,4 @@
-package com.example.springbatchitemreader.error_handler_item_reader.skip_record;
+package com.example.springbatchitemreader.error_handler_item_reader;
 
 import org.springframework.batch.item.*;
 
