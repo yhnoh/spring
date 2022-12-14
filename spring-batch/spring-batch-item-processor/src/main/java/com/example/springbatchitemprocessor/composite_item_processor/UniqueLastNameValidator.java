@@ -1,5 +1,6 @@
 package com.example.springbatchitemprocessor.composite_item_processor;
 
+import com.example.springbatchitemprocessor.composite_item_processor.Customer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.validator.ValidationException;

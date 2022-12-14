@@ -1,5 +1,7 @@
-package com.example.springbatchitemprocessor.composite_item_processor;
+package com.example.springbatchitemprocessor.composite_item_processor.composite;
 
+import com.example.springbatchitemprocessor.composite_item_processor.Customer;
+import com.example.springbatchitemprocessor.composite_item_processor.UniqueLastNameValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
