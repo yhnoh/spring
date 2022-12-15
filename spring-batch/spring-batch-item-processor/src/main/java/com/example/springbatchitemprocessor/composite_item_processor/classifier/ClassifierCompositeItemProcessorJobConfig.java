@@ -97,6 +97,9 @@ public class ClassifierCompositeItemProcessorJobConfig {
                 classifierUniqueLastNameValidatingItemProcessor());
     }
 
+    /**
+     * 모든 상황에 ItemProcessor를 적용하는 것이 아닌, 각 상황에 맞게끔 ItemProcessor를 적용한다.
+     */
     @Bean
     public ClassifierCompositeItemProcessor<Customer, Customer> classifierCompositeItemProcessor(){
         ClassifierCompositeItemProcessor<Customer, Customer> itemProcessor = new ClassifierCompositeItemProcessor<>();
