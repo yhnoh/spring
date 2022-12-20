@@ -1,4 +1,4 @@
-package com.example.springbatchitemwriter.database_item_writer.jdbc;
+package com.example.springbatchitemwriter.database_item_writer;
 
 import lombok.Getter;
 import lombok.Setter;

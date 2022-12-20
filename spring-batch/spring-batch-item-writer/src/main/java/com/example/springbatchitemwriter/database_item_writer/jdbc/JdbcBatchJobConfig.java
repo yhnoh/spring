@@ -1,5 +1,6 @@
 package com.example.springbatchitemwriter.database_item_writer.jdbc;
 
+import com.example.springbatchitemwriter.database_item_writer.Customer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

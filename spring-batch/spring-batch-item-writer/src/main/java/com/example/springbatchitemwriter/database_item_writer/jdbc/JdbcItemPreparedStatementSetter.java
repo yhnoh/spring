@@ -1,5 +1,6 @@
 package com.example.springbatchitemwriter.database_item_writer.jdbc;
 
+import com.example.springbatchitemwriter.database_item_writer.Customer;
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 
 import java.sql.PreparedStatement;
