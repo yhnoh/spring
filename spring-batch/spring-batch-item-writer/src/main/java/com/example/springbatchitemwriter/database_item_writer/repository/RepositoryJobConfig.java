@@ -65,6 +65,9 @@ public class RepositoryJobConfig {
                 .build();
     }
 
+    /**
+     * @EnableJpaRepositories을 사용하여 repositorty가 어디있는지 알려줘야 한다.
+     */
     @Bean
     public RepositoryItemWriter<CustomerEntity> repositoryItemWriter(EntityManagerFactory entityManagerFactory) {
 
