@@ -25,7 +25,9 @@ dependencies {
     //xml
     implementation 'org.springframework:spring-oxm'
     implementation 'com.thoughtworks.xstream:xstream:1.4.19'
-
+    
+    //activemq
+    implementation 'org.springframework.boot:spring-boot-starter-activemq'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
