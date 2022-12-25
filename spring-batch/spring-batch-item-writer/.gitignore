@@ -37,3 +37,4 @@ out/
 .vscode/
 
 /docker/mariadb/data/
+/src/main/resources/output/
