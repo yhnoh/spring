@@ -1,5 +1,6 @@
 package com.example.springbatchitemwriter.stax_event_item_writer;
 
+import com.example.springbatchitemwriter.stax_event_item_writer.header_footer.XmlFileHeaderCallback;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -26,6 +27,7 @@ import java.util.Map;
 public class XmlFileJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
+    private final XmlFileHeaderCallback xmlFileHeaderCallback;
 
     @Bean
     public Job xmlFileJob() {
@@ -88,6 +90,7 @@ public class XmlFileJobConfig {
                 .name("xmlFileItemWriter")
                 .resource(outputFile)
                 .rootTagName("customers")
+                .headerCallback(xmlFileHeaderCallback)
                 .marshaller(marshaller)
                 .build();
     }
