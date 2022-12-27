@@ -5,9 +5,7 @@ import com.example.springbatchexample.customer_update.dto.CustomerContactUpdate;
 import com.example.springbatchexample.customer_update.dto.CustomerNameUpdate;
 import com.example.springbatchexample.customer_update.dto.CustomerUpdate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
@@ -34,17 +32,9 @@ import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-public class CustomerUpdateJobConfig {
+public class CustomerUpdateStepConfig {
 
-    private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
-
-    @Bean
-    public Job customerUpdateJob() throws Exception {
-        return jobBuilderFactory.get("customerUpdateJob")
-                .start(this.customerUpdateStep())
-                .build();
-    }
 
     @Bean
     public Step customerUpdateStep() throws Exception {
