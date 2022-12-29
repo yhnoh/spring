@@ -15,12 +15,14 @@ public class BankJobConfig {
     private final Step customerUpdateStep;
     private final Step transactionStep;
     private final Step accountUpdateStep;
+    private final Step accountStatementStep;
     @Bean
     public Job bankJob() throws Exception {
         return jobBuilderFactory.get("bankJob")
                 .start(customerUpdateStep)
                 .next(transactionStep)
                 .next(accountUpdateStep)
+                .next(accountStatementStep)
                 .build();
     }
 
