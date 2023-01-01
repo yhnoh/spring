@@ -55,7 +55,7 @@ public class CustomerUpdateStepConfig {
     @StepScope
     public FlatFileItemReader<CustomerUpdate> customerUpdateItemReader(@Value("#{jobParameters['customerUpdateFile']}") Resource resource) throws Exception {
         return new FlatFileItemReaderBuilder<CustomerUpdate>()
-                .name("customerUpdateFile")
+                .name("customerUpdateItemReader")
                 .resource(resource)
                 .lineTokenizer(this.customerUpdateLineTokenizer())
                 .fieldSetMapper(this.customerUpdateFieldSetMapper())
