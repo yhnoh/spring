@@ -3,11 +3,9 @@ package com.example.springbatchexample;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class SpringBatchExampleApplicationTests {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test
-    void contextLoads() {
-    }
+public class SpringBatchExampleApplicationTests {
 
 }
