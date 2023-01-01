@@ -14,7 +14,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomerUpdateValidator implements Validator<CustomerUpdate> {
 
-    private static final String FIND_CUSTOMER = "SELECT COUNT(*) FROM CUSTOMER WHERE customer_id = :id";
+    static final String FIND_CUSTOMER = "SELECT COUNT(*) FROM CUSTOMER WHERE customer_id = :id";
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Override
