@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class User {
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,10 +22,10 @@ public class User {
     private String username;
     private LocalDateTime registerDate;
 
-    private static User createUser(String username) {
-        User user = new User();
-        user.username = username;
-        user.registerDate = LocalDateTime.now();
-        return user;
+    public static Member createMember(String username) {
+        Member member = new Member();
+        member.username = username;
+        member.registerDate = LocalDateTime.now();
+        return member;
     }
 }
