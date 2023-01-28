@@ -1,11 +1,10 @@
 package com.example.mapstruct.entity;
 
+import com.example.mapstruct.entity.enums.MemberStatus;
+import com.example.mapstruct.entity.enums.MemberType;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
@@ -24,13 +23,20 @@ public class Member {
     private Long id;
 
     private String username;
-    private LocalDateTime registerDate;
+    private LocalDateTime createdDatetime;
 
+    @Enumerated(value = EnumType.STRING)
+    private MemberType memberType;
+
+    @Enumerated(value = EnumType.STRING)
+    private MemberStatus memberStatus;
 
     public static Member createMember(String username) {
         Member member = new Member();
         member.username = username;
-        member.registerDate = LocalDateTime.now();
+        member.createdDatetime = LocalDateTime.now();
+        member.memberType = MemberType.MEMBER;
+        member.memberStatus = MemberStatus.ACTIVE;
         return member;
     }
 }

@@ -2,6 +2,8 @@ package com.example.mapstruct.mapper;
 
 import com.example.mapstruct.dto.MemberDTO;
 import com.example.mapstruct.entity.Member;
+import com.example.mapstruct.entity.enums.MemberStatus;
+import com.example.mapstruct.entity.enums.MemberType;
 import com.example.mapstruct.repository.MemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,7 @@ public class MemberMapperTest {
     private MemberMapper memberMapper;
 
     /**
+     * TODO:
      * 기본적으로 기본생성자와 빌더를 통해서 컴파일 시점에 @Mapper 어노테이션을 기반으로 코드를 생성한다.
      * intellij mapstruct plugin : https://plugins.jetbrains.com/plugin/10036-mapstruct-support
      */
@@ -38,27 +41,32 @@ public class MemberMapperTest {
         MemberDTO memberDTO = memberMapper.toMemberDTO(findMember);
 
         assertThat(memberDTO.getUsername()).isEqualTo("member1");
+        assertThat(memberDTO.getMemberType()).isEqualTo("MEMBER");
+        assertThat(memberDTO.getMemberStatus()).isEqualTo(MemberStatus.ACTIVE);
     }
 
     @Test
+    @DisplayName("dto 에서 entity")
     public void toEntityTest() {
         MemberDTO memberDTO = MemberDTO.builder()
                 .id(1L)
                 .username("member1")
-                .registerDate(LocalDateTime.of(2023, 01, 28, 00, 00))
+                .createdDatetime(LocalDateTime.of(2023, 01, 28, 00, 00))
+                .memberType("ADMIN")
+                .memberStatus(MemberStatus.DELETED)
                 .build();
 
         Member member = memberMapper.toMember(memberDTO);
-
-        assertThat(member.getId()).isNull();
-        assertThat(member.getUsername()).isEqualTo("member1");
-        assertThat(member.getRegisterDate()).isEqualTo(LocalDateTime.of(2023, 01, 28, 00, 00));
-
         Member saveMember = memberJpaRepository.save(member);
 
         assertThat(saveMember.getId()).isNotNull();
         assertThat(saveMember.getUsername()).isEqualTo("member1");
-        assertThat(saveMember.getRegisterDate()).isEqualTo(LocalDateTime.of(2023, 01, 28, 00, 00));
+        assertThat(saveMember.getCreatedDatetime()).isEqualTo(LocalDateTime.of(2023, 01, 28, 00, 00));
+        //enum도 자동 매핑이 된다.
+        assertThat(saveMember.getMemberType()).isEqualTo(MemberType.ADMIN);
+        assertThat(saveMember.getMemberStatus()).isEqualTo(MemberStatus.DELETED);
 
     }
+
+
 }
