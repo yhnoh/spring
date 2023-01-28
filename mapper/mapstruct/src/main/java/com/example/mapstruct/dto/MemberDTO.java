@@ -1,6 +1,5 @@
 package com.example.mapstruct.dto;
 
-import com.example.mapstruct.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -17,7 +16,7 @@ public class MemberDTO {
     private String username;
     private LocalDateTime registerDate;
 
-    public Member toEntity() {
-        return Member.createMember(username);
-    }
+//    public Member toEntity() {
+//        return Member.createMember(username);
+//    }
 }
