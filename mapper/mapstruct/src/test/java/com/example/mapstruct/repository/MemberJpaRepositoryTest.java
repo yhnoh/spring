@@ -20,4 +20,5 @@ public class MemberJpaRepositoryTest {
 
         assertThat(savedMember.getUsername()).isEqualTo("username");
     }
+
 }

@@ -17,7 +17,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String orderName;
-    private LocalDateTime orderDateTime;
+    private LocalDateTime createdDatetime;
     private Integer quantity;
 
     @JoinColumn(name = "member_id")
@@ -27,6 +27,7 @@ public class Order {
     public static Order createOrder(String orderName, int quantity, Member member) {
         Order order = new Order();
         order.orderName = orderName;
+        order.createdDatetime = LocalDateTime.now();
         order.quantity = quantity;
         order.member = member;
         return order;

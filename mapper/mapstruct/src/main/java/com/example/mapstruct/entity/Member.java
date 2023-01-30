@@ -6,6 +6,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @Builder와 @NoArgsConstructor를 같이 사용하면 @Builder는 사용할 매개변수가 없다.
@@ -27,9 +29,12 @@ public class Member {
 
     @Enumerated(value = EnumType.STRING)
     private MemberType memberType;
-
     @Enumerated(value = EnumType.STRING)
     private MemberStatus memberStatus;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member")
+    private List<Order> orders = Collections.emptyList();
 
     public static Member createMember(String username) {
         Member member = new Member();
@@ -39,5 +44,6 @@ public class Member {
         member.memberStatus = MemberStatus.ACTIVE;
         return member;
     }
+
 }
 

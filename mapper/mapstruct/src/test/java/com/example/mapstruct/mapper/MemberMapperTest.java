@@ -69,4 +69,6 @@ public class MemberMapperTest {
     }
 
 
+//    @Test
+//    @DisplayName("연관관계 테스트")
 }
