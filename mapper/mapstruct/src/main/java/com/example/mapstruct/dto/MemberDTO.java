@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -20,4 +22,6 @@ public class MemberDTO {
     private String memberType;
     private MemberStatus memberStatus;
 
+    @Builder.Default
+    private List<OrderDTO> orders = new ArrayList<>();
 }

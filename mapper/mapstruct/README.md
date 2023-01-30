@@ -6,15 +6,7 @@
 - MapStruct는 Java Bean 타입 간의 매핑 구현을 단순화하는 Code Generator이다.
   - Model <-> DTO 의 매핑 시 자주 사용
   - 컴파일 시, 내가 작성한 매핑 방식을 코드로 생성
-- 컴파일을 통해서 코드를 생성하기 때문에 잘못 사용할 시, 애플리케이션 자체가 실행이 안되거나, warning을 개발자에게 알려준다.
-  - 해당 필드가 매핑이 되지 않는다는 warning
-  ```
-  > Task :compileJava
-  /Users/yhnoh/git/spring/mapper/mapstruct/src/main/java/com/example/mapstruct/mapper/MemberMapper.java:13: warning: Unmapped target property: "orders".
-      Member toMember(MemberDTO memberDTO);
-          ^
-  1 warning
-  ```
+
 
 #### MapStruct 특징
 
@@ -27,6 +19,14 @@
   - ***개발자가 클래스를 작성한 기반으로 코드를 매핑하기 때문에 다른 개발자가 와도 MapStruct의 기본 지식만 있다면 쉽게 확인할 수 있음***
   - 문제 원인 발견과 디버깅이 쉬움
   - 특정 필드 누락 시에도 이를 인지하기 쉬움
+    - 해당 필드가 매핑이 되지 않는다는 warning
+    ```
+    > Task :compileJava
+    /Users/yhnoh/git/spring/mapper/mapstruct/src/main/java/com/example/mapstruct/mapper/MemberMapper.java:13: warning: Unmapped target property: "orders".
+        Member toMember(MemberDTO memberDTO);
+            ^
+    1 warning
+    ```
 - 다른 형태의 매핑 또는 복잡한 형태의 매핑을 시도하는 경우 왠만해서는 해결이 되지만 MapStruct 로직이 매우 복잡해 짐
 #### MapStruct 간단한 예제
 
@@ -82,9 +82,93 @@ public class MemberMapperImpl implements MemberMapper {
 }
 ```
 
-###
+### MapStruct가 객체의 필드를 매핑하는 여러 방법
+
+---
 
 
+
+### MapStruct가 객체의 필드에 접근하는 여러 방법
+
+---
+
+#### 1. 필드에 직접 접근
+- 읽는 필드에는 public과 public final을 통해서 접근, static은 고려 대상 아님
+- 작성 필드에는 public만 접근, final과 static은 고려 대상 아님
+
+#### 2. Getter/Setter를 이용한 방법
+- 필드를 private으로 두고 Getter/Setter 접근자 메서드를 통해서 매핑 가능
+
+#### 3. Builder 패턴을 이용한 방법
+- builder 패턴을 활용하여 객체를 매핑가능
+- 만약 build 메서드가 여러개가 있을 경우, MapStruct는 build라는 메서드를 찾아 호출, 만약 없다면 컴파일 오류 발생 
+  - `MoreThanOneBuilderCreationMethodException` 에러 발생
+- 특정 build 메서드를 정의하고저 한다면 `@Builder`를 통해서 build 메서드 지정
+  - `@BeanMapping, @Mapper, @MapperConfig` 함께 사용 가능
+
+#### 4. 생성자가 여러개일 경우
+
+```java
+public class Vehicle {
+
+    protected Vehicle() { }
+
+    // 단일 public 생성자이기 때문에, MapStruct는 해당 객체 사용하여 매핑
+    public Vehicle(String color) { }
+}
+
+public class Car {
+
+    // public 생성자이며 파라미터가 없기 때문에, MapStruct는 해당 객체 사용하여 매핑
+    public Car() { }
+
+    public Car(String make, String color) { }
+}
+
+public class Truck {
+
+    public Truck() { }
+
+    // @Default 어노테이션이 있기 때문에, MapStruct는 해당 객체 사용
+    @Default
+    public Truck(String make, String color) { }
+}
+
+public class Van {
+
+    //MapStruct가 어떤 생성자를 사용할지를 지정할 수 없기 때문에 에러 발생
+    public Van(String make) { }
+
+    public Van(String make, String color) { }
+
+}
+```
+
+### Mapper에 접근할 수 있는 방법
+
+---
+
+#### 1. Mappers Factory
+```java
+public interface MemberMapper {
+    /**
+     * Mappers Factory를 이용하여 직접 접근
+     */
+    MemberMapper INSTANCE = Mappers.getMapper(MemberMapper.class);
+}
+```
+
+#### 2. Dependency injection
+```java
+/**
+ * 스프링 컨테이너에서 Bean객체로 관리하여 주입받을 수 있는 방법
+ */
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface MemberMapper {
+
+    MemberMapper INSTANCE = Mappers.getMapper(MemberMapper.class);
+}
+```
 
 ### Reference
 > [https://mapstruct.org/](https://mapstruct.org/) <br/>

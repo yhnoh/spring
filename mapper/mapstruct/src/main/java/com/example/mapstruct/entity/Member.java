@@ -6,7 +6,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +34,7 @@ public class Member {
 
     @Builder.Default
     @OneToMany(mappedBy = "member")
-    private List<Order> orders = Collections.emptyList();
+    private List<Order> orders = new ArrayList<>();
 
     public static Member createMember(String username) {
         Member member = new Member();
@@ -43,6 +43,13 @@ public class Member {
         member.memberType = MemberType.MEMBER;
         member.memberStatus = MemberStatus.ACTIVE;
         return member;
+    }
+
+    public void addOrder(Order order) {
+        if (order == null) {
+            return;
+        }
+        orders.add(order);
     }
 
 }

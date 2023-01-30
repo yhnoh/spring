@@ -30,8 +30,8 @@ public class Order {
         order.createdDatetime = LocalDateTime.now();
         order.quantity = quantity;
         order.member = member;
+        order.member.addOrder(order);
         return order;
     }
-
 
 }

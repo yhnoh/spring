@@ -2,9 +2,11 @@ package com.example.mapstruct.mapper;
 
 import com.example.mapstruct.dto.MemberDTO;
 import com.example.mapstruct.entity.Member;
+import com.example.mapstruct.entity.Order;
 import com.example.mapstruct.entity.enums.MemberStatus;
 import com.example.mapstruct.entity.enums.MemberType;
 import com.example.mapstruct.repository.MemberJpaRepository;
+import com.example.mapstruct.repository.OrderJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class MemberMapperTest {
     @Autowired
     private MemberMapper memberMapper;
 
+    @Autowired
+    private OrderJpaRepository orderJpaRepository;
+
     /**
      * TODO:
      * 기본적으로 기본생성자와 빌더를 통해서 컴파일 시점에 @Mapper 어노테이션을 기반으로 코드를 생성한다.
@@ -37,12 +42,17 @@ public class MemberMapperTest {
         Member member = Member.createMember("member1");
         memberJpaRepository.save(member);
 
+        Order order = Order.createOrder("orderName", 1, member);
+        Order saveOrder = orderJpaRepository.save(order);
+
         Member findMember = memberJpaRepository.findByUsername("member1");
         MemberDTO memberDTO = memberMapper.toMemberDTO(findMember);
 
         assertThat(memberDTO.getUsername()).isEqualTo("member1");
         assertThat(memberDTO.getMemberType()).isEqualTo("MEMBER");
         assertThat(memberDTO.getMemberStatus()).isEqualTo(MemberStatus.ACTIVE);
+        assertThat(memberDTO.getOrders().size()).isEqualTo(1);
+        assertThat(memberDTO.getOrders().get(0).getMember()).isNull();
     }
 
     @Test
