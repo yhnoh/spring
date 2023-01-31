@@ -82,6 +82,10 @@ public class MemberMapperImpl implements MemberMapper {
 }
 ```
 
+### Spring에서 MapStruct 추가하기
+
+---
+
 ### MapStruct가 객체의 필드를 매핑하는 여러 방법
 
 ---
