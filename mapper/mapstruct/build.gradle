@@ -37,8 +37,8 @@ dependencies {
     // mapstruct
     //lombok-mapstruct-binding은 lombok과 mapstruct가 충돌하는 것을 방지하기 위한 라이브러리
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
     testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"

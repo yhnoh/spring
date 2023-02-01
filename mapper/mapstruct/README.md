@@ -82,14 +82,259 @@ public class MemberMapperImpl implements MemberMapper {
 }
 ```
 
-### Spring에서 MapStruct 추가하기
+### Spring에서 MapStruct 셋팅
 
 ---
 
-### MapStruct가 객체의 필드를 매핑하는 여러 방법
+```groovy
+    compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    testImplementation "org.mapstruct:mapstruct:${mapstructVersion}"
+
+    // mapstruct
+    //lombok-mapstruct-binding은 lombok과 mapstruct가 충돌하는 것을 방지하기 위한 라이브러리
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+```
+
+- MapStruct가 Lombok보다 뒤에 선언되어야 함
+  - MapStruct는 Lombok이 생성한 코드를 기반을 매핑을 하는 경우가 많기 때문
+
+
+### MapStruct가 객체의 필드를 매핑 유용한 방법들
 
 ---
 
+#### 1. 기본 사용 방법
+
+```java
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface BasicMapper {
+
+    @Mapping(target = "memberName", source = "username")
+    MemberDTO toMemberDTO(Member member);
+}
+```
+
+- `Member` 엔티티의 `usernmae` 필드를 제외하고는 자동 매핑 진행
+- `Member` 엔티티의 `usernmae` 필드를 `MemberDTO`의 `memberName` 필드에 매핑 진행
+
+#### 2. Composition Mapping
+
+- Mapping을 선언한 어노테이션을 제작하여 Mapper 인터페이스의 Mapping 메서드에서 사용 가능
+
+```java
+//Mapping 선언 어노테이션
+@Retention(RetentionPolicy.CLASS)
+@Mapping(target = "id", ignore = true)
+public @interface ToEntity {
+}
+
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface CompositionMapper {
+
+    //Mapping 선언한 어노테이션 사용
+    @ToEntity
+    @Mapping(target = "memberName", source = "username")
+    MemberDTO toMemberDTO(Member member);
+}
+```
+
+- 해당 예제를 통해서 id 값은 제외되고 매핑 진행
+
+#### 3. 커스텀 메서드를 통한 매핑
+
+- 인터페이스나 추상 클래스에서 자체 제작한 메서드들을 매핑 도구로 사용할 수 있다.
+  
+1. 자동 매핑
+
+```java
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface CustomMethodMapper {
+
+    MemberDTO toAutoMemberDTO(Member member);
+
+    default List<OrderDTO> toAutoOrderDTOs(List<Order> orders) {
+        return orders.stream().map(order -> OrderDTO.builder()
+                .id(order.getId())
+                .orderName(order.getOrderName())
+                .quantity(order.getQuantity())
+                .createdDatetime(order.getCreatedDatetime())
+                .build()).collect(Collectors.toList());
+    }
+}
+
+```
+
+- `MemberDTO` 내에 있는 `orders` 필드를 개발자가 직접 커스텀하여 매핑할 수 있음
+- Mapper 클래스의 크기가 작거나, 서로 연관 없을 때 사용하기 좋음
+  - 만약 다른 매핑 메서드애서 `List<OrderDTO> orders` 필드를 가진 DTO가 존재할 경우 서로 영향이 갈 수 있기 때문에 추천하지 않음
+
+2. 지정 매핑
+
+```java
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface CustomMethodMapper {
+
+    @Mapping(target = "orders", qualifiedByName = "ToOrderDTO")
+    MemberDTO toQualifiedMemberDTO(Member member);
+
+    @Mapping(target = "id", ignore = true)
+    @Named("ToOrderDTO")
+    OrderDTO toQualifiedOrderDTO(Order order);
+}
+```  
+- 동일하게 커스텀 매핑이 가능하지만 `@Named`를 지정하여 특정 이름을 지정한 곳에서만 해당 매핑 방식을 사용하도록 가능
+- ***Mapper 클래스 내에서도 지정하여 매핑을 하기 때문에 서로 영향 없이 작업 진행 가능*** 
+
+#### 4. 여러 파라미터를 받아 매핑 진행
+
+```java
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface SeveralSourceParametersMapper {
+
+    @Mapping(target = "username", source = "member.username")
+    @Mapping(target = "orderName", source = "order.orderName")
+    MemberOrderDTO toMemberOrderDTO(Member member, Order order);
+}
+```
+
+- 여러개의 파라미터를 전달 받아도 매핑 진행이 가능하다.
+
+### MapStruct를 이용한 데이터 타입을 변경
+
+---
+
+#### 1. 외부 데이터 변경 클래스 가져와 테이터 타입 변경
+
+```java
+public class InvokedMapper {
+
+
+    public static String localDateTimeToString(LocalDateTime localDateTime) {
+        return localDateTime != null ? localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
+    }
+
+    public static LocalDateTime stringToLocalDateTime(String localDateTime) {
+        return localDateTime != null ? LocalDateTime.parse(localDateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
+    }
+
+    public static String stringToString(String string) {
+        return string.replace("username", "username2");
+    }
+}
+
+//uses 필드를 이용하여 외부 데이터 매핑 클래스 사용 가능
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = InvokedMapper.class)
+public interface InvokingOtherMapper {
+
+    MemberDTO toMemberDTO(Member member);
+
+}
+```
+
+- `InvokedMapper`내에 있는 데이터 타입 변경 메서드를 사용 가능
+  - 인자는 source, 리턴 타입은 target
+- Mapper 클래스 내에 있는 모든 매핑 메서드에 영향을 줄 수 있기 때문에 추천하지 않는다.
+
+#### 2. 외부 데이터 변경 클래스를 가져와 지정하여 테이터 타입 변경
+
+- 두 가지 사용법이 존재하는데 실제 프로젝트를 진행하다보면 데이터 타입을 변경하는 util 클래스를 만드는 경우가 있는데 함께 사용하기 좋음
+
+1. 이름 기반으로 지정하여 데이터 타입 변경
+```java
+@Named("NamedInvokedMapper")
+public class NamedInvokedMapper {
+
+
+    @Named("LocalDateTimeToString")
+    public static String localDateTimeToString(LocalDateTime localDateTime) {
+        return localDateTime != null ? localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
+    }
+
+    @Named("StringToLocalDateTime")
+    public static LocalDateTime stringToLocalDateTime(String localDateTime) {
+        return localDateTime != null ? LocalDateTime.parse(localDateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
+    }
+
+    @Named("StringToString")
+    public static String stringToString(String string) {
+        return string.replace("username", "username2");
+    }
+}
+
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = NamedInvokedMapper.class)
+public interface NamedInvokingOtherMapper {
+
+
+    @Mapping(target = "createdDateTime", qualifiedByName = "LocalDateTimeToString")
+    @Mapping(target = "modifiedDateTime", qualifiedByName = {"NamedInvokedMapper", "StringToLocalDateTime"})
+    MemberDTO toMemberDTO(Member member);
+
+}
+```
+
+- 특정 매핑 필드에 대해서만 지정하여 데이터 타입 변경이 가능
+  - `qualifiedByName` 필드에 값을 지정할 때 IDE의 도움을 받지 못하기 때문에 사용하기 조금 불편
+
+2. 어노테이션 기반으로 지정하여 데이터 타입 변경
+
+
+```java
+@Qualifier
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.CLASS)
+public @interface LocalDateTimeToString {
+}
+
+@Qualifier
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.CLASS)
+public @interface StringToLocalDateTime {
+
+}
+
+@Qualifier
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.CLASS)
+public @interface StringToString {
+
+}
+
+public class AnnotatedInvokedMapper {
+
+    @LocalDateTimeToString
+    public static String localDateTimeToString(LocalDateTime localDateTime) {
+        return localDateTime != null ? localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
+    }
+
+    @StringToLocalDateTime
+    public static LocalDateTime stringToLocalDateTime(String localDateTime) {
+        return localDateTime != null ? LocalDateTime.parse(localDateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
+    }
+
+    @StringToString
+    public static String stringToString(String string) {
+        return string.replace("username", "username2");
+    }
+}
+
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = AnnotatedInvokedMapper.class)
+public interface AnnotatedInvokingOtherMapper {
+
+
+    @Mapping(target = "createdDateTime", qualifiedBy = LocalDateTimeToString.class)
+    @Mapping(target = "username", qualifiedBy = StringToString.class)
+    MemberDTO toMemberDTO(Member member);
+
+}
+
+```
+
+- 어노테이션 기반이기 때문에 IDE의 도움을 받아 쉽게 해당 메서드가 어디서 사용되고 있는지 확인할 수 있음
+- 하지만 지속적으로 어노테이션을 만들어줘야하는 불편함 존재, 많아질 경우 관리가 가능할지 의문
 
 
 ### MapStruct가 객체의 필드에 접근하는 여러 방법

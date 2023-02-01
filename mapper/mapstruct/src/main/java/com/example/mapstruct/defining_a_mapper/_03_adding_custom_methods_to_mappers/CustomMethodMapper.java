@@ -16,6 +16,8 @@ public interface CustomMethodMapper {
 
     MemberDTO toAutoMemberDTO(Member member);
 
+    MemberOrdersDTO toMemberOrdersDTO(Member member);
+
     default List<OrderDTO> toAutoOrderDTOs(List<Order> orders) {
         return orders.stream().map(order -> OrderDTO.builder()
                 .id(order.getId())

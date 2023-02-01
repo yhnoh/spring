@@ -44,6 +44,13 @@ public class CustomMethodMapperTest {
     }
 
     @Test
+    public void toMemberOrdersDTOTest() {
+        MemberDTO memberDTO = customMethodMapper.toAutoMemberDTO(member);
+
+        assertThat(memberDTO.getOrders()).extracting("id").first().isNotNull();
+    }
+
+    @Test
     public void toQualifiedMemberDTOTest() {
         MemberDTO memberDTO = customMethodMapper.toQualifiedMemberDTO(member);
 
