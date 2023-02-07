@@ -1,4 +1,4 @@
-package com.example.springbatchstock;
+package com.example.springbatchstock.stock.daily;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

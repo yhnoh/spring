@@ -1,4 +1,4 @@
-package com.example.springbatchstock;
+package com.example.springbatchstock.stock.daily;
 
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
@@ -14,13 +14,13 @@ public class DailyStockDataJobParametersValidator implements JobParametersValida
     @Override
     public void validate(JobParameters jobParameters) throws JobParametersInvalidException {
         Map<String, JobParameter> parameters = jobParameters.getParameters();
-        if(parameters.get("dailyStockFile") == null){
+        if (parameters.get("dailyStockFile") == null) {
             throw new JobParametersInvalidException("dailyStockFile parameter is not found");
         }
 
         String dailyStockFile = (String) parameters.get("dailyStockFile").getValue();
         Resource resource = new ClassPathResource(dailyStockFile);
-        if(!resource.exists()){
+        if (!resource.exists()) {
             throw new JobParametersInvalidException("dailyStockFile resource is not found");
         }
     }

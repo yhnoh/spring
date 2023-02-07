@@ -1,4 +1,4 @@
-package com.example.springbatchstock;
+package com.example.springbatchstock.stock.daily;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Entity
 @IdClass(StockPrimaryKey.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "stock_price")
+@Table(name = "daily_stock")
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DailyStock {

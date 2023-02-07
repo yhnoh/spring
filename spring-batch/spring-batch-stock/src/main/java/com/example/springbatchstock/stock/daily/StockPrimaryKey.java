@@ -1,4 +1,4 @@
-package com.example.springbatchstock;
+package com.example.springbatchstock.stock.daily;
 
 import java.io.Serializable;
 import java.time.LocalDate;
