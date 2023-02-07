@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Table(name = "stock_price")
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Stock {
+public class DailyStock {
     @Id
     private String stockCode;
     @Id
