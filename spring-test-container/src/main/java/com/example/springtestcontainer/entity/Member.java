@@ -26,4 +26,8 @@ public class Member {
         member.createdDateTime = LocalDateTime.now();
         return member;
     }
+
+    public void changeUsername(String username){
+        this.username = username;
+    }
 }
