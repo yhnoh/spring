@@ -28,6 +28,14 @@ import static org.assertj.core.api.Assertions.*;
 @ActiveProfiles("test")
 public class CreatingContainerTest {
 
+
+    /**
+     * .withExposedPorts(6379) 컨테이너 관점에서의 포트 번호
+     * .getMappedPort(6379) 실제 호스트와 매핑된 포트 번호를 가져오는 방법
+     *
+     * 로컬에서 실행 중인 소프트웨어와의 포트 충돌을 방지하기 위해서 이런식으로 설계 되었다.
+     */
+
     @Container
     private static final GenericContainer REDIS_CONTAINER = new GenericContainer("redis:7.0.8-alpine")
             .withExposedPorts(6379);
