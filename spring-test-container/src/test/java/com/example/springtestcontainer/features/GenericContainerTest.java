@@ -1,15 +1,11 @@
 package com.example.springtestcontainer.features;
 
 import com.example.springtestcontainer.config.RedisConfig;
-import com.github.dockerjava.api.model.Bind;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -17,16 +13,13 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.List;
-import java.util.function.Supplier;
-
 import static org.assertj.core.api.Assertions.*;
 
 @Testcontainers
 @Slf4j
 @SpringBootTest(classes = RedisConfig.class)
 @ActiveProfiles("test")
-public class CreatingContainerTest {
+public class GenericContainerTest {
 
 
     /**
