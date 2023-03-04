@@ -3,6 +3,7 @@ package com.example.springbatchtest;
 import com.example.springbatchtest.dto.DailyStockPriceDTO;
 import com.example.springbatchtest.entity.DailyStockPrice;
 import com.example.springbatchtest.repository.DailyStockPriceEntityRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,13 +65,13 @@ class DailJobConfigTest {
                 .openInt(1)
                 .build();
 
-        given(dataItemReader.read()).willReturn(dailyStockPriceDTO, null);
+        given(dataItemReader.read()).willReturn(dailyStockPriceDTO, (DailyStockPriceDTO) null);
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         assertThat(jobExecution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
 
         List<DailyStockPrice> dailyStockPrices = dailyStockPriceEntityRepository.findAll();
-        System.out.println("DailJobConfigTest.launchJobTest dailyStockPrices size = " + dailyStockPrices.size());
+        assertThat(dailyStockPrices.size()).isEqualTo(1);
     }
 
     @Test
@@ -85,13 +86,13 @@ class DailJobConfigTest {
                 .openInt(1)
                 .build();
 
-        given(dataItemReader.read()).willReturn(dailyStockPriceDTO, null);
+        given(dataItemReader.read()).willReturn(dailyStockPriceDTO, (DailyStockPriceDTO) null);
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         assertThat(jobExecution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
 
         List<DailyStockPrice> dailyStockPrices = dailyStockPriceEntityRepository.findAll();
-        System.out.println("DailJobConfigTest.launchJobTest2 dailyStockPrices size = " + dailyStockPrices.size());
+        assertThat(dailyStockPrices.size()).isEqualTo(1);
 
     }
 
