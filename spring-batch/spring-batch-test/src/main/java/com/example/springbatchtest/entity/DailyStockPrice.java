@@ -1,4 +1,4 @@
-package com.example.springbatchtest;
+package com.example.springbatchtest.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Builder
 @Getter
 @Table(name = "daily_stock_price")
-public class DailyStockPriceEntity {
+public class DailyStockPrice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

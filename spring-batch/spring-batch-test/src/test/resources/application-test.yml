@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:tc:mariadb:10.5.8:///spring_batch
+    username: sa
+    password:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  batch:
+    job:
+      names: ${job.names:NONE}
+    jdbc:
+      initialize-schema: always
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true

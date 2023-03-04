@@ -1,4 +1,4 @@
-package com.example.springbatchtest;
+package com.example.springbatchtest.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 @Getter
 @ToString
-public class DailyStockPrice {
+public class DailyStockPriceDTO {
 
     private LocalDate marketDate;
     private BigDecimal openPrice;
