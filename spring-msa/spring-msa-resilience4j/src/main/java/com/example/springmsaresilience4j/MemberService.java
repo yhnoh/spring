@@ -26,7 +26,7 @@ public class MemberService {
         }
     }
 
-    @CircuitBreaker(name = "memberService")
+    @CircuitBreaker(name = "memberService", fallbackMethod = "fallbackMethod")
     public List<Member> getMembers() {
         this.waitRandom();
         return memberRepository.findAll();

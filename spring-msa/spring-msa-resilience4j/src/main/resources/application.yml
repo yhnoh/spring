@@ -1,9 +1,45 @@
-#resilience4j:
-#  circuit-breaker:
-#    configs:
-#      default:
-#        failure-rate-threshold: 50
-#    instances:
-#      hello:
-#        base-config: default
-#
+resilience4j:
+  circuit-breaker:
+    instances:
+      memberService:
+        register-health-indicator: true
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50
+        record-exceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.client.ResourceAccessException
+        permitted-number-of-calls-in-half-open-state: 5
+        sliding-window-size: 3
+      orderService:
+        register-health-indicator: true
+        sliding-window-size: 6
+        permitted-number-of-calls-in-half-open-state: 4
+        wait-duration-in-open-state:
+          units:
+            - 20s
+        failure-rate-threshold: 60
+  bulkhead:
+    instances:
+      bulkheadMemberService:
+        max-wait-duration:
+          units:
+            - 10ms
+        max-concurrent-calls: 20
+  thread-pool-bulkhead:
+    instances:
+      bulkheadMemberService:
+        max-thread-pool-size: 1
+        core-thread-pool-size: 1
+        queue-capacity: 1
+  retry:
+    instances:
+      retryMemberService:
+        max-attempts: 5
+        wait-duration:
+          units:
+            - 10000
+        retry-exceptions:
+          - java.util.concurrent.TimeoutException
+
