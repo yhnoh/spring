@@ -23,5 +23,24 @@
 - 게이트웨이로 유입되는 요청과 응답을 검사s혹 조치를 취할 수 있는 필터를 제공한다.
   - 해당 필터로 들어오는 HTTP 요청 및 응답을 수정할 수 있다.
 - 요청을 실행하거나 처리하기 전에 해당 요청이 주어진 조건을 충족하는지 확인할 수 있는 서술자를 만든다.
-- 
+
 - 클라이언트가 서비스를 직접 호출한다면 각 서비스 마다 보인아나 로깅 같은 공통 관심사 로직을 직접 구현하는 것 외에 신속하게 구현할 수 있는 방법은 없다.
+  
+- 스프링 클라우드 게이트웨이는 본래 리버스 프록시다.
+  - 리버스 프록시는 자원에 도달하려는 클라이언트와 자원 사이에 위치한 중개 서비스이다.
+- 경로 매핑 방식에는 자동 경로 매핑과 수동 경로 매핑이있다.
+
+- 게이트웨이와 게이트웨이의 Predicate 및 Filter Factories를 사용하면 게이트웨이로 라우팅되는 모든 서비스에 대한 공통 관심사를 구현할 수 있다.
+
+#### 게이트웨이 Prdicate Factories
+- 게이트웨이 Prdicate는 요청을 실행하거나 처리하기 전에 요청이 조건을 충족하는지 확인하는 객체다.
+- (Spring Cloud Gateway Route Predicate Factories)[https://cloud.spring.io/spring-cloud-gateway/reference/html/#gateway-request-predicates-factories]
+
+### 게이트웨이 Filter Factories
+- 해당 게이트웨를 통한 모든 서비스 호출과 응답에 대해 일관된 방식으로 작업을 수행할 수 있게 해준다.
+- (Spring Cloud Gateway Fileter Factories)[https://cloud.spring.io/spring-cloud-gateway/reference/html/#gatewayfilter-factories]
+- 모든 서비스 호출에 적용될 수 있는 사용자 정의로직을 작성할 수 있다.
+  - 사전 필터 (pre-filter) : 실제 요청이 목적지 서비스로 전송되기 전에 사전 필터가 호출된다.
+    - 메시지 형싱을 확인하거나 (주요 HTTP 헤더 존재 여부 확인) 서비스를 호출하는 사용자가 인증되었는지 확인한다.
+  - 사후 필터 (post-filter) : 대상 목적지 서비스가 응답을 보낸 이후에 사후 필터가 호출된다.
+    - 일반적으로 대상 서비스의 응답을 다시 기록하거나 오류를 처리하거나 민간함 정보에 대한 응답을 검사하려고 사용된다.
