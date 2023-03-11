@@ -6,13 +6,14 @@ import com.example.springbatchdatabase.repository.MemberJpaRepository;
 import com.example.springbatchdatabase.repository.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class DataInitialization {

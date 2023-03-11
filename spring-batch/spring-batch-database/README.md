@@ -98,7 +98,7 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
     }
     ```
     - `javax.persistence.TransactionRequiredException: no transaction is in progress` 에러 발생
-    - 해당 에러가 발생하는 이유는 메인 클래스에서 `@EnableBatchProcessing`이 설정되면서 디폴트 트랜잭션을 `DefaultBatchConfigurer`에서 셋팅하고 JpaTransactionManager를 셋팅하지 않기 때문이다.
+    - 테스트 코드에서 해당 에러가 발생하는 이유는 메인 클래스에서 `@EnableBatchProcessing`이 설정되면서 디폴트 트랜잭션을 `DefaultBatchConfigurer`에서 셋팅하고 `JpaTransactionManager`를 셋팅하지 않기 때문이다.
     ```java
     public class DefaultBatchConfigurer implements BatchConfigurer {
         	@PostConstruct
