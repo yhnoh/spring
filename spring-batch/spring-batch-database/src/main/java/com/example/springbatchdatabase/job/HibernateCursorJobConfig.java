@@ -1,4 +1,4 @@
-package com.example.springbatchdatabase;
+package com.example.springbatchdatabase.job;
 
 import com.example.springbatchdatabase.entity.Member;
 import lombok.RequiredArgsConstructor;

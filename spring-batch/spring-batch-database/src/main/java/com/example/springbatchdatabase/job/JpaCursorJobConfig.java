@@ -1,4 +1,4 @@
-package com.example.springbatchdatabase;
+package com.example.springbatchdatabase.job;
 
 import com.example.springbatchdatabase.entity.Member;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +22,16 @@ public class JpaCursorJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final EntityManagerFactory entityManagerFactory;
+
     @Bean
-    public Job jpaCursorJob(){
+    public Job jpaCursorJob() {
         return jobBuilderFactory.get("jpaCursorJob")
                 .start(this.jpaCursorStep())
                 .build();
     }
 
     @Bean
-    public Step jpaCursorStep(){
+    public Step jpaCursorStep() {
         return stepBuilderFactory.get("jpaCursorStep")
                 .<Member, Member>chunk(20)
                 .reader(this.jpaCursorItemReader())
@@ -38,8 +39,9 @@ public class JpaCursorJobConfig {
                 .writer(this.jpaCursorItemWriter())
                 .build();
     }
+
     @Bean
-    public JpaCursorItemReader<Member> jpaCursorItemReader(){
+    public JpaCursorItemReader<Member> jpaCursorItemReader() {
         return new JpaCursorItemReaderBuilder<Member>().name("jpaCursorItemReader")
                 .entityManagerFactory(entityManagerFactory)
                 .queryString("select m from Member m")
@@ -47,7 +49,7 @@ public class JpaCursorJobConfig {
     }
 
     @Bean
-    public ItemProcessor<Member, Member> jpaCursorItemProcessor(){
+    public ItemProcessor<Member, Member> jpaCursorItemProcessor() {
         return item -> {
             String changeUsername = item.getUsername().replace("username", "un");
             item.changeUsername(changeUsername);
@@ -56,7 +58,7 @@ public class JpaCursorJobConfig {
     }
 
     @Bean
-    public JpaItemWriter<Member> jpaCursorItemWriter(){
+    public JpaItemWriter<Member> jpaCursorItemWriter() {
         return new JpaItemWriterBuilder<Member>()
                 .entityManagerFactory(entityManagerFactory)
                 .build();

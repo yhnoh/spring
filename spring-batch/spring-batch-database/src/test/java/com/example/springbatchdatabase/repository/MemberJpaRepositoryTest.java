@@ -15,15 +15,14 @@ import java.util.List;
 public class MemberJpaRepositoryTest {
     @Autowired
     private MemberJpaRepository memberJpaRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
     @Autowired
     private OrderJpaRepository orderJpaRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
     @Test
-    public void test() {
+    public void defaultBatchFetchSizeTest() {
         List<Member> members = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             Member member = Member.builder()
@@ -50,12 +49,11 @@ public class MemberJpaRepositoryTest {
 
         entityManager.flush();
         entityManager.clear();
+
         List<Member> findMembers = memberJpaRepository.findAll();
 
         findMembers.get(0).getOrders().get(0);
         findMembers.get(1).getOrders().get(1);
-//        List<Order> orders1 = findMembers.get(0).getOrders().get(0);
-//        List<Order> orders2 = findMembers.get(1).getOrders().get(1);
     }
 
 }
