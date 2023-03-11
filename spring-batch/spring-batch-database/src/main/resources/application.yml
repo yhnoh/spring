@@ -1,0 +1,12 @@
+spring:
+  batch:
+    job:
+      names: ${job.names:NONE}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 1000
