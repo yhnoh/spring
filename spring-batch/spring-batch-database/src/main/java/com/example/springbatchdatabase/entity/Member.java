@@ -12,6 +12,7 @@ import java.util.List;
 @Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Member {
 
     @Id
@@ -20,7 +21,8 @@ public class Member {
     private String username;
 
     @Builder.Default
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    @ToString.Exclude
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
 
     public void changeUsername(String username) {

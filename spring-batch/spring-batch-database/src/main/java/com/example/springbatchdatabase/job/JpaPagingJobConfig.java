@@ -2,14 +2,14 @@ package com.example.springbatchdatabase.job;
 
 import com.example.springbatchdatabase.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.SessionFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.HibernateCursorItemReader;
-import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder;
+import org.springframework.batch.item.database.JpaPagingItemReader;
+import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,38 +17,41 @@ import javax.persistence.EntityManagerFactory;
 
 @Configuration
 @RequiredArgsConstructor
-public class HibernateCursorJobConfig {
+public class JpaPagingJobConfig {
+
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final EntityManagerFactory entityManagerFactory;
 
     @Bean
-    public Job hibernateCursorJob() {
-        return jobBuilderFactory.get("hibernateCursorJob")
-                .start(this.hibernateCursorStep())
+    public Job jpaPagingJob() {
+        return jobBuilderFactory.get("jpaPagingJob")
+                .start(this.jpaPagingStep())
                 .build();
     }
 
     @Bean
-    public Step hibernateCursorStep() {
-        return stepBuilderFactory.get("hibernateCursorStep")
+    public Step jpaPagingStep() {
+        return stepBuilderFactory.get("jpaPagingStep")
                 .<Member, Member>chunk(20)
-                .reader(this.hibernateCursorItemReader())
-                .writer(this.hibernateCursorItemWriter())
+                .reader(this.jpaPagingItemReader())
+                .writer(this.jpaPagingItemWriter())
                 .build();
     }
 
     @Bean
-    public HibernateCursorItemReader<Member> hibernateCursorItemReader() {
-        return new HibernateCursorItemReaderBuilder<Member>()
-                .name("hibernateCursorItemReader")
-                .sessionFactory(entityManagerFactory.unwrap(SessionFactory.class))
-                .queryString("from Member")
+    @StepScope
+    public JpaPagingItemReader<Member> jpaPagingItemReader() {
+        return new JpaPagingItemReaderBuilder<Member>()
+                .name("jpaPagingItemReader")
+                .entityManagerFactory(entityManagerFactory)
+                .pageSize(20)
+                .queryString("select m from Member m")
                 .build();
     }
 
     @Bean
-    public ItemWriter<Member> hibernateCursorItemWriter() {
+    public ItemWriter<Member> jpaPagingItemWriter() {
         return items -> items.forEach(System.out::println);
     }
 }
