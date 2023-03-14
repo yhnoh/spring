@@ -18,31 +18,43 @@ import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-public class JdbcPagingJobConfig {
+public class ConnectionCursorJobConfig {
+
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
     private final DataSource dataSource;
 
     @Bean
-    public Job jdbcPagingJob() {
-        return jobBuilderFactory.get("jdbcPagingJob")
-                .start(this.jdbcPagingStep())
+    public Job connectionCursorJob() {
+        return jobBuilderFactory.get("connectionCursorJob")
+                .start(this.connectionCursorStep())
                 .build();
     }
 
     @Bean
-    public Step jdbcPagingStep() {
-        return stepBuilderFactory.get("jdbcPagingStep")
-                .<Member, Member>chunk(10)
-                .reader(this.jdbcPagingItemReader())
-                .writer(this.jdbcPagingItemWriter())
+    public Step connectionCursorStep() {
+        return stepBuilderFactory.get("connectionCursorStep")
+                .<Member, Member>chunk(5)
+                .reader(this.databaseConnectionItemReader())
+                .writer(this.jdbcCursorItemWriter())
                 .build();
     }
 
+//    @Bean
+//    public DatabaseConnectionItemReader<Member> databaseConnectionItemReader() {
+//        JdbcCursorItemReader<Member> jdbcCursorItemReader = new JdbcCursorItemReaderBuilder<Member>()
+//                .name("databaseConnectionItemReader")
+//                .dataSource(dataSource)
+//                .sql("select * from member")
+//                .beanRowMapper(Member.class)
+//                .build();
+//        return new DatabaseConnectionItemReader<>(jdbcCursorItemReader);
+//    }
+
     @Bean
-    public JdbcPagingItemReader<Member> jdbcPagingItemReader() {
-        return new JdbcPagingItemReaderBuilder<Member>()
+    public DatabaseConnectionItemReader<Member> databaseConnectionItemReader() {
+        JdbcPagingItemReader<Member> jdbcPagingItemReader = new JdbcPagingItemReaderBuilder<Member>()
                 .name("jdbcPagingItemReader")
                 .dataSource(dataSource)
                 .selectClause("select *")
@@ -52,12 +64,12 @@ public class JdbcPagingJobConfig {
                 .pageSize(10)
                 .fetchSize(10)
                 .build();
+        return new DatabaseConnectionItemReader<>(jdbcPagingItemReader);
     }
+
 
     @Bean
-    public ItemWriter<Member> jdbcPagingItemWriter() {
+    public ItemWriter<Member> jdbcCursorItemWriter() {
         return items -> items.forEach(System.out::println);
     }
-
-
 }

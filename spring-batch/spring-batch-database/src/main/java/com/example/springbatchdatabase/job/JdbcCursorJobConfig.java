@@ -11,7 +11,6 @@ import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import javax.sql.DataSource;
 
@@ -42,10 +41,10 @@ public class JdbcCursorJobConfig {
     @Bean
     public JdbcCursorItemReader<Member> jdbcCursorItemReader() {
         return new JdbcCursorItemReaderBuilder<Member>()
-                .name("jdbcCursorStep")
+                .name("jdbcCursorItemReader")
                 .dataSource(dataSource)
                 .sql("select * from member")
-                .rowMapper(new BeanPropertyRowMapper<>())
+                .beanRowMapper(Member.class)
                 .build();
     }
 
