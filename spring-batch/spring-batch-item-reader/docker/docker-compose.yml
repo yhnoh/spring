@@ -16,17 +16,21 @@ services:
       MYSQL_USER: sa
       MYSQL_PASSWORD: 1234
       TZ: Asia/Seoul
-#  mongodb:
-#    image: mongo
-#    container_name: "mongodb_container"
-#    #    entrypoint: [ "mongod", "--auth" ]
-#    volumes:
-#      - ./mongodb/data:/data/db
-#    ports:
-#      - 27017:27017
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: yhnoh
-#      MONGO_INITDB_ROOT_PASSWORD: 1234
+  mongodb:
+    image: mongo
+    container_name: "mongodb_container"
+    #    command: [ "mongod", "--config", "/etc/mongo/mongod.conf" ]
+    command: --auth
+    volumes:
+      - ./mongodb/data:/data/db
+      - ./mongodb/conf.d:/etc/mongo
+      - ./mongodb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: test_db
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
 #  mongo-express:
 #    image: mongo-express
 #    container_name: "mongo-express_container"
