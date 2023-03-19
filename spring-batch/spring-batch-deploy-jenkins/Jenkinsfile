@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+    parameters {
+        gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'BRANCH', type: 'PT_BRANCH'
+    }
+    stages {
+        stage ('git pull') {
+            steps {
+                git branch: "${params.BRANCH}", url: '${env.GIT_URL}'
+            }
+        }
+        stage ('build') {
+            steps {
+                sh '''
+                    ./gradlew clean build;
+                '''
+            }
+        }
+        stage ('deploy') {
+            steps {
+                sshagent(credentials: ['ssh-deploy-server']) {
+                    sh 'echo "$HOSTNAME-$DEPLOY_IP"'
+                    sh '''
+                        SSH_USER_HOME_DIRECTORY_NAME=$(ssh ubuntu@$DEPLOY_IP "pwd");
+                        DIRECTORY_NAME=deploy/batch_$(/bin/date +%Y%m%d%H%M%S);
+                        LINK_NAME=deploy/batch;
+                        
+                        ssh $UBUNTU_NAME@$DEPLOY_IP "mkdir -p $SSH_USER_HOME_DIRECTORY_NAME/$DIRECTORY_NAME";
+                        scp build/libs/*.jar $UBUNTU_NAME@$DEPLOY_IP:$SSH_USER_HOME_DIRECTORY_NAME/$DIRECTORY_NAME;
+                        ssh $UBUNTU_NAME@$DEPLOY_IP "ln -Tfs $SSH_USER_HOME_DIRECTORY_NAME/$DIRECTORY_NAME $SSH_USER_HOME_DIRECTORY_NAME/$LINK_NAME";
+                        
+                        JAR_PATH=$(ssh $UBUNTU_NAME@$DEPLOY_IP "readlink -f $SSH_USER_HOME_DIRECTORY_NAME/$LINK_NAME/ci-cd-jenkins-code-0.0.1-SNAPSHOT.jar");
+                        ssh $UBUNTU_NAME@$DEPLOY_IP "ls -t|tail -n +4|xargs rm -f"
+                    '''
+                }
+            }
+        }
+    }
+}
