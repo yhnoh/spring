@@ -22,6 +22,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'com.h2database:h2'
     //xml
     implementation 'org.springframework:spring-oxm'
     implementation 'org.glassfish.jaxb:jaxb-runtime'

@@ -1,5 +1,224 @@
+### ItemReader를 Bean으로 생성시 주의할 점
+
 ### AbstractItemCountingItemStreamItemReader
 ---
+
+
+### 1. ItemStream
+---
+
+- Chunk 단위의 배치 처리에서 ItemReader와 ItemWriter를 읽고 쓰는 작업이 가능하다.
+- 하지만 그 이외의 작업 처리가 불가능하므로 ItemStream 인터페이스를 활용하는 것이다.
+    - 그 이외의 작업 종류에는 어떤 것들이 있을까?
+        - 데이터를 읽기 위하여 리소스 초기화 작업
+        - Chunk 단위의 읽고 쓰는 작업이 끝났을때 초기화 했던 리소스를 해제하는 작업
+        - 데이터를 어디까지 읽고 쓰고 있는지 확인할 수 있는 작업
+- ItemStream은 ItemReader와 ItemWriter가 할 수 없는 나머지 작업들을 위한 인터페이스들을 제공한다.
+    ```java
+    public interface ItemStream {
+
+        void open(ExecutionContext executionContext) throws ItemStreamException;
+
+        void update(ExecutionContext executionContext) throws ItemStreamException;
+
+        void close() throws ItemStreamException;
+    }
+    ```
+- ItemStream 실행 시점 확인하기
+- open
+    - 스텝이 실행될 때 Chunk 단위 작업을 위해 리소스를 초기화하는데 주로 사용된다.
+    - 스텝이 실행될 때 해당 메서드를 실행한다.
+- update
+    - 스텝이 실행되는 동안 Chunk 단위 작업시작, 진행 상태를 체크한다.
+    - `ExcutionContext`를 통해서 현재 작업 상태를 저장소에 저장 가능하며, 해당 저장소에서 확인할 수 있다.
+    - 스텝이 실행될때, 그리고 Chunk단위로 실행되며, 스텝이 종료되기 전에도 실행된다.
+- close
+    - 스텝이 종료될 때 Chunk 단위 작업이 끝난 이후 리소스를 해제한다.
+    - 스텝이 종료될때 실행된다.
+
+#### ItemStream을 확인하기 위한 간단한 예제
+
+- 1부터 5까지 읽는 간단한 배치 프로그램을 제작
+
+```java
+
+@Configuration
+@RequiredArgsConstructor
+@Slf4j
+public class ItemStreamFlowJobConfig {
+
+    private final JobBuilderFactory jobBuilderFactory;
+    private final StepBuilderFactory stepBuilderFactory;
+    public static final String JOB_NAME_PREFIX = "itemStreamFlow";
+
+    @Bean(name = JOB_NAME_PREFIX + "Job")
+    public Job job() {
+        return jobBuilderFactory.get(JOB_NAME_PREFIX + "Job").start(this.step()).build();
+    }
+
+    @Bean(name = JOB_NAME_PREFIX + "Step")
+    public Step step() {
+        return stepBuilderFactory.get(JOB_NAME_PREFIX + "Step")
+                .<String, String>chunk(1)
+                .reader(new ItemStreamFlowItemReader())
+                .writer(items -> items.forEach(item -> log.info("write = {}", item)))
+                .build();
+    }
+
+    @Slf4j
+    public static class ItemStreamFlowItemReader implements ItemStreamReader<String> {
+
+        private Iterator<String> iterator = List.of("1", "2", "3", "4", "5").iterator();
+        String read = "";
+
+        @Override
+        public String read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+            read = iterator.hasNext() ? iterator.next() : null;
+            log.info("read = {}", read);
+            return read;
+        }
+
+        @Override
+        public void open(ExecutionContext executionContext) throws ItemStreamException {
+            log.info("open");
+        }
+
+        @Override
+        public void update(ExecutionContext executionContext) throws ItemStreamException {
+            log.info("update = {}", read);
+        }
+
+        @Override
+        public void close() throws ItemStreamException {
+            log.info("close");
+        }
+    }
+
+}
+```
+
+- 결과
+
+```text
+Job: [SimpleJob: [name=itemStreamFlowJob]] launched with the following parameters: [{random=-8943712583433438564}]
+Executing step: [itemStreamFlowStep]
+open
+update = 
+read = 1
+write = 1
+update = 1
+read = 2
+write = 2
+update = 2
+read = 3
+write = 3
+update = 3
+read = 4
+write = 4
+update = 4
+read = 5
+write = 5
+update = 5
+read = null
+update = null
+Step: [itemStreamFlowStep] executed in 39ms
+close
+Job: [SimpleJob: [name=itemStreamFlowJob]] completed with the following parameters: [{random=-8943712583433438564}] and the following status: [COMPLETED] in 59ms
+```
+
+- 잡과 스텝이 시작되면서 open, update 메서드를 호출하게 된다.
+- 이후 chunkSize 만큼 read,write를 하고 완료될 경우 update 메서드를 호출한다.
+- read에서 더이상 데이터를 읽을게 없을 경우 update 메서드를 실행하고, 스텝이 종료 이후 close 메서드를 호출한다.
+
+#### ItemStream은 주로 어디서 사용될까?
+
+- 가장 대표적으로 실패한 잡을 재실행할 때, 실패지점부터 다시 잡을 실행하도록 사용된다.
+- 스텝에서 정크 단위로 작업이 완료될때마다 ItemStream의 update 메서드가 실행되면서, 해당 정크 단위의 작업의 상태를 쉽게 알 수 있다.
+- 해당 ItemStream을 직접 구현도 할 수 있지만 스프링 배치에서 제공해주는 `AbstractItemCountingItemStreamItemReader` 클래스가 존재한다.
+  - 해당 클래스는 스프링 배치 내에 존재하는 많은 ItemReader들이 상속받아 사용받고 있기 때문에 해당 클래스를 분석해보는 것이 좋다.
+- 해당 클래스를 상속받아 내가 구현해야하는 배치 로직에 집중할 수 있는 장점이 있다.
+
+```java
+public abstract class AbstractItemCountingItemStreamItemReader<T> extends AbstractItemStreamItemReader<T> {
+	private static final String READ_COUNT = "read.count";
+
+	private static final String READ_COUNT_MAX = "read.count.max";
+
+	private int currentItemCount = 0;
+
+	private int maxItemCount = Integer.MAX_VALUE;
+
+	private boolean saveState = true;
+    
+    //특정 시작 시점을 설정할 수 있는 로직
+    @Override
+	public void open(ExecutionContext executionContext) throws ItemStreamException {
+		super.open(executionContext);
+		try {
+			doOpen();
+		}
+		catch (Exception e) {
+			throw new ItemStreamException("Failed to initialize the reader", e);
+		}
+		if (!isSaveState()) {
+			return;
+		}
+        
+		if (executionContext.containsKey(getExecutionContextKey(READ_COUNT_MAX))) {
+			maxItemCount = executionContext.getInt(getExecutionContextKey(READ_COUNT_MAX));
+		}
+
+		int itemCount = 0;
+		if (executionContext.containsKey(getExecutionContextKey(READ_COUNT))) {
+			itemCount = executionContext.getInt(getExecutionContextKey(READ_COUNT));
+		}
+		else if(currentItemCount > 0) {
+			itemCount = currentItemCount;
+		}
+
+		if (itemCount > 0 && itemCount < maxItemCount) {
+			try {
+				jumpToItem(itemCount);
+			}
+			catch (Exception e) {
+				throw new ItemStreamException("Could not move to stored position on restart", e);
+			}
+		}
+
+		currentItemCount = itemCount;
+
+	}
+    //update 메서드가 호출될 때마다 읽은 개수를 저장소에 저장
+	@Override
+	public void update(ExecutionContext executionContext) throws ItemStreamException {
+		super.update(executionContext);
+		if (saveState) {
+            //
+			Assert.notNull(executionContext, "ExecutionContext must not be null");
+			executionContext.putInt(getExecutionContextKey(READ_COUNT), currentItemCount);
+			if (maxItemCount < Integer.MAX_VALUE) {
+				executionContext.putInt(getExecutionContextKey(READ_COUNT_MAX), maxItemCount);
+			}
+		}
+
+	}
+}
+```
+
+> https://jgrammer.tistory.com/entry/Spring-Batch-%EC%8B%A4%ED%8C%A8%EB%A5%BC-%EB%8B%A4%EB%A3%A8%EB%8A%94-%EA%B8%B0%EC%88%A0-ItemStream
+
+### ItemReader
+
+- ItemReader는 read 메서드를 통해서 값을 리턴 받거나 null을 리턴받는다.
+    - 더이상 읽어들일 데이터가 없으면 null을 리턴한다.
+
+```java
+public interface ItemReader<T> {
+
+    T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
+
+}
+```
 
 ### CursorItemReader
 
