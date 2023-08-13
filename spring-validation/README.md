@@ -43,10 +43,10 @@ public class MemberController {
 - 회원가입 요청 객체의 필드 개수가 얼마 안되어 딱히 어렵지 않은 코드처럼 보이지만 필드가 수십개가 넘어가고 해당 필드에대해 전부 유효성 체크를 하는 로직과 비지니스 로직 수행 요청 로직이 몇개씩 섞여 들어가게 된다면 보기 어려운 코드가 탄생할 수 있다.
 - 때문에 우리는 유효성 검증과 비지니스 로직의 관심사를 분리하여 보기 좋은 코드, 유지 보수가 쉬운 코드를 작성할 수 있어야 한다. 
 
-### Spring Validation
+### Spring Boot Validation
 ---
 
-- 스프링에서는 유효성 검증과 비지니스 로직의 수행에 대해 관심사를 분리할 수 있는 라이브러리를 제공한다.
+- 스프링 부트에서는 유효성 검증과 비지니스 로직의 수행에 대해 관심사를 분리할 수 있는 라이브러리를 제공한다.
 
 ```groovy
 implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -55,12 +55,57 @@ implementation 'org.springframework.boot:spring-boot-starter-validation'
 ### @Valid
 ---
 
-- @Valid 어노테이션을 활용하면 외부의 요청에 대한 유효성 검증에 대한 관심사 분리를 간단하게 할 수 있다.
+- @Valid는 JSR-303 표준 스펙(자바 진영 스펙)으로써 빈 검증기(Bean Validator)를 이용해 객체의 제약 조건을 검증하도록 지시하는 어노테이션이다.
+- 스프링 웹은 외부 요청으로 부터 @Valid 어노테이션이 선언된 모델에 대해서 유효성 검증을 진행할 수 있는 기능을 제공하고 있다.  
 
-- 
+#### @Valid 사용법
+1. 먼저 요청시(런타임) 모델이 어떤 유효성 검증을 할지 알기 위해서, 요청 모델에 유효성 검사 제약 조건 어노테이션을 선언한다.
+  - 요청 모델 필드에 선언하는 어노테이션은 `javax.validation`에서 기본적으로 제공하는 제약 조건이나 사용자 정의 제약 조건을 정의할 수 있다.
+    ```java
+    @RequiredArgsConstructor
+    @Getter
+    public class MemberJoinerRequest {
 
+        @NotBlank
+        private final String id;
 
+        @NotBlank
+        private final String password;
 
+        @Min(1)
+        private final int age;
+
+    }
+    ```
+2. 컨트롤러로 부터 요청이 들어올 때, 요청 모델이 유효성 체크를 진행해야한다는 것을 알 수 있도록 @Valid 어노테이션을 선언한다.
+    ```java
+    @RestController
+    @RequiredArgsConstructor
+    public class MemberController {
+
+        private final JoinMemberService joinMemberService;
+
+        @PostMapping("/members-valid")
+        public void joinValidMember(@RequestBody @Valid MemberJoinerRequest memberJoinerRequest) {
+            //회원가입 요청
+            joinMemberService.joinMember(memberJoinerRequest);
+        }
+
+    }
+    ```
+- 요청 모델에 대한 유효성 검증이 실패시 응답으로 Bad Request와 MethodArgumentNotValidException 에러가 발생한다.
+```json
+{
+  "timestamp": "2023-08-12T08:38:55.523+00:00",
+  "status": 400,
+  "error": "Bad Request",
+  "path": "/validate"
+}
+
+org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument
+```
+
+#### Controller에서 @Valid 선언으로 요청 모델의 유효성 검증이 되는 원리 파악해보기
 
 - 스프링 웹은 외부에서 요청할 경우 DispatcherServlet을 통해서 요청을 처리할 Controller를 찾아 위임하고, 그 결과를 받아아는 구조이다.
   - DispatcherServlet에서 Controller에게 요청을 위임하고 응답하는 일련의 과정 속에서 원하는 형태로 메시지를 요청, 응답을 받기위해 가공해주는 핸들러 객체가 있다.
