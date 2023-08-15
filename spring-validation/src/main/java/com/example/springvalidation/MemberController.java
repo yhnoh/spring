@@ -2,7 +2,9 @@ package com.example.springvalidation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -51,26 +53,4 @@ public class MemberController {
         joinMemberService.joinMember(commend);
     }
 
-
-    private final ValidateService validateService;
-
-
-    @PostMapping("/valid")
-    public String valid(@RequestBody @Valid MemberJoinerRequest memberJoinerRequest) {
-        return "ok";
-    }
-
-    @GetMapping("/validated")
-    public String validated(@RequestParam(required = false) String id,
-                            @RequestParam(required = false) String password,
-                            @RequestParam(required = false) int age) {
-        validateService.validate(new ValidateCommand(id, password, age));
-        return "ok";
-    }
-
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "hello";
-    }
 }
