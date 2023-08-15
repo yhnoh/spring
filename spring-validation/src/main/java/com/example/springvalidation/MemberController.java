@@ -37,20 +37,23 @@ public class MemberController {
     }
 
     @PostMapping("/members-valid")
-    public void joinValidMember(@RequestBody @Valid MemberJoinerRequest memberJoinerRequest) {
+    public void joinValidMember(@RequestBody @Valid MemberJoinerRequest request) {
         //회원가입 요청
-        joinMemberService.joinMember(memberJoinerRequest);
+        joinMemberService.joinMember(request);
+    }
+
+    @PostMapping("/members-validated")
+    public void joinValidatedMember(@RequestBody MemberJoinerRequest request) {
+
+
+        MemberJoinerCommend commend = new MemberJoinerCommend(request.getId(), request.getPassword(), request.getAge());
+        //회원가입 요청
+        joinMemberService.joinMember(commend);
     }
 
 
     private final ValidateService validateService;
 
-
-    @PostMapping("/validator")
-    public String valid(@RequestBody @Valid Member member) {
-
-        return "ok";
-    }
 
     @PostMapping("/valid")
     public String valid(@RequestBody @Valid MemberJoinerRequest memberJoinerRequest) {

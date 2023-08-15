@@ -1,4 +1,4 @@
-### 유효성 검증의 필요성
+### 1. 유효성 검증의 필요성
 ---
 
 - 웹 프로젝트에서는 외부의 요청 -> 비지니스 로직 수행 -> 데이터 쓰기 및 읽기 작업을 주로 진행한다.
@@ -43,7 +43,7 @@ public class MemberController {
 - 회원가입 요청 객체의 필드 개수가 얼마 안되어 딱히 어렵지 않은 코드처럼 보이지만 필드가 수십개가 넘어가고 해당 필드에대해 전부 유효성 체크를 하는 로직과 비지니스 로직 수행 요청 로직이 몇개씩 섞여 들어가게 된다면 보기 어려운 코드가 탄생할 수 있다.
 - 때문에 우리는 유효성 검증과 비지니스 로직의 관심사를 분리하여 보기 좋은 코드, 유지 보수가 쉬운 코드를 작성할 수 있어야 한다. 
 
-### Spring Boot Validation
+### 2. Spring Boot Validation
 ---
 
 - 스프링 부트에서는 유효성 검증과 비지니스 로직의 수행에 대해 관심사를 분리할 수 있는 라이브러리를 제공한다.
@@ -52,14 +52,14 @@ public class MemberController {
 implementation 'org.springframework.boot:spring-boot-starter-validation'
 ```
 
-### @Valid
+### 3. @Valid
 ---
 
 - @Valid는 JSR-303 표준 스펙(자바 진영 스펙)으로써 빈 검증기(Bean Validator)를 이용해 객체의 제약 조건을 검증하도록 지시하는 어노테이션이다.
 - 스프링 웹은 외부 요청으로 부터 @Valid 어노테이션이 선언된 모델에 대해서 유효성 검증을 진행할 수 있는 기능을 제공하고 있다.  
 
-#### @Valid 사용법
-1. 먼저 요청시(런타임) 모델이 어떤 유효성 검증을 할지 알기 위해서, 요청 모델에 유효성 검사 제약 조건 어노테이션을 선언한다.
+#### 3.1. @Valid 사용해보기
+1. 먼저 요청시(런타임) 모델이 어떤 유효성 검증을 해야하는지, 요청 모델에 유효성 검사 제약 조건 어노테이션을 선언한다.
   - 요청 모델 필드에 선언하는 어노테이션은 `javax.validation`에서 기본적으로 제공하는 제약 조건이나 사용자 정의 제약 조건을 정의할 수 있다.
     ```java
     @RequiredArgsConstructor
@@ -105,45 +105,91 @@ implementation 'org.springframework.boot:spring-boot-starter-validation'
 org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument
 ```
 
-#### Controller에서 @Valid 선언으로 요청 모델의 유효성 검증이 되는 원리 파악해보기
+#### 3.2. Controller에서 @Valid 선언으로 요청 모델의 유효성 검증이 되는 원리 파악해보기
 
-- 스프링 웹은 외부에서 요청할 경우 DispatcherServlet을 통해서 요청을 처리할 Controller를 찾아 위임하고, 그 결과를 받아아는 구조이다.
+- 스프링 웹은 외부에서 요청할 경우 DispatcherServlet을 통해서 요청을 처리할 Controller를 찾아 위임하고, 그 결과를 전달하는 구조이다.
   - DispatcherServlet에서 Controller에게 요청을 위임하고 응답하는 일련의 과정 속에서 원하는 형태로 메시지를 요청, 응답을 받기위해 가공해주는 핸들러 객체가 있다.
   - `HandlerMethodArgumentResolver, HandlerMethodReturnValueHandler`
-  
+- 외부에서 전달한 메서지를 어떤형태의 매개변수로 전달할지 `HandlerMethodArgumentResolver`가 결정하기 때문에 해당 클래스를 상속받은 클래스를 살펴보면 어떻게 동작하는지 확인할 수 있다. 
+- 위 예제에서는 @RequestBody를 선언하여 json을 역직렬화한 객체를 컨트롤러에게 전달하고 있기 때문에 `RequestResponseBodyMethodProcessor` 클래스를 통해서 유효성 검증 로직을 확인할 수 있다.
+    ```java
+    public class RequestResponseBodyMethodProcessor extends AbstractMessageConverterMethodProcessor {
+        @Override
+        public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
+                NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+
+            //...
+
+            if (binderFactory != null) {
+                WebDataBinder binder = binderFactory.createBinder(webRequest, arg, name);
+                if (arg != null) {
+                    //@Valid가 선언되어 있는 요청 모델에 대한 유효성 검증 진행
+                    validateIfApplicable(binder, parameter);
+                    if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
+                        throw new MethodArgumentNotValidException(parameter, binder.getBindingResult());
+                    }
+                }
+                if (mavContainer != null) {
+                    mavContainer.addAttribute(BindingResult.MODEL_KEY_PREFIX + name, binder.getBindingResult());
+                }
+            }
+
+            return adaptArgumentIfNecessary(arg, parameter);
+        }
+    }
+    ```  
+    - `validateIfApplicable(binder, parameter);`를 통해서 @Valid가 선언되어 있는지 확인한다.
+    - 이후 유효성 검증을 실패할 경우 `MethodArgumentNotValidException`에러를 던진다.
 
 
+### 4. @Validated
 
-- 그 전에 유효성 검증과 비지니스 로직이 함께 있는 코드란 무엇인지 한번 알아보자.
+- 스프링 웹에서 @Valid를 통해서 간단하게 유효성 검증을 진행할 수 있다는 것을 확인햇다.
+- 하지만 그 이외의 계층에서 입력 유효성 체크는 어떻게 진행하는 것이 좋을까?
+  - `@Validated`와 `@Valid`를 활용하면 다른 계층에서도 유효성 검증을 할 수 있다.
 
+#### 4.1. @Validated 사용해보기 
 
+1. 입력 모델 필드에 제약 조건들을 선언한다.
+    ```java
+    @RequiredArgsConstructor
+    @Getter
+    public class MemberJoinerCommend {
 
-- Spring에서는 `LocalValidatorFactoryBean`가 제약조건 검증을 담당한다.
+        @NotBlank
+        private final String id;
 
-디스패처 서블릿을 통해서 @Valid
+        @NotBlank
+        private final String password;
 
-- 디스패처 서블릿을 컨트롤러를 요
+        @Min(1)
+        private final int age;
 
-- `org.springframework.web.bind.MethodArgumentNotValidException` 에러가 발생하며 DefaultHandlerExceptionResolver을 통해서 에러를 핸들링하여
-  400으로 응답을 한다.
-- @Valid는 기본적으로 컨트롤러에서만 동작하며 기본적으로 다른 계층에서는 검증이 되지 않는다.
+    }
+    ```
+2. 유효성 검증을 해당 클래스에서 진행한다는 것을 알려주기 위하여 @Validated를 선언하고, 해당 입력 모델이 유효성 체크를 해야한다는 것을 일려주기 위해서 @Valid를 선언한다.
+    ```java
+    @RequiredArgsConstructor
+    @Service
+    @Validated
+    public class JoinMemberService {
+        public void joinMember(@Valid MemberJoinerCommend memberJoinerCommend) {
 
-```json
-{
-  "timestamp": "2023-08-12T08:38:55.523+00:00",
-  "status": 400,
-  "error": "Bad Request",
-  "path": "/validate"
-}
+        }
+    }
+    ```
+- 요청 모델에 대한 유효성 검증이 실패시 응답으로 Internal Server Error와 ConstraintViolationException 에러가 발생한다.
+    ```json
+    {
+        "timestamp": "2023-08-15T06:44:39.120+00:00",
+        "status": 500,
+        "error": "Internal Server Error",
+        "path": "/members-validated"
+    }
 
-org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument
-```
+    javax.validation.ConstraintViolationException
+    ```
 
-- https://mangkyu.tistory.com/174
-
-https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html
-
-- https://docs.spring.io/spring-framework/reference/core/validation/validator.html
 
 
 - @Validated
@@ -156,7 +202,7 @@ https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation
     - @Validated를 선언된 클래스들의 메소드들이 호출될 때 AOP의 포인트 컷으로써 요청을 가로채서 유효성 검증을 진행한다.
 
 ```java
-public class MethodValidationPostProcessor extends AbstractBeanFactoryAwareAdvisingPostProcessor
+
         implements InitializingBean {
 
     private final Class<? extends Annotation> validatedAnnotationType = Validated.class;
@@ -185,3 +231,8 @@ public class MethodValidationPostProcessor extends AbstractBeanFactoryAwareAdvis
 Validator 활용해보
 
 - MethodValidationInterceptor
+
+
+- https://mangkyu.tistory.com/174
+- https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html
+- https://docs.spring.io/spring-framework/reference/core/validation/validator.html
