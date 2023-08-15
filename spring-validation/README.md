@@ -190,20 +190,14 @@ org.springframework.web.bind.MethodArgumentNotValidException: Validation failed 
     javax.validation.ConstraintViolationException
     ```
 
+#### 4.2. @Validated 선언으로 입력 모델의 유효성 검증이 되는 원리 파악해보기
 
-
-- @Validated
-- 스프링 웹에서는 컨트롤러를 통해 들어오는 요청에 대해 유효성 체크를 하기 위해서 @Valid를 이용하여 입력 파라미터의 검증을 진행하고 있다.
-- 하지만 그 이외의 계층에서 입력 유효성 체크는 어떻게 진행하는 것이 좋을까?
-- 가장 간단한 방법은 @Validated를 활용하는 것이다.
-- 스프링에서 제공하는 @Validated 어노테이션을 활용하면 @Validated가 선언된 클래스의 메소드 요청을 가로채서 유효성 검증을 진행한다.
-    - @Validated를 선언하면 해당 클래스의 메서드 요청을 가로채서 유효성 검증을 할 수 있도록 AOP 어드바이스에 등록된다.
-        - MethodValidationPostProcessor, MethodValidationInterceptor
-    - @Validated를 선언된 클래스들의 메소드들이 호출될 때 AOP의 포인트 컷으로써 요청을 가로채서 유효성 검증을 진행한다.
-
+- 스프링에서는 관심사의 분리를 위하여 AOP 기술을 많이 활용하고 있으며 @Validated를 통한 유효성 검증도 AOP를 활용한다.
+- @Validated를 선언하면 해당 클래스의 메서드 요청을 가로채서 유효성 검증을 할 수 있도록 Advisor가 생성된다.
+    - `MethodValidationPostProcessor, MethodValidationInterceptor`
 ```java
-
-        implements InitializingBean {
+public class MethodValidationPostProcessor extends AbstractBeanFactoryAwareAdvisingPostProcessor
+		implements InitializingBean {
 
     private final Class<? extends Annotation> validatedAnnotationType = Validated.class;
 
@@ -222,17 +216,12 @@ org.springframework.web.bind.MethodArgumentNotValidException: Validation failed 
     }
 }
 ```
-
-- `validator`필드의 값을 가져오기 위해서 @Valid가 선언된 곳에서만 활용이 가능하다.
-- javax.validation.ConstraintViolationException 에러가 발생한다.
-
-커스텀 애노테이션(Custom Annotation) 만들어 직접 유효성 검사하기
-
-Validator 활용해보
-
-- MethodValidationInterceptor
+- 유효성 검증 로직이 정의되어있는 Advice와 @Validated가 선언되어 있는 곳에서 검증을 할 수 있도록 Pointcut이 생성된다.
+- 유효성 검증을 실패할 경우 `ConstraintViolationException`에러를 던진다.
 
 
-- https://mangkyu.tistory.com/174
-- https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html
-- https://docs.spring.io/spring-framework/reference/core/validation/validator.html
+
+
+> https://mangkyu.tistory.com/174 <br/>
+> https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html <br/>
+> https://docs.spring.io/spring-framework/reference/core/validation/validator.html <br/>
