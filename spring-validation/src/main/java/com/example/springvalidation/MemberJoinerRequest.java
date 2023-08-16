@@ -13,7 +13,7 @@ public class MemberJoinerRequest {
     @NotBlank
     private final String id;
 
-    @NotBlank
+    @Password
     private final String password;
 
     @Min(1)
