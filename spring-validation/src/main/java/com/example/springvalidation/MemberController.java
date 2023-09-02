@@ -1,18 +1,39 @@
 package com.example.springvalidation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final JoinMemberService joinMemberService;
+
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    private ResponseEntity<CustomResponse> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
+        CustomResponse customResponse = new CustomResponse(HttpStatus.BAD_REQUEST.value(), e);
+
+        return ResponseEntity.status(customResponse.getStatus()).body(customResponse);
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    private ResponseEntity constraintViolationExceptionHandler(ConstraintViolationException e) {
+        CustomResponse customResponse = new CustomResponse(HttpStatus.BAD_REQUEST.value(), e);
+        return ResponseEntity.status(customResponse.getStatus()).body(customResponse);
+    }
+
 
     @PostMapping("/members")
     public void joinMember(@RequestBody MemberJoinerRequest memberJoinerRequest) {
@@ -52,5 +73,6 @@ public class MemberController {
         //회원가입 요청
         joinMemberService.joinMember(commend);
     }
+
 
 }
