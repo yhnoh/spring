@@ -232,6 +232,114 @@ public class MethodValidationPostProcessor extends AbstractBeanFactoryAwareAdvis
 
 ### 5. Spring Boot Web에서 유효성 검증 실패시 응답
 
+- Spring Boot Web에서는 API 요청에 의해서 에러가 발생할 경우 어떻게 핸들링 할지를 쉽게 정의할 수 있다.
+  - `@ControllerAdvice, @ExceptionHandler`어노테이션을 활용하여 에러 핸들링이 가능하다.
+- 때문에 Spring Boot Validation 이용해 유효성 검증이 실패할 경우,  `MethodArgumentNotValidException, ConstraintViolationException` 에러가 발생한다는 것을 확인하였기 때문에, Spring Boot Web에서 해당 에러를 핸들링하여 클라이언트에게 전달할 응답 메시지를 정의할 수 있다.
+- 뿐만 아니라 `MethodArgumentNotValidException, ConstraintViolationException` 객체에는 클라이언트에게 알려줄 수 있는 여러 정보들이 있기 때문에 상세한 응답 메시지를 정의할 수 있다.
+  - 유효성 검증이 실패한 필드 이름
+  - 유효성 검증이 실패시 정의된 메시지
+  - 클라이언트가 필드에 잘못 입력한 값
+  - ...
+
+#### 5.1. @ExceptionHandler를 통해서 에러 핸들링 해보기
+
+- 유효성 검증이 실패하여 `MethodArgumentNotValidException, ConstraintViolationException`에러가 발생할 경우, `@ExceptionHandler`를 이용하여 에러를 핸들링하고 개발자가 정의한 응답 메시지를 클라이언트에게 보여주는 간단한 실습을 진행하고자 한다.
+
+
+1. Controller에서 @ExceptionHadler 정의
+    ```java
+    @RestController
+    @RequiredArgsConstructor
+    public class MemberController {
+
+        //...
+
+        @ExceptionHandler(value = MethodArgumentNotValidException.class)
+        private ResponseEntity<CustomResponse> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
+            CustomResponse customResponse = new CustomResponse(HttpStatus.BAD_REQUEST.value(), e);
+
+            return ResponseEntity.status(customResponse.getStatus()).body(customResponse);
+        }
+
+        @ExceptionHandler(value = ConstraintViolationException.class)
+        private ResponseEntity constraintViolationExceptionHandler(ConstraintViolationException e) {
+            CustomResponse customResponse = new CustomResponse(HttpStatus.BAD_REQUEST.value(), e);
+            return ResponseEntity.status(customResponse.getStatus()).body(customResponse);
+        }
+
+        //...
+    }
+    ```
+    - 클라이언트가 잘못된 값을 입력하게 되는 경우 일반적으로 `404` status 응답을 한다.
+    - CustomReponse를 통해서 에러 메시지를 클라이언트에게 응답한다.
+
+2. CustomResponse 클래스 작성하기
+    ```java
+    @Getter
+    public class CustomResponse {
+        private final int status;
+        private final List<ResponseError> errors = new ArrayList<>();
+
+        public CustomResponse(int status, MethodArgumentNotValidException methodArgumentNotValidException) {
+            this.status = status;
+            methodArgumentNotValidException.getBindingResult().getFieldErrors().stream().forEach(fieldError -> {
+                //유효성 검증 실패 시, 필드 이름과 메시지를 응답한다.
+                ResponseError responseError = new ResponseError(fieldError.getField(), fieldError.getDefaultMessage());
+                errors.add(responseError);
+            });
+        }
+
+        public CustomResponse(int status, ConstraintViolationException constraintViolationException) {
+            constraintViolationException.getConstraintViolations().stream()
+                    .forEach(constraintViolation -> {
+                        //유효성 검증 실패 시, 필드 이름과 메시지를 응답한다.
+                        ResponseError responseError = new ResponseError(this.getPropertyName(constraintViolation.getPropertyPath()), constraintViolation.getMessage());
+                        errors.add(responseError);
+                    });
+            this.status = status;
+        }
+
+        // 전체 속성 경로에서 속성 이름만 가져온다.
+        private String getPropertyName(Path path) {
+            String pathString = path.toString();
+            return pathString.substring(pathString.lastIndexOf('.') + 1); 
+        }
+
+        @Getter
+        static class ResponseError {
+            private final String property;
+            private final String message;
+
+            public ResponseError(String property, String message) {
+                this.property = property;
+                this.message = message;
+            }
+        }
+    }
+    ```
+    - MethodArgumentNotValidException, ConstraintViolationException 에러가 발생할 경우 클라이언트에게 어떻게 응답할지를 정의해 두었다.
+    - API 요청 시 유효섬 겅증 에러가 발생할 경우 아래와 같은 응답 메시지를 확인할 수 있다.
+        ```json
+        {
+            "status": 400,
+            "errors": [
+                {
+                    "property": "password",
+                    "message": "비밀번호가 일치하지 않습니다."
+                },
+                {
+                    "property": "age",
+                    "message": "1 이상이어야 합니다"
+                },
+                {
+                    "property": "id",
+                    "message": "공백일 수 없습니다"
+                }
+            ]
+        }
+        ```
+
+
 ### 6. 유효성 검증 커스터마이징 하기
 
 > https://mangkyu.tistory.com/174 <br/>
