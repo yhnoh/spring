@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    function:
+      definition: producer;consumer
+    stream:
+      bindings:
+        producer-out-0:
+          destination: channel # topic
+        consumer-in-0:
+          destination: channel # topic
+  rabbitmq:
+    addresses: 127.0.0.1
+    username: guest
+    password: guest
