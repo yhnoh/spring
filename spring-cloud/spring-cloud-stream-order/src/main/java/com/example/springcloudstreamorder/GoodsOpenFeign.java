@@ -11,6 +11,7 @@ import java.util.List;
 @FeignClient(name = "goodsOpenFeign", url = "http://localhost:8080", path = "goods")
 public interface GoodsOpenFeign {
 
+
     @GetMapping
     List<Goods> getGoodsList();
 

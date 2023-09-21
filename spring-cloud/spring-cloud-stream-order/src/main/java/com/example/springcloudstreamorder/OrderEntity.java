@@ -18,7 +18,7 @@ public class OrderEntity {
     @Column(name = "id")
     private long id;
 
-    @Column(name = "goodsId")
+    @Column(name = "goods_id")
     private long goodsId;
     @Column(name = "name")
     private String name;
@@ -26,12 +26,16 @@ public class OrderEntity {
     private int quantity;
     @Column(name = "amount")
     private int amount;
+    @Column(name = "total_amount")
+    private int totalAmount;
 
     @Builder
-    public OrderEntity(long goodsId, String name, int quantity, int amount) {
+    public OrderEntity(long goodsId, String name, int quantity, int amount, int totalAmount) {
         this.goodsId = goodsId;
         this.name = name;
         this.quantity = quantity;
         this.amount = amount;
+        this.totalAmount = totalAmount;
     }
+
 }

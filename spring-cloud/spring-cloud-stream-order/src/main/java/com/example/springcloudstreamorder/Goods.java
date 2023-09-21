@@ -12,10 +12,11 @@ public class Goods {
     private long id;
     private String name;
     private int quantity;
-
+    private int amount;
     public void changeQuantity(int orderQuantity){
         if(orderQuantity > quantity){
             throw new IllegalArgumentException("상품 재고가 부족합니다.");
         }
+        this.quantity -= orderQuantity;
     }
 }

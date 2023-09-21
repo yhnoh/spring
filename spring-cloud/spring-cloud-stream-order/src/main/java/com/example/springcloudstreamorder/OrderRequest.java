@@ -10,6 +10,5 @@ public class OrderRequest {
 
     private long goodsId;
     private int quantity;
-    private int amount;
 
 }
