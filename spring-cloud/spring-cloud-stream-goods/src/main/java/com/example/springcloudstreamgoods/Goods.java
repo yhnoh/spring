@@ -11,6 +11,5 @@ public class Goods {
     private long id;
     private String name;
     private int quantity;
-
-
+    private int amount;
 }

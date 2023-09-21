@@ -21,15 +21,18 @@ public class GoodsEntity {
     private String name;
     @Column(name = "quantity")
     private int quantity;
-
+    @Column(name = "amount")
+    private int amount;
     @Builder
-    public GoodsEntity(String name, int quantity) {
+    public GoodsEntity(String name, int quantity, int amount) {
         this.name = name;
         this.quantity = quantity;
+        this.amount = amount;
     }
 
     public void changeByGoods(Goods goods){
         this.name = goods.getName();
         this.quantity = goods.getQuantity();
+        this.amount = goods.getAmount();
     }
 }

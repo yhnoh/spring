@@ -21,12 +21,12 @@ public class GoodsController {
     }
 
     @PostMapping("/goods")
-    public Goods saveGoods(@RequestBody Goods goods){
-        return goodsService.saveGoods(goods);
+    public Goods saveGoods(@RequestBody GoodsRegistrationRequest goodsRegistrationRequest){
+        return goodsService.saveGoods(goodsRegistrationRequest);
     }
     @PutMapping("/goods/{id}")
-    public Goods updateGoods(@PathVariable("id") long id, @RequestBody Goods goods){
-        return goodsService.updateGoods(id, goods);
+    public Goods updateGoods(@PathVariable("id") long id, @RequestBody GoodsRegistrationRequest goodsRegistrationRequest){
+        return goodsService.updateGoods(id, goodsRegistrationRequest);
     }
 
 }

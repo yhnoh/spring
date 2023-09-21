@@ -26,15 +26,17 @@ public class GoodsService {
         return goodsJpaRepository.findById(id).map(goodsMapper::toGoods).orElse(null);
     }
 
-    public Goods saveGoods(Goods goods){
-        GoodsEntity goodEntity = goodsMapper.toGoodEntity(goods);
+    public Goods saveGoods(GoodsRegistrationRequest registrationRequest){
+
+        GoodsEntity goodEntity = goodsMapper.toGoodEntity(registrationRequest);
         goodsJpaRepository.save(goodEntity);
         return goodsMapper.toGoods(goodEntity);
     }
 
-    public Goods updateGoods(long id, Goods goods){
+    public Goods updateGoods(long id, GoodsRegistrationRequest registrationRequest){
         GoodsEntity goodsEntity = goodsJpaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("상품 정보가 없습니다."));
+        Goods goods = goodsMapper.toGoods(registrationRequest);
         goodsEntity.changeByGoods(goods);
         return goodsMapper.toGoods(goodsEntity);
     }
