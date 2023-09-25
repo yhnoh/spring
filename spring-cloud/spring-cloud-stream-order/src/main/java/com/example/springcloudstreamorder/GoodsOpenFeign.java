@@ -12,7 +12,6 @@ import java.util.List;
 @FeignClient(name = "goodsOpenFeign", url = "http://localhost:8080", path = "goods")
 public interface GoodsOpenFeign {
 
-
     @Cacheable(cacheManager = "cacheManager", cacheNames = "goods", key = "'all'")
     @GetMapping
     List<Goods> getGoodsList();

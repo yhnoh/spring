@@ -1,12 +1,11 @@
 package com.example.springcloudstreamorder;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,9 +18,15 @@ public class OrderController {
         return orderService.orderGoodsList();
     }
 
+    @GetMapping(path = "/orders/{id}")
+    public OrderGoods orderGoods(@PathVariable long id){
+        return orderService.getOrderGoods(id);
+    }
+
 
     @PostMapping(path = "/orders")
     public OrderGoods orderGoods(@RequestBody OrderRequest orderRequest){
         return orderService.order(orderRequest);
     }
+
 }

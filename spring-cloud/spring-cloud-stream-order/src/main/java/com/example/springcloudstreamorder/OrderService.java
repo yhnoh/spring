@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -24,6 +26,13 @@ public class OrderService {
             Goods findGoods = goodsList.stream().filter(goods -> goods.getId() == orderEntity.getGoodsId()).findAny().orElse(null);
             return orderGoodsMapper.toOrder(orderEntity, findGoods);
         }).collect(Collectors.toList());
+    }
+
+    public OrderGoods getOrderGoods(long id) {
+        return orderJpaRepository.findById(id).map(orderEntity1 -> {
+            Goods goods = goodsOpenFeign.getGoodsById(orderEntity1.getGoodsId());
+            return orderGoodsMapper.toOrder(orderEntity1, goods);
+        }).orElse(null);
     }
 
     public OrderGoods order(OrderRequest orderRequest){
@@ -48,4 +57,5 @@ public class OrderService {
         goodsOpenFeign.updateGoods(goodsId, goods);
         return orderGoodsMapper.toOrder(orderEntity, goods);
     }
+
 }
