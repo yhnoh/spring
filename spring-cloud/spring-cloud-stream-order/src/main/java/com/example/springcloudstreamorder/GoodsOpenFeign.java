@@ -1,5 +1,6 @@
 package com.example.springcloudstreamorder;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,9 +13,11 @@ import java.util.List;
 public interface GoodsOpenFeign {
 
 
+    @Cacheable(cacheManager = "cacheManager", cacheNames = "goods", key = "'all'")
     @GetMapping
     List<Goods> getGoodsList();
 
+    @Cacheable(cacheManager = "cacheManager", cacheNames = "goods", key = "#goodsId")
     @GetMapping("/{id}")
     Goods getGoodsById(@PathVariable("id") long goodsId);
 

@@ -12,22 +12,9 @@ public class GoodsOpenFeignTest {
     @Autowired
     private GoodsOpenFeign goodsOpenFeign;
 
-    @Autowired
-    private GoodsRedisRepository goodsRedisRepository;
-    @Autowired
-    private GoodsMapper goodsMapper;
     @Test
     void test(){
         List<Goods> goods = goodsOpenFeign.getGoodsList();
         System.out.println(goods);
-    }
-
-    @Test
-    void redisTest(){
-        List<GoodsRedisEntity> goodsRedisEntities = goodsOpenFeign.getGoodsList().stream().map(goodsMapper::toGoodsRedisEntity).collect(Collectors.toList());
-
-        Iterable<GoodsRedisEntity> goodsRedisEntities1 = goodsRedisRepository.saveAll(goodsRedisEntities);
-
-
     }
 }
