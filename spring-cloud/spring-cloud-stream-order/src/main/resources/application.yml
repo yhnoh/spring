@@ -3,16 +3,16 @@ server:
 spring:
   cloud:
     function:
-      definition: goodsCacheEvict
+      definition: goodsChangeEvent
     stream:
       bindings:
-        goodsCacheEvict-in-0:
-          destination: goods-cache-topic
+        goodsChangeEvent-in-0:
+          destination: goods-change-event
       rabbit:
         bindings:
-          goodsCacheEvict-in-0:
+          goodsChangeEvent-in-0:
             consumer:
-              binding-routing-key: goods-cache-topic
+              binding-routing-key: goods-change-event
 
 
   redis:

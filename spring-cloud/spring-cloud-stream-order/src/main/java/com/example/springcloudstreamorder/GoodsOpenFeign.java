@@ -9,14 +9,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
+import static com.example.springcloudstreamorder.CacheConfig.GOODS_CACHE_NAME;
+
 @FeignClient(name = "goodsOpenFeign", url = "http://localhost:8080", path = "goods")
 public interface GoodsOpenFeign {
 
-    @Cacheable(cacheManager = "cacheManager", cacheNames = "goods", key = "'all'")
+    @Cacheable(cacheManager = "cacheManager", cacheNames = GOODS_CACHE_NAME, key = "'all'")
     @GetMapping
     List<Goods> getGoodsList();
 
-    @Cacheable(cacheManager = "cacheManager", cacheNames = "goods", key = "#goodsId")
+    @Cacheable(cacheManager = "cacheManager", cacheNames = GOODS_CACHE_NAME, key = "#goodsId")
     @GetMapping("/{id}")
     Goods getGoodsById(@PathVariable("id") long goodsId);
 
