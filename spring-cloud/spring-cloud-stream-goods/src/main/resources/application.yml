@@ -1,1 +1,17 @@
 
+spring:
+  cloud:
+    stream:
+      bindings:
+        goodsChangeEvent-out-0:
+          destination: goods-change-event
+      rabbit:
+        bindings:
+          goodsChangeEvent-out-0:
+            producer:
+              routing-key: goods-change-event
+
+  rabbitmq:
+    addresses: 127.0.0.1
+    username: guest
+    password: guest
