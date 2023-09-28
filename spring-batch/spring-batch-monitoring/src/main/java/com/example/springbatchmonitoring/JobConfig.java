@@ -1,7 +1,11 @@
 package com.example.springbatchmonitoring;
 
+import io.micrometer.prometheus.PrometheusMeterRegistry;
+import io.prometheus.client.exporter.PushGateway;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -9,6 +13,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Map;
 import java.util.Random;
 
 @Configuration
@@ -43,10 +48,11 @@ public class JobConfig {
                 .tasklet((contribution, chunkContext) -> {
                     int nextInt = random.nextInt(3000);
                     Thread.sleep(nextInt);
-                    if (nextInt % 5 == 0) {
-                        throw new Exception("Boom!");
-                    }
-                    return RepeatStatus.FINISHED;
+                    throw new Exception("Boom!");
+//                    if (nextInt % 5 == 0) {
+//
+//                    }
+//                    return RepeatStatus.FINISHED;
                 })
                 .build();
     }

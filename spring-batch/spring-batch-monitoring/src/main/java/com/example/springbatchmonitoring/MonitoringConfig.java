@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.IOException;
 import java.util.Map;
 
-@Configuration
+//@Configuration
 @RequiredArgsConstructor
 public class MonitoringConfig {
 

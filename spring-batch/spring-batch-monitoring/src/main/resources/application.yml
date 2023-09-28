@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: SPRING_BATCH
+management:
+
+  metrics:
+    export:
+      prometheus:
+        pushgateway:
+          base-url: localhost:9091
+          enabled: true
+          shutdown-operation: push
+          grouping-key:
+            service_name: ${spring.application.name}
+            env: ${spring.profiles.active}
+          job: springbatch
+          push-rate: 1s
+        enabled:
