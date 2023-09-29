@@ -26,3 +26,15 @@ services:
       - ./grafana:/var/lib/grafana
     environment:
       TZ: 'Asia/Seoul'
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.10.2
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - 5000:5000/tcp
+      - 5000:5000/udp
+      - 9600:9600
+    environment:
+      TZ: 'Asia/Seoul'
+      LS_JAVA_OPTS: '-Xmx256m -Xms256m'

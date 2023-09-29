@@ -2,7 +2,6 @@ spring:
   application:
     name: SPRING_BATCH
 management:
-
   metrics:
     export:
       prometheus:
@@ -15,4 +14,3 @@ management:
             env: ${spring.profiles.active}
           job: springbatch
           push-rate: 1s
-        enabled:

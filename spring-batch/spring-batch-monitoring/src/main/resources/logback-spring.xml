@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+<!--    <appender name="LOG_STASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:5000</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <prefix class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <pattern>,</pattern>
+                </layout>
+            </prefix>
+        </encoder>
+&lt;!&ndash;
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc></mdc>
+            </providers>
+        </encoder>
+&ndash;&gt;
+    </appender>-->
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+<!--
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc></mdc>
+            </providers>
+        </encoder>
+-->
+
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeCallerData>true</includeCallerData>
+            <provider class="net.logstash.logback.composite.loggingevent.LoggingEventPatternJsonProvider">
+
+                <pattern>
+                    {
+                    "message": "%mdc{custom_value} %message"
+                    }
+                </pattern>
+            </provider>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <!--<appender-ref ref="LOG_STASH" />-->
+    </root>
+</configuration>

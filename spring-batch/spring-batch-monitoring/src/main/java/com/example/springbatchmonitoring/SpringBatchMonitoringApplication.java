@@ -15,10 +15,4 @@ public class SpringBatchMonitoringApplication {
         SpringApplication.run(SpringBatchMonitoringApplication.class, args);
     }
 
-    @Bean(destroyMethod = "shutdown")
-    public ThreadPoolTaskScheduler taskScheduler() {
-        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(3);
-        return threadPoolTaskScheduler;
-    }
 }
