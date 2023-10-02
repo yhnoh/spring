@@ -1,6 +1,6 @@
 docker/grafana/**
 docker/prometheus/data
-
+docker/elasticsearch/data
 
 HELP.md
 .gradle
