@@ -58,6 +58,6 @@ services:
       - 5601:5601
     environment:
       TZ: 'Asia/Seoul'
-      LS_JAVA_OPTS: '-Xms1g -Xmx1g'
+#      LS_JAVA_OPTS: '-Xms1g -Xmx1g'
     depends_on:
       - elasticsearch

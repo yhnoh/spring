@@ -4,7 +4,9 @@ spring:
 management:
   metrics:
     export:
+
       prometheus:
+
         pushgateway:
           base-url: localhost:9091
           enabled: true
