@@ -7,10 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.batch.JobExecutionEvent;
-import org.springframework.boot.autoconfigure.batch.JobExecutionExitCodeGenerator;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
@@ -18,13 +14,16 @@ import org.springframework.context.annotation.Bean;
 @RequiredArgsConstructor
 public class SpringBatchExitCodeApplication {
 
-
-    private final JobExecutionExitCodeGenerator jobExecutionExitCodeGenerator;
-
     public static void main(String[] args) {
         System.exit(SpringApplication.exit(SpringApplication.run(SpringBatchExitCodeApplication.class, args)));
     }
 
+    @Bean
+    public ExitCodeGenerator exitCodeGenerator() {
+        return () -> 42;
+    }
+
+//    private final JobExecutionExitCodeGenerator jobExecutionExitCodeGenerator;
 
 //    @Bean
 //    public ExitCodeGenerator exitCodeGenerator(){
