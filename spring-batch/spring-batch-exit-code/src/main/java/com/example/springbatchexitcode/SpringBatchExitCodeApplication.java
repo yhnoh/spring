@@ -18,11 +18,6 @@ public class SpringBatchExitCodeApplication {
         System.exit(SpringApplication.exit(SpringApplication.run(SpringBatchExitCodeApplication.class, args)));
     }
 
-    @Bean
-    public ExitCodeGenerator exitCodeGenerator() {
-        return () -> 42;
-    }
-
 //    private final JobExecutionExitCodeGenerator jobExecutionExitCodeGenerator;
 
 //    @Bean
