@@ -14,9 +14,14 @@ public class LoginUserDetailsService implements UserDetailsService {
     private final UserJpaRepository userJpaRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserEntity> userEntity = userJpaRepository.findByUsername(username);
-        userEntity.orElseThrow(() -> new UsernameNotFoundException("not found username"));
-        User.builder().username(username).password(userEntity.);
-        return null;
+
+        Optional<UserDetails> userDetails = userJpaRepository.findByUsername(username).map(userEntity -> User.builder()
+                .username(userEntity.getUsername())
+                .password(userEntity.getPassword())
+                .build());
+
+        userDetails.orElseThrow(() -> new UsernameNotFoundException("not found username"));
+
+        return userDetails.get();
     }
 }
