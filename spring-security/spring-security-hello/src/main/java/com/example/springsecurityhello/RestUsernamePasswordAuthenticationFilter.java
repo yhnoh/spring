@@ -38,7 +38,7 @@ public class RestUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
         UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.getUsername(),
                 loginRequest.getPassword());
 
-        return this.getAuthenticationManager().authenticate(authRequest);
+        return getAuthenticationManager().authenticate(authRequest);
 
     }
 

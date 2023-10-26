@@ -1,4 +1,4 @@
-package com.example.springsecurityhello;
+package com.example.springsecurityhello.user;
 
 import lombok.AccessLevel;
 import lombok.Builder;
