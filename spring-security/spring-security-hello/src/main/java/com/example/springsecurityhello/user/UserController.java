@@ -24,6 +24,4 @@ public class UserController {
         userJpaRepository.save(userEntity);
     }
 
-    @PostMapping("/login-success")
-
 }

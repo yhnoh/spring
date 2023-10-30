@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -79,7 +80,16 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers(HttpMethod.POST, "/login").permitAll().and()
+                .authorizeRequests(authorize -> {
+                    authorize.anyRequest().authenticated().withObjectPostProcessor(new ObjectPostProcessor<Object>() {
+                        @Override
+                        public <O> O postProcess(O object) {
+                            return null;
+                        }
+                    })
+                })
                 .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout", HttpMethod.POST.name())).and()
+                .aut
                 .addFilterBefore(restUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
