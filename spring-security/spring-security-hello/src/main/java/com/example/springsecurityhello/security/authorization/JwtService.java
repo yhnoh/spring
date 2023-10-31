@@ -1,78 +1,54 @@
 package com.example.springsecurityhello.security.authorization;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.security.Key;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 public class JwtService {
 
-    private final Key key;
     private final String secretKey;
-    public JwtService(@Value(value = "${jwt.secret}") String secretKey) {
+    private final Long expireIn;
 
+    public JwtService(@Value(value = "${jwt.secret}") String secretKey, @Value(value = "${jwt.expire-in}") Long expireIn) {
+        this.secretKey = secretKey;
+        this.expireIn = expireIn;
     }
 
-    String createToken(){
-        Algorithm algorithm = Algorithm.(rsaPublicKey, rsaPrivateKey);
-        String token = JWT.create()
-                .withIssuer("auth0")
-                .sign(algorithm)
-                ;
-    }
-    public String generateToken(String email, int expiredTime) {
-        HashMap<String, Object> claims = new HashMap<>();
-        return createToken(claims, email, expiredTime);
-    }
+    String generateToken(String subject) {
+        SecretKey key = getSecretKey();
 
-    public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public boolean isValidToken(String token) {
-
-        Claims claims = extractAllClaims(token);
-        return false;
-    }
-
-    private String createToken(HashMap<String, Object> claims, String email, int expiredTime) {
-
+        Date date = new Date();
         return Jwts.builder()
-                .setHeader(settingHeaders())
-                .signWith(SignatureAlgorithm.HS512, )
-                .signWith(key, SignatureAlgorithm.HS512)
-                .setClaims(claims)
-                .setSubject(email)
-                .setIssuedAt(settingsDate(0))
-                .setExpiration(settingsDate(expiredTime))
+                .header().add("alg", "HS256").add("typ", "JWT").and()
+                .subject(subject)
+                .issuedAt(date)
+                .expiration(new Date(date.getTime() + expireIn))
+                .signWith(key)
                 .compact();
     }
 
-    private Date settingsDate(int plusTime) {
-        return Date.from(
-                LocalDateTime.now().plusMinutes(plusTime)
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-        );
+    boolean isValidToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(this.getSecretKey()) // <----
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        }catch (JwtException | IllegalArgumentException e){
+            return false;
+        }
     }
 
-    private Map<String, Object> settingHeaders() {
-        return Map.of("typ", Header.JWT_TYPE, "alg", SignatureAlgorithm.HS512);
+    private SecretKey getSecretKey() {
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        SecretKey key = Keys.hmacShaKeyFor(keyBytes);
+        return key;
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
+}
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
-    }}
+

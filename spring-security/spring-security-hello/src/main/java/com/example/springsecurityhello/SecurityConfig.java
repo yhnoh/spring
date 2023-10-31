@@ -80,16 +80,16 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers(HttpMethod.POST, "/login").permitAll().and()
-                .authorizeRequests(authorize -> {
-                    authorize.anyRequest().authenticated().withObjectPostProcessor(new ObjectPostProcessor<Object>() {
-                        @Override
-                        public <O> O postProcess(O object) {
-                            return null;
-                        }
-                    })
-                })
+//                .authorizeRequests(authorize -> {
+//                    authorize.anyRequest().authenticated().withObjectPostProcessor(new ObjectPostProcessor<Object>() {
+//                        @Override
+//                        public <O> O postProcess(O object) {
+//                            return null;
+//                        }
+//                    })
+//                })
                 .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout", HttpMethod.POST.name())).and()
-                .aut
+//                .aut
                 .addFilterBefore(restUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

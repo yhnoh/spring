@@ -3,3 +3,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+jwt:
+  secret-key: xitrNXnuR1V5e9GLfZK32dA45mV2pom5
+  expire-in: 3600000 # 1000 * 60 * 60
+
