@@ -1,25 +1,25 @@
-package org.example.lock;
+package org.example.lock.concurrency_update_issue;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Table(name = "board_like")
+@Table(name = "board")
 public class BoardJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private long memberId;
-    private long boardId;
-    private long viewHit;
+    private long reviewCount;
 
-    public void increaseViewHit(){
-        viewHit++;
+    public void increaseReviewCount(){
+        reviewCount++;
     }
-
 }

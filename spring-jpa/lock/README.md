@@ -114,11 +114,45 @@
     ]    
     ```
 - 주문번호가 동시에 삽입될 수 있다는 것을 가정하고 데이터베이스의 제약 조건 즉 Lock을 거는 방법을 비관적 락이라고 부른다.
-- 비관적 락을 통해서 동시성을 제어할 수 있다는 의미는 여러 트랜잭션의 요청에도 하나의 트랜잭션만이 읽기/쓰기가 가능하다는 의미이다. 하지만 이러한 비관적 락에는 치명적인 단점이 있는데 많은 트래픽이 몰리기 시작하면 성능이 저하되는 문제가 있다. 왜냐하면 아무리 많은 트랜잭션의 요청이 들어와도 하나의 트랜잭션만 처리할 수 있기ㄷ 때문에 다른 트랜잭션에서 타임아웃이 발생할 가능성이 있다.
+- 비관적 락을 통해서 동시성을 제어할 수 있다는 의미는 여러 트랜잭션의 요청에도 하나의 트랜잭션만이 읽기/쓰기가 가능하다는 의미이다. 하지만 이러한 비관적 락에는 치명적인 단점이 있는데 많은 트래픽이 몰리기 시작하면 성능이 저하되는 문제가 있다. 왜냐하면 아무리 많은 트랜잭션의 요청이 들어와도 하나의 트랜잭션만 처리할 수 있기 때문에 다른 트랜잭션에서 타임아웃이 발생할 가능성이 있다.
 - 해당 문제를 해결하기 위해서는 큐를 이용하여 대기열 시스템을 만들고 실제 데이터에 쓰는 작업을 지연시켜 해결할 수 있는 방법이 있다.
 
 
-#### 2. 동시에 UPDATE
+#### 2. 동시에 많은 사용자가 동일한 데이터에 UPDATE하게 될 경우에는 어떻게 할것인가?
+
+- 게시글에 리뷰를 달았을때 게시글의 리뷰수를 증가시키는 요구사항이 들어왔다고 가정을 하고 해당 비지니스 로직을 작성한다면 아래와 그림과 같은 흐름을 가지게 될 것이다.
+![](./img/review_business_logic.png)
+
+- 한명의 사용자가 리뷰수를 증가시키는 것은 아무런 문제가 없겠지만 다수의 사용자가 리뷰를 작성하고 증가시키게 되면 어떤 문제가 발생할까?
+```java
+@RestController
+@RequiredArgsConstructor
+public class BoardController {
+    //...
+    @PostMapping("/boards/{id}/reviews/multi-thread")
+    public void writeReviewMultiThread(@PathVariable long id){
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        for (int i = 0; i < 10; i++) {
+            executorService.execute(() -> {
+                restTemplate.postForObject("http://localhost:8080/boards/{id}/reviews", null,
+                        Void.class, id);
+            });
+        }
+
+        executorService.shutdown();
+    }
+}
+```
+- `/boards/{id}/reviews/multi-thread`는 10명의 사용자가 동시에 리뷰를 작성하게 될 경우를 가정하여 만든 API이다. 해당 API를 호출하게 될 경우 리뷰수가 10이 나오기를 예상하지만, 기대한 값과 달리 다른 값이 계속해서 나온다.
+- 해당 문제가 발생한 이유는 하나의 트랜잭션이 종료되지 않은 상태에서 동시에 여러 사용자가 게시판의 리뷰수에 접근하여 발생한 동시성 이슈이다. 
+
+![](./img/review_concurrency_update_issue.png)
+
+- 위의 그림을 보면 transaction1과 transaction2가 서로 커밋이 완료되기전에 게시글을 조회하였고 이때 게시글의 리뷰수는 0이다.
+- 이후 transaction1과 transaction2이 리뷰를 작성한 이후 0인 리뷰수를 1씩 증가하는 것이기 때문에 2가 될것이라고 예상하지만 1이 발생하는 것이다.
+- 그렇다면 우리는 어떻게 해당 문제를 해결할 수 있을까? 가장 먼저 떠오르는 방법은 하나의 레코드에 접근할 때 Lock을 걸어서 해결하는 방법이 있다. 가장 간단한 방법은 transaction1과 transaction2가 동시에 접근한다고 하여도 transaction1이 작업을 완료한 이후에 transaction2가 작업을 시작하게끔 하는 것이다.
+
 
 - Spring Data JPA와 H2 데이터베이스를 이용하여 게시판에 조회수를 증가시키는 예제를 통해서 한번 확인해보자.
     ```java

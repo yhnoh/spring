@@ -1,4 +1,4 @@
-package org.example.lock;
+package org.example.lock.concurrency_update_issue;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
