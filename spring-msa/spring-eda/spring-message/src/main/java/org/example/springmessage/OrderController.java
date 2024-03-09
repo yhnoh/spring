@@ -14,38 +14,44 @@ import java.util.List;
 class OrderController {
 
     private final OrderService orderService;
+
     @Data
     static class OrderRequest {
         private String name;
     }
 
     @GetMapping
-    public List<OrderJpaEntity> getOrders(){
+    public List<OrderJpaEntity> getOrders() {
         return orderService.getOrders();
     }
 
     @PostMapping("/sync")
-    public void orderSync(@RequestBody OrderRequest orderRequest){
+    public void orderSync(@RequestBody OrderRequest orderRequest) {
         orderService.orderSync(orderRequest.getName());
     }
 
     @PostMapping("/async")
-    public void orderAsync(@RequestBody OrderRequest orderRequest){
+    public void orderAsync(@RequestBody OrderRequest orderRequest) {
         orderService.orderAsync(orderRequest.getName());
     }
+
     @PostMapping("/async-throw-exception")
-    public void orderAsyncThrowException(@RequestBody OrderRequest orderRequest){
+    public void orderAsyncThrowException(@RequestBody OrderRequest orderRequest) {
         orderService.orderAsyncThrowException(orderRequest.getName());
     }
 
     @PostMapping("/transaction-event-listener")
-    public void orderTransactionalEventListener(@RequestBody OrderRequest orderRequest){
+    public void orderTransactionalEventListener(@RequestBody OrderRequest orderRequest) {
         orderService.orderTransactionalEventListener(orderRequest.getName());
     }
 
     @PostMapping("/transaction-event-listener-throw-exception")
-    public void orderTransactionalEventListenerThrowException(@RequestBody OrderRequest orderRequest){
+    public void orderTransactionalEventListenerThrowException(@RequestBody OrderRequest orderRequest) {
         orderService.orderTransactionalEventListenerThrowException(orderRequest.getName());
     }
 
+    @PostMapping("/http")
+    public void orderHttp(@RequestBody OrderRequest orderRequest) {
+        orderService.orderHttp(orderRequest.getName());
+    }
 }

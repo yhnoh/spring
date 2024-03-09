@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.springmessage.message.service.AsyncMessageService;
 import org.example.springmessage.message.service.ExceptionMessageService;
 import org.example.springmessage.order.event.OrderCompletedEvent;
+import org.example.springmessage.order.event.OrderCompletedHttpEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +20,13 @@ public class OrderService {
     private final ExceptionMessageService exceptionMessageService;
     private final AsyncMessageService asyncMessageService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    public List<OrderJpaEntity> getOrders(){
+
+    public List<OrderJpaEntity> getOrders() {
         return orderJpaRepository.findAll();
     }
 
     //메시지를 보내는 것이 주문에 영향을 미친다.
-    public void orderSync(String name){
+    public void orderSync(String name) {
         OrderJpaEntity orderJpaEntity = OrderJpaEntity.builder().name(name).build();
         orderJpaRepository.save(orderJpaEntity);
 
@@ -32,7 +34,7 @@ public class OrderService {
         exceptionMessageService.sendkakaoTalk(orderJpaEntity.getId());
     }
 
-    public void orderAsync(String name){
+    public void orderAsync(String name) {
 
         OrderJpaEntity orderJpaEntity = OrderJpaEntity.builder().name(name).build();
         orderJpaRepository.save(orderJpaEntity);
@@ -42,7 +44,7 @@ public class OrderService {
 
     }
 
-    public void orderAsyncThrowException(String name){
+    public void orderAsyncThrowException(String name) {
 
         OrderJpaEntity orderJpaEntity = OrderJpaEntity.builder().name(name).build();
         orderJpaRepository.save(orderJpaEntity);
@@ -53,7 +55,7 @@ public class OrderService {
         throw new IllegalArgumentException("주문 실패");
     }
 
-    public void orderTransactionalEventListener(String name){
+    public void orderTransactionalEventListener(String name) {
 
         OrderJpaEntity orderJpaEntity = OrderJpaEntity.builder().name(name).build();
         orderJpaRepository.save(orderJpaEntity);
@@ -62,15 +64,22 @@ public class OrderService {
         applicationEventPublisher.publishEvent(orderCompletedEvent);
     }
 
-    public void orderTransactionalEventListenerThrowException(String name){
+    public void orderTransactionalEventListenerThrowException(String name) {
 
         OrderJpaEntity orderJpaEntity = OrderJpaEntity.builder().name(name).build();
         orderJpaRepository.save(orderJpaEntity);
 
-        OrderCompletedEvent orderCompletedEvent = new OrderCompletedEvent(this, orderJpaEntity.getId());
-        applicationEventPublisher.publishEvent(orderCompletedEvent);
+        OrderCompletedEvent event = new OrderCompletedEvent(this, orderJpaEntity.getId());
+        applicationEventPublisher.publishEvent(event);
 
         throw new IllegalArgumentException("주문 실패");
     }
 
+    public void orderHttp(String name) {
+        OrderJpaEntity orderJpaEntity = OrderJpaEntity.builder().name(name).build();
+        orderJpaRepository.save(orderJpaEntity);
+
+        OrderCompletedHttpEvent event = new OrderCompletedHttpEvent(this, orderJpaEntity.getId());
+        applicationEventPublisher.publishEvent(event);
+    }
 }
