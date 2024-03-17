@@ -35,13 +35,11 @@ public class OrderService {
     }
 
     public void orderAsync(String name) {
-
         OrderJpaEntity orderJpaEntity = OrderJpaEntity.builder().name(name).build();
         orderJpaRepository.save(orderJpaEntity);
 
         asyncMessageService.sendEmail(orderJpaEntity.getId());
         asyncMessageService.sendkakaoTalk(orderJpaEntity.getId());
-
     }
 
     public void orderAsyncThrowException(String name) {
