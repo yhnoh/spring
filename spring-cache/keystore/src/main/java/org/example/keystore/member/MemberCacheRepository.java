@@ -28,7 +28,7 @@ public class MemberCacheRepository {
     }
 
     public void deleteMembersById(long id){
-        keyStoreRedisCacheHandler.evictAll("member" + "::" + id);
+        keyStoreRedisCacheHandler.evictAll("member" + "::" + id + "::keys");
     }
 
 }

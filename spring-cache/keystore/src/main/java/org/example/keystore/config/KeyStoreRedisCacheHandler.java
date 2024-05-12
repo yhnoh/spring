@@ -25,8 +25,8 @@ public class KeyStoreRedisCacheHandler {
         redisTemplate.execute(new SessionCallback<>() {
             @Override
             public Object execute(RedisOperations operations) throws DataAccessException {
-                String key = getKey(cacheKeySuffix, cacheKeyPrefix);
-                String value = getValue(cacheKeySuffix, cacheKeyPrefix);
+                String key = getKey(cacheKeyPrefix, cacheKeySuffix);
+                String value = getValue(cacheKeyPrefix, cacheKeySuffix);
 
                 BoundSetOperations<String, String> setOperations = operations.boundSetOps(key);
                 setOperations.expire(timeToLive);
@@ -94,8 +94,8 @@ public class KeyStoreRedisCacheHandler {
         return cacheKeyPrefix + KEY_DELIMITER + arrKeySuffix[0] + KEY_DELIMITER + KEY_SUFFIX;
     }
 
-    private String getValue(String keySuffix, String keyPrefix) {
-        return keyPrefix + KEY_DELIMITER + keySuffix;
+    private String getValue(String cacheKeyPrefix, String cacheKeySuffix) {
+        return cacheKeyPrefix + KEY_DELIMITER + cacheKeySuffix;
     }
 
 }
