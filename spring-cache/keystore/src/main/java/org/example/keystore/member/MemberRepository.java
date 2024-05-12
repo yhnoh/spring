@@ -15,11 +15,19 @@ public class MemberRepository {
 
     @PostConstruct
     public void init() {
+        Member member1 = this.createMember(1);
+        MEMBERS.put(member1.getId(), member1);
+
+        Member member2 = this.createMember(2);
+        MEMBERS.put(member2.getId(), member2);
+    }
+
+    private Member createMember(long id){
         Set<Member.Level> levels = new HashSet<>();
         levels.add(Member.Level.BRONZE);
         levels.add(Member.Level.SILVER);
-        Member member = Member.builder().id(1).name("name").levels(levels).build();
-        MEMBERS.put(member.getId(), member);
+        return Member.builder().id(id).name("name" + id).levels(levels).build();
+
     }
 
     public Member findByIdAndLevel(long id, Member.Level level) {

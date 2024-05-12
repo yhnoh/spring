@@ -17,4 +17,10 @@ public class MemberController {
     public void deleteMember(@PathVariable("id") long id, @RequestParam Member.Level level){
         memberCacheRepository.deleteMember(id, level);
     }
+
+    @DeleteMapping()
+    public void deleteMembersById(@RequestParam long id){
+        memberCacheRepository.deleteMembersById(id);
+    }
+
 }

@@ -1,82 +1,101 @@
 package org.example.keystore.config;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.BoundHashOperations;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class KeyStoreRedisCacheHandler {
 
-    private final RedisConnectionFactory redisConnectionFactory;
-    private RedisTemplate<String, Map<String, Set<String>>> redisTemplate;
+    private final StringRedisTemplate redisTemplate;
+    private static final String KEY_SUFFIX = "keys";
+    private static final String KEY_DELIMITER = "::";
 
-    @PostConstruct
-    public void init() {
-        redisTemplate = new RedisTemplate<>();
+    /**
+     *
+     */
+    public void put(String cacheKeyPrefix, String cacheKeySuffix, Duration timeToLive){
 
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(RedisSerializer.string());
-        redisTemplate.setValueSerializer(RedisSerializer.string());
-        redisTemplate.setHashKeySerializer(RedisSerializer.string());
-        redisTemplate.setHashValueSerializer(RedisSerializer.json());
-        redisTemplate.afterPropertiesSet();
+        redisTemplate.execute(new SessionCallback<>() {
+            @Override
+            public Object execute(RedisOperations operations) throws DataAccessException {
+                String key = getKey(cacheKeySuffix, cacheKeyPrefix);
+                String value = getValue(cacheKeySuffix, cacheKeyPrefix);
+
+                BoundSetOperations<String, String> setOperations = operations.boundSetOps(key);
+                setOperations.expire(timeToLive);
+
+                //키 조회시 없을 경우 추가
+                if(!setOperations.isMember(value)){
+                    setOperations.add(value);
+                }
+
+                return null;
+            }
+        });
     }
 
-    public void putKeyStore(String name, String keySuffix, Duration timeToLive){
 
-        BoundHashOperations<String, String, Set<String>> hashOperations = redisTemplate.boundHashOps(name);
-        hashOperations.expire(timeToLive);
+    /**
+     *
+     */
+    public void evict(String cacheKeySuffix, String cacheKeyPrefix){
 
-        String[] arrKeySuffix = keySuffix.split("::");
-        String hashKey = name + "::" + arrKeySuffix[0];
+        redisTemplate.execute(new SessionCallback<>() {
+            @Override
+            public List<Object> execute(RedisOperations operations) throws DataAccessException {
 
-        Boolean hasKey = hashOperations.hasKey(hashKey);
-        String value = name + "::" + keySuffix;
+                String key = getKey(cacheKeySuffix, cacheKeyPrefix);
+                String value = getValue(cacheKeySuffix, cacheKeyPrefix);
 
-        Set<String> values;
-        if(hasKey){
-            values = hashOperations.get(hashKey);
-            values.add(value);
-        }else {
-            values = new HashSet<>();
-            values.add(value);
-        }
 
-        hashOperations.put(hashKey, values);
+                BoundSetOperations<String, String> setOperations = operations.boundSetOps(key);
+                //값을 통해 조회시 존재할 경우 제외
+                if(setOperations.isMember(value)){
+                    setOperations.remove(value);
+                }
+                return null;
+            }
+        });
     }
 
-    public void evictKeyStore(String name, String keySuffix){
-        BoundHashOperations<String, String, Set<String>> hashOperations = redisTemplate.boundHashOps(name);
+    public void evictAll(String key){
+        redisTemplate.execute(new SessionCallback<>() {
+            @Override
+            public List<Object> execute(RedisOperations operations) throws DataAccessException {
 
-        String[] arrKeySuffix = keySuffix.split("::");
-        String hashKey = name + "::" + arrKeySuffix[0];
-        String value = name + "::" + keySuffix;
-        Boolean hasKey = hashOperations.hasKey(hashKey);
+                BoundSetOperations<String, String> setOperations = operations.boundSetOps(key);
+                Set<String> values = setOperations.members();
 
-        Set<String> values;
-        if(hasKey){
-            values = hashOperations.get(hashKey);
-            values.remove(value);
-            hashOperations.put(hashKey, values);
-        }else {
-            return;
-        }
+                if(values == null || values.isEmpty()){
+                    return null;
+                }
 
-        if(values.isEmpty()){
-            hashOperations.delete(hashKey);
-        }
+                //전체 값 삭제
+                for (String value : values) {
+                    BoundValueOperations valueOperations = operations.boundValueOps(value);
+                    valueOperations.getAndDelete();
+                    setOperations.remove(value);
+                }
 
+                return null;
+            }
+        });
+    }
+
+    private String getKey(String cacheKeyPrefix, String cacheKeySuffix) {
+        String[] arrKeySuffix = cacheKeySuffix.split(KEY_DELIMITER);
+        return cacheKeyPrefix + KEY_DELIMITER + arrKeySuffix[0] + KEY_DELIMITER + KEY_SUFFIX;
+    }
+
+    private String getValue(String keySuffix, String keyPrefix) {
+        return keyPrefix + KEY_DELIMITER + keySuffix;
     }
 
 }
