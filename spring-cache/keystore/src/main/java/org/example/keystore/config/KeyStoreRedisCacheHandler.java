@@ -17,10 +17,8 @@ public class KeyStoreRedisCacheHandler {
     private static final String KEY_SUFFIX = "keys";
     private static final String KEY_DELIMITER = "::";
 
-    /**
-     *
-     */
-    public void put(String cacheKeyPrefix, String cacheKeySuffix, Duration timeToLive){
+    //RedisCache가 Redis에 데이터를 저장한 이후 작업 수행
+    void put(String cacheKeyPrefix, String cacheKeySuffix, Duration timeToLive){
 
         redisTemplate.execute(new SessionCallback<>() {
             @Override
@@ -41,11 +39,8 @@ public class KeyStoreRedisCacheHandler {
         });
     }
 
-
-    /**
-     *
-     */
-    public void evict(String cacheKeySuffix, String cacheKeyPrefix){
+    //RedisCache가 Redis에 데이터를 삭제한 이후 작업 수행
+    void evict(String cacheKeySuffix, String cacheKeyPrefix){
 
         redisTemplate.execute(new SessionCallback<>() {
             @Override
@@ -65,6 +60,7 @@ public class KeyStoreRedisCacheHandler {
         });
     }
 
+    //키 저장소에 저장되어 있는 모든 Redis 데이터 삭제
     public void evictAll(String key){
         redisTemplate.execute(new SessionCallback<>() {
             @Override

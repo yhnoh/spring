@@ -13,6 +13,7 @@ public class KeyStoreRedisCacheManager extends RedisCacheManager {
         this.keyStoreRedisCacheHandler = keyStoreRedisCacheHandler;
     }
 
+    //KeyStoreRedisCache 구현체 생성
     @Override
     protected RedisCache createRedisCache(String name, RedisCacheConfiguration cacheConfiguration) {
         return new KeyStoreRedisCache(name, getCacheWriter(), cacheConfiguration, keyStoreRedisCacheHandler);

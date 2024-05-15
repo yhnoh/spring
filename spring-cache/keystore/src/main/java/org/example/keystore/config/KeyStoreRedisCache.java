@@ -15,6 +15,7 @@ public class KeyStoreRedisCache extends RedisCache {
         this.keyStoreRedisCacheHandler = keyStoreRedisCacheHandler;
     }
 
+    //캐시 저장
     @Override
     public void put(Object key, Object value) {
         super.put(key, value);
@@ -23,6 +24,7 @@ public class KeyStoreRedisCache extends RedisCache {
 
     }
 
+    //캐시 삭제
     @Override
     public void evict(Object key) {
         super.evict(key);

@@ -27,6 +27,7 @@
 - 만약 키가 변경이되거나 애플리케이션이 실행될 때 값을 가지고 있을 수 없는 경우라면 어떻게?
 <br/>
 
+
 - 위와같은 문제들 때문에 해당 방법들은 사용하기가 힘들다고 판단하였고 다른 방법을 생각한 것이 바로 키를 관리할 수 있는 키 저장소를 만들면 되지 않을까라는 결론을 내리게 되었다.
 - 키를 관리할 수 있는 키 저장소를 만들기 위하여 몇가지 조건을 생각해보았다.
   - 기존 코드의 수정이 거의 이루어 지면 안된다.
@@ -58,14 +59,136 @@
 !![](./img/spring_cache_structure.png)
  
 
-## 3. Spring Cache Abstraction를 수정하여 문제해결하기
+## 3. 캐시 키를 관리하기위한 키 저장소 만들기
 
 - 원본 데이터를 수정한 이후에 캐시 정보를 수정하기 위하여 아래의 네가지 조건을 만족해야한다고 했다.
   - 기존 코드의 수정이 거의 이루어 지면 안된다.
-  - 모든 캐시키가 관리될 필요는 없다.
+  - 모든 캐시키가 관리 대상이 될 필요는 없다. 캐시키에 관리 되어야 할 대상 및 관리 되지 말아야할 대상을 구분 지을 수 있어야한다.
   - 원본 데이터 상태 변경 이벤트가 들어올 경우 쉽게 캐시 정보를 업데이트할 수 있어야한다.
   - 키를 관리할 수 있는 키 저장소에 이미 없어진 캐시 키 정보를 가지고 있을 수는 있지만, 현재 가지고 있는 캐시 키 정보는 왠만해서는 가지고 있어야한다.    
-- 위의 조건들을 만족하기 위해서는 캐시가 저장된 이후, 또는 삭제된 이후에 캐시 Spring Cache Abstraction에서 캐시가 저장된 이후 또는 삭제된 이후에 
+- 위의 조건들을 만족하기 위해서는 캐시가 저장된 이후, 또는 삭제된 이후에 캐시 키를 관리하기 위한 키 저장소에 데이터의 삽입 또는 삭제를 진행하면 된다고 판단하였다.
+
+### 3.1. 작업 수행
+
+- 해당 작업을 수행하기 위하여 새롭게 만들거나 가공해야하는 클래스는 아래와 같다.
+  - 스프링이 캐싱 작업을 수행할 수 있도록 하는 설정 클래스
+  - RedisCache: Redis에 데이터를 쓰고/읽기 작업을 수행
+  - RedisCacheManager: RedisCache를 생성하고, 가져오기위한 작업 수행 
+  - 캐시가 저장되고 삭제될 때 핸들링할 수 있는 핸들러 클래스
+
+
+```java
+@Configuration
+@EnableCaching
+@RequiredArgsConstructor
+public class CacheConfig {
+
+    private final KeyStoreRedisCacheHandler keyStoreRedisCacheHandler;
+
+
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory){
+        RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory);
+
+        RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofHours(1))
+                .disableCachingNullValues()
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+
+        return new KeyStoreRedisCacheManager(redisCacheWriter, defaultCacheConfig, keyStoreRedisCacheHandler);
+    }
+
+    @Bean
+    public KeyGenerator keyGenerator(){
+        return new RedisKeyGenerator();
+    }
+
+}
+```
+
+```java
+public class KeyStoreRedisCacheManager extends RedisCacheManager {
+
+    private final KeyStoreRedisCacheHandler keyStoreRedisCacheHandler;
+    public KeyStoreRedisCacheManager(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration, KeyStoreRedisCacheHandler keyStoreRedisCacheHandler) {
+        super(cacheWriter, defaultCacheConfiguration);
+        this.keyStoreRedisCacheHandler = keyStoreRedisCacheHandler;
+    }
+
+    //KeyStoreRedisCache 구현체 생성
+    @Override
+    protected RedisCache createRedisCache(String name, RedisCacheConfiguration cacheConfiguration) {
+        return new KeyStoreRedisCache(name, getCacheWriter(), cacheConfiguration, keyStoreRedisCacheHandler);
+    }
+}
+```
+
+```java
+public class KeyStoreRedisCache extends RedisCache {
+
+    private final KeyStoreRedisCacheHandler keyStoreRedisCacheHandler;
+
+    protected KeyStoreRedisCache(String name, RedisCacheWriter cacheWriter, RedisCacheConfiguration cacheConfiguration, KeyStoreRedisCacheHandler keyStoreRedisCacheHandler) {
+        super(name, cacheWriter, cacheConfiguration);
+        this.keyStoreRedisCacheHandler = keyStoreRedisCacheHandler;
+    }
+
+    //캐시 저장
+    @Override
+    public void put(Object key, Object value) {
+        super.put(key, value);
+        Duration timeToLive = getCacheConfiguration().getTtlFunction().getTimeToLive(key, value);
+        keyStoreRedisCacheHandler.put(super.getName(), (String) key, timeToLive);
+
+    }
+
+    //캐시 삭제
+    @Override
+    public void evict(Object key) {
+        super.evict(key);
+        keyStoreRedisCacheHandler.evict(super.getName(), (String) key);
+    }
+}
+```
+
+```java
+@Component
+@RequiredArgsConstructor
+public class KeyStoreRedisCacheHandler {
+
+    private final StringRedisTemplate redisTemplate;
+    private static final String KEY_SUFFIX = "keys";
+    private static final String KEY_DELIMITER = "::";
+
+    //RedisCache가 Redis에 데이터를 저장한 이후 작업 수행
+    void put(String cacheKeyPrefix, String cacheKeySuffix, Duration timeToLive){
+        //...
+    }
+
+    //RedisCache가 Redis에 데이터를 삭제한 이후 작업 수행
+    void evict(String cacheKeySuffix, String cacheKeyPrefix){
+        //...
+    }
+
+    //키 저장소에 저장되어 있는 모든 Redis 데이터 삭제
+    public void evictAll(String key){
+        //...
+    }
+
+    private String getKey(String cacheKeyPrefix, String cacheKeySuffix) {
+        String[] arrKeySuffix = cacheKeySuffix.split(KEY_DELIMITER);
+        return cacheKeyPrefix + KEY_DELIMITER + arrKeySuffix[0] + KEY_DELIMITER + KEY_SUFFIX;
+    }
+
+    private String getValue(String cacheKeyPrefix, String cacheKeySuffix) {
+        return cacheKeyPrefix + KEY_DELIMITER + cacheKeySuffix;
+    }
+
+}
+```
+
+
 
 
 
