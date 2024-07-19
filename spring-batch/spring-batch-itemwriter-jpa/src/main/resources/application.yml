@@ -1,7 +1,12 @@
 spring:
+  jpa:
+    generate-ddl: true
+    show-sql: true
   batch:
     job:
       name: ${job.names:NONE}
+    jdbc:
+      initialize-schema: always
   datasource:
     driver-class-name: ${datasource.member.driver-class-name}
     username: ${datasource.member.username}
