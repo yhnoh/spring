@@ -1,4 +1,4 @@
-package org.example.springbatchitemwriterjpa;
+package org.example.springbatchitemwriterjpa.jpa;
 
 import lombok.Getter;
 import lombok.Setter;

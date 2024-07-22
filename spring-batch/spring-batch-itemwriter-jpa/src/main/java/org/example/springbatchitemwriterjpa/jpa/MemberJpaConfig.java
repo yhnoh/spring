@@ -2,7 +2,7 @@ package org.example.springbatchitemwriterjpa.jpa;
 
 import javax.sql.DataSource;
 import jakarta.persistence.EntityManagerFactory;
-import static org.example.springbatchitemwriterjpa.DataSourceConfig.MEMBER_DATA_SOURCE_BEAN_NAME;
+import static org.example.springbatchitemwriterjpa.jpa.DataSourceConfig.MEMBER_DATA_SOURCE_BEAN_NAME;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.context.annotation.Bean;
