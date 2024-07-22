@@ -31,3 +31,5 @@ datasource:
     hikari:
       pool-name: order-hikari-pool
 
+logging.level:
+  org.springframework.transaction.interceptor: trace

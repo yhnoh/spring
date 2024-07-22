@@ -8,18 +8,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class InitData {
+public class MemberOrderCountDataInitialization {
 
     private final MemberService memberService;
     private final OrderService orderService;
 
-
     @PostConstruct
     public void init() {
         MemberJpaEntity member1 = memberService.save("member1");
-        OrderJpaEntity order1 = orderService.save(member1.getId());
+        for (int i = 0; i < 10; i++) {
+            OrderJpaEntity order = orderService.save(member1.getId());
+        }
 
-        System.out.println("member1 = " + member1);
-        System.out.println("order1 = " + order1);
+        MemberJpaEntity member2 = memberService.save("member2");
+        for (int i = 0; i < 5; i++) {
+            OrderJpaEntity order = orderService.save(member2.getId());
+        }
+
     }
 }
