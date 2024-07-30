@@ -1,5 +1,6 @@
-package org.example.springbatchjoblauncher;
+package org.example.springbatchjoblauncher.v3;
 
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
 @Configuration
+@EnableBatchProcessing
 public class BatchConfig {
 
     @Bean
@@ -19,10 +21,11 @@ public class BatchConfig {
             JobRepository jobRepository, BatchProperties properties) {
         JobLauncherApplicationRunner runner =
                 new DefaultJobLauncherApplicationRunner(jobLauncher, jobExplorer, jobRepository);
-        String jobName = properties.getJob().getName();
-        if(StringUtils.hasText(jobName)) {
-            runner.setJobName(jobName);
+        String jobNames = properties.getJob().getNames();
+        if(StringUtils.hasText(jobNames)) {
+            runner.setJobNames(jobNames);
         }
         return runner;
     }
+
 }

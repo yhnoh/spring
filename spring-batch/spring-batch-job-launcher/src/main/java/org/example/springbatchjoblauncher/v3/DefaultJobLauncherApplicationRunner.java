@@ -1,4 +1,4 @@
-package org.example.springbatchjoblauncher;
+package org.example.springbatchjoblauncher.v3;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +19,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.batch.JobLauncherApplicationRunner;
 import org.springframework.core.log.LogMessage;
-import org.springframework.util.Assert;
 import org.springframework.util.PatternMatchUtils;
 
 public class DefaultJobLauncherApplicationRunner extends JobLauncherApplicationRunner {
@@ -37,14 +36,6 @@ public class DefaultJobLauncherApplicationRunner extends JobLauncherApplicationR
 
 
     @Override
-    public void afterPropertiesSet() {
-
-        Assert.isTrue(jobs.size() != 0, "jobs empty");
-        Assert.isTrue(jobNames.size() != 0, "jabNames empty");
-        Assert.isTrue(!this.isLocalJob(), "No job found with name '" + jobNames.toString() + "'");
-    }
-
-
     @Autowired(required = false)
     public void setJobParametersConverter(JobParametersConverter converter) {
         super.setJobParametersConverter(converter);
@@ -52,6 +43,7 @@ public class DefaultJobLauncherApplicationRunner extends JobLauncherApplicationR
     }
 
 
+    @Override
     @Autowired(required = false)
     public void setJobs(Collection<Job> jobs) {
         super.setJobs(jobs);
@@ -60,9 +52,9 @@ public class DefaultJobLauncherApplicationRunner extends JobLauncherApplicationR
 
 
     @Override
-    public void setJobName(String jobName) {
-        super.setJobName(jobName);
-        this.jobNames = Arrays.stream(jobName.split(",")).toList();
+    public void setJobNames(String jobNames) {
+        super.setJobNames(jobNames);
+        this.jobNames = Arrays.stream(jobNames.split(",")).toList();
     }
 
 
@@ -80,11 +72,6 @@ public class DefaultJobLauncherApplicationRunner extends JobLauncherApplicationR
 
             super.execute(findJob.get(), jobParameters);
         }
-    }
-
-
-    private boolean isLocalJob() {
-        return jobNames.stream().allMatch(jobName -> jobs.contains(jobName));
     }
 
 }
