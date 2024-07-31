@@ -19,13 +19,13 @@ public class HelloJobConfig {
 
 
     @Bean
-    @Order(2)
     public Job helloJob1() {
         return jobBuilderFactory.get("helloJob1").start(this.helloStep1()).build();
     }
 
 
     @Bean
+    @Order(2)
     public Step helloStep1() {
         return stepBuilderFactory.get("helloStep1").tasklet((contribution, chunkContext) -> {
             System.out.println("helloJob1 run!!!");
@@ -35,13 +35,13 @@ public class HelloJobConfig {
 
 
     @Bean
-    @Order(1)
     public Job helloJob2() {
         return jobBuilderFactory.get("helloJob2").start(this.helloStep2()).build();
     }
 
 
     @Bean
+    @Order(1)
     public Step helloStep2() {
         return stepBuilderFactory.get("helloStep2").tasklet((contribution, chunkContext) -> {
             System.out.println("helloJob2 run!!!");
