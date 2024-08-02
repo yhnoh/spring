@@ -41,7 +41,7 @@ public class HelloJobConfig {
     @Bean
     public Step helloStep2() {
         return stepBuilderFactory.get("helloStep2").tasklet((contribution, chunkContext) -> {
-            System.out.println("helloStep2 run!!!");
+            System.out.println("helloJob2 run!!!");
             return RepeatStatus.FINISHED;
         }).build();
     }

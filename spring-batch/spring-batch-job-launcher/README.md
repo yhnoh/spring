@@ -12,4 +12,76 @@
     > If the auto-configuration detects a single job is, it will be executed on startup.
     > If multiple jobs are found in the context, a job name to execute on startup must be supplied by the user using the spring.batch.job.name property.
 
-    
+### Spring Batch Multiple Job
+- 
+
+### Spring Batch Multiple Job 순서대로 실행
+
+#### Job Setting
+
+```java
+@Configuration
+@RequiredArgsConstructor
+public class HelloJobConfig {
+
+    private final JobBuilderFactory jobBuilderFactory;
+    private final StepBuilderFactory stepBuilderFactory;
+
+
+    @Bean
+    public Job helloJob1() {
+        return jobBuilderFactory.get("helloJob1").start(this.helloStep1()).build();
+    }
+
+
+    @Bean
+    public Step helloStep1() {
+        return stepBuilderFactory.get("helloStep1").tasklet((contribution, chunkContext) -> {
+            System.out.println("helloJob1 run!!!");
+            return RepeatStatus.FINISHED;
+        }).build();
+    }
+
+
+    @Bean
+    public Job helloJob2() {
+        return jobBuilderFactory.get("helloJob2").start(this.helloStep2()).build();
+    }
+
+
+    @Bean
+    public Step helloStep2() {
+        return stepBuilderFactory.get("helloStep2").tasklet((contribution, chunkContext) -> {
+            System.out.println("helloJob2 run!!!");
+            return RepeatStatus.FINISHED;
+        }).build();
+    }
+
+}
+```
+
+- `HelloJobConfig` 클래스에 `helloJob1`과 `helloJob2` 잡을 셋팅해두었다.
+- jar 파일을 실행시킬 때, `--job.names` 프로퍼티에 `helloJob2,helloJob1` 값을 넣고 실행시켰을 때, `helloJob2`가 먼저 실행되고 `helloJob1`이 실행되는 것을 기대하였지만, `helloJob1`이 먼저 실행된 이후 `helloJob2`가 실행되는 것을 확인할 수 있다.
+    ```text
+    java -jar ./build/libs/spring-batch-job-launcher-0.0.1-SNAPSHOT.jar --job.names=helloJob2,helloJob1
+
+    ....
+    2024-08-02 13:53:22.487  INFO 39927 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=helloJob1]] launched with the following parameters: [{}]
+    2024-08-02 13:53:22.522  INFO 39927 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [helloStep1]
+    helloJob1 run!!!
+    2024-08-02 13:53:22.534  INFO 39927 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [helloStep1] executed in 11ms
+    2024-08-02 13:53:22.536  INFO 39927 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=helloJob1]] completed with the following parameters: [{}] and the following status: [COMPLETED] in 36ms
+    2024-08-02 13:53:22.543  INFO 39927 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=helloJob2]] launched with the following parameters: [{}]
+    2024-08-02 13:53:22.551  INFO 39927 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [helloStep2]
+    helloJob2 run!!!
+    2024-08-02 13:53:22.556  INFO 39927 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [helloStep2] executed in 5ms
+    2024-08-02 13:53:22.561  INFO 39927 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=helloJob2]] completed with the following parameters: [{}] and the following status: [COMPLETED] in 16ms
+    ....
+    ```
+
+
+- 하지만 기대한 결과와는 다르게 `helloJob1`이 먼저 실행된 이후 `helloJob2`가 실해
+
+- [HelloJobConfig.class](./src/main/java/org/example/springbatchjoblauncher/v1/HelloJobConfig.java)
+- 해당 HelloJob을 실행시켜
+org.example.springbatchjoblauncher.v1

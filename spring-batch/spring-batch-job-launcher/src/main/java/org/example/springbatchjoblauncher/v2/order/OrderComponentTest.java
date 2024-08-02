@@ -10,18 +10,18 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrderComponentTest implements InitializingBean {
 
-    private final List<OrderComponent> orderComponents;
+    private final List<OrderComponent> orderComponentList;
     private final Collection<OrderComponent> orderComponentCollection;
 
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        for(OrderComponent orderComponent : orderComponents) {
-            System.out.println("orderComponent = " + orderComponent.getName());
+        for(OrderComponent orderComponent : orderComponentList) {
+            System.out.println("orderComponentList item = " + orderComponent.getName());
         }
 
         for(OrderComponent orderComponent : orderComponentCollection) {
-            System.out.println("orderComponent = " + orderComponent.getName());
+            System.out.println("orderComponentCollection item = " + orderComponent.getName());
         }
     }
 }
