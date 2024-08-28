@@ -7,4 +7,14 @@ public interface RetrofitApi {
 
     @GET("/hello")
     Call<String> hello();
+
+    @GET("/exception")
+    Call<String> exception();
+
+    @GET("/error/400")
+    Call<String> error400();
+
+    @GET("/error/500")
+    Call<String> error500();
+
 }

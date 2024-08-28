@@ -1,0 +1,11 @@
+###
+GET http://127.0.0.1:8080/retrofit/hello
+
+###
+GET http://127.0.0.1:8080/retrofit/exception
+
+###
+GET http://127.0.0.1:8080/retrofit/error/400
+
+###
+GET http://127.0.0.1:8080/retrofit/error/500
