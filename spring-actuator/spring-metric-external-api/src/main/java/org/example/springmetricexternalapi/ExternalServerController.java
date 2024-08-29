@@ -29,4 +29,11 @@ public class HelloController {
         return ResponseEntity.status(500).body("Internal Server Error");
     }
 
+
+
+    public abstract class Abstract
+    public static class Order {
+
+    }
+
 }
