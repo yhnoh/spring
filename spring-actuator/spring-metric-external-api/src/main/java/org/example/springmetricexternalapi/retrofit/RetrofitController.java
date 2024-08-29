@@ -23,24 +23,32 @@ public class RetrofitController {
         return execute.body();
     }
 
-    @GetMapping("/exception")
-    public String exception() throws IOException {
-        Call<String> call = retrofitApi.exception();
-        Response<String> execute = call.execute();
+    @GetMapping("/status/200")
+    public RetrofitResponse status200() throws IOException {
+        Call<RetrofitResponse> call = retrofitApi.status200();
+        Response<RetrofitResponse> execute = call.execute();
         return execute.body();
     }
 
-    @GetMapping("/error/400")
-    public String error400() throws IOException {
-        Call<String> call = retrofitApi.error400();
-        Response<String> execute = call.execute();
+    @GetMapping("/status/200/error")
+    public RetrofitResponse status200Error() throws IOException {
+        Call<RetrofitResponse> call = retrofitApi.status200Error();
+        Response<RetrofitResponse> execute = call.execute();
         return execute.body();
     }
 
-    @GetMapping("/error/500")
-    public String error500() throws IOException {
-        Call<String> call = retrofitApi.error500();
-        Response<String> execute = call.execute();
+    @GetMapping("/status/400")
+    public RetrofitResponse status400() throws IOException {
+        Call<RetrofitResponse> call = retrofitApi.status400();
+        Response<RetrofitResponse> execute = call.execute();
         return execute.body();
     }
+
+    @GetMapping("/status/500")
+    public RetrofitResponse status500() throws IOException {
+        Call<RetrofitResponse> call = retrofitApi.status500();
+        Response<RetrofitResponse> execute = call.execute();
+        return execute.body();
+    }
+
 }

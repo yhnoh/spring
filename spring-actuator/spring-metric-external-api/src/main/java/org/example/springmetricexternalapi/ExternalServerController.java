@@ -1,5 +1,7 @@
 package org.example.springmetricexternalapi;
 
+import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,32 +9,50 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class HelloController {
+public class ExternalServerController {
 
     @GetMapping("/hello")
     public String hello() {
         return "Hello World!";
     }
 
-    @GetMapping("/exception")
-    public ResponseEntity<String> exception() {
-        throw new RuntimeException("RuntimeException");
+    @GetMapping("/status/200")
+    public ResponseEntity<ExternalServerResponse> success() {
+        return ResponseEntity.ok().body(ExternalServerResponse.createSuccess());
     }
 
-    @GetMapping("/error/400")
-    public ResponseEntity<String> error400() {
-        return ResponseEntity.badRequest().body("Bad Request");
+    @GetMapping("/status/200/error")
+    public ResponseEntity<ExternalServerResponse> successError() {
+        return ResponseEntity.ok().body(ExternalServerResponse.createError());
     }
 
-    @GetMapping("/error/500")
-    public ResponseEntity<String> error500() {
-        return ResponseEntity.status(500).body("Internal Server Error");
+    @GetMapping("/status/400")
+    public ResponseEntity<ExternalServerResponse> error400() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/status/500")
+    public ResponseEntity<ExternalServerResponse> error500() {
+        return ResponseEntity.status(500).build();
     }
 
 
 
-    public abstract class Abstract
-    public static class Order {
+    @Data
+    public static class ExternalServerResponse {
+        private String result;
+
+        public static ExternalServerResponse createSuccess() {
+            ExternalServerResponse externalServerResponse = new ExternalServerResponse();
+            externalServerResponse.setResult("success");
+            return externalServerResponse;
+        }
+
+        public static ExternalServerResponse createError() {
+            ExternalServerResponse externalServerResponse = new ExternalServerResponse();
+            externalServerResponse.setResult("error");
+            return externalServerResponse;
+        }
 
     }
 

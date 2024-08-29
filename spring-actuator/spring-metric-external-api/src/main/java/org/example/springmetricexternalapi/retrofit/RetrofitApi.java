@@ -8,13 +8,16 @@ public interface RetrofitApi {
     @GET("/hello")
     Call<String> hello();
 
-    @GET("/exception")
-    Call<String> exception();
+    @GET("/status/200")
+    Call<RetrofitResponse> status200();
 
-    @GET("/error/400")
-    Call<String> error400();
+    @GET("/status/200/error")
+    Call<RetrofitResponse> status200Error();
 
-    @GET("/error/500")
-    Call<String> error500();
+    @GET("/status/400")
+    Call<RetrofitResponse> status400();
+
+    @GET("/status/500")
+    Call<RetrofitResponse> status500();
 
 }
