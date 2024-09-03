@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: spring-metric-external-api
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - metrics
+  endpoint:
+    metrics:
+      enabled: true
+

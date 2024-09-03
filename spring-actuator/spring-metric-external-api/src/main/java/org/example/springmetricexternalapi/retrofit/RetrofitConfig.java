@@ -1,27 +1,28 @@
 package org.example.springmetricexternalapi.retrofit;
 
-import okhttp3.Interceptor;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.okhttp3.OkHttpMetricsEventListener;
+import io.micrometer.core.instrument.binder.okhttp3.OkHttpObservationInterceptor;
+import io.micrometer.observation.ObservationRegistry;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Configuration
 public class RetrofitConfig {
 
 
     @Bean
-    public RetrofitApi retrofitApi() {
+    public RetrofitApi retrofitApi(ObservationRegistry observationRegistry, MeterRegistry registry) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://localhost:8080")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(new OkHttpClient.Builder()
-                        .eventListener(new RetrofitEventListener())
+                        .eventListener(OkHttpMetricsEventListener.builder(registry, "okhttp.requests").build())
+                        .addInterceptor(OkHttpObservationInterceptor.builder(observationRegistry, "http.client.requests").build())
                         .addInterceptor(chain -> {
                             System.out.println("Interceptor.intercept");
                             return chain.proceed(chain.request());
