@@ -17,16 +17,16 @@ public class RetrofitConfig {
     @Bean
     public RetrofitApi retrofitApi(ObservationRegistry observationRegistry, MeterRegistry registry) {
 
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://localhost:8080")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(new OkHttpClient.Builder()
                         .eventListener(OkHttpMetricsEventListener.builder(registry, "okhttp.requests").build())
-                        .addInterceptor(OkHttpObservationInterceptor.builder(observationRegistry, "http.client.requests").build())
-                        .addInterceptor(chain -> {
-                            System.out.println("Interceptor.intercept");
-                            return chain.proceed(chain.request());
-                        })
+                        .addInterceptor(OkHttpObservationInterceptor.builder(observationRegistry, "http.client.requests")
+                                .includeHostTag(true)
+                                .uriMapper((request) -> request.url().uri().getPath())
+                                .build())
                         .build())
                 .build();
         return retrofit.create(RetrofitApi.class);
