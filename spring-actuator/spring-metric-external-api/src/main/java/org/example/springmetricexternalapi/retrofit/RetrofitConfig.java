@@ -7,6 +7,7 @@ import io.micrometer.observation.ObservationRegistry;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -15,39 +16,43 @@ public class RetrofitConfig {
 
 
     @Bean
-    public RetrofitApi retrofitApi(ObservationRegistry observationRegistry, MeterRegistry registry) {
+    @Primary
+    public RetrofitExternalApi retrofitApi(ObservationRegistry observationRegistry, MeterRegistry registry) {
 
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://localhost:8080")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(new OkHttpClient.Builder()
-                        .eventListener(OkHttpMetricsEventListener.builder(registry, "okhttp.requests").build())
-                        .addInterceptor(OkHttpObservationInterceptor.builder(observationRegistry, "http.client.requests")
+                        .eventListener(OkHttpMetricsEventListener.builder(registry, "okhttp.requests")
                                 .includeHostTag(true)
-                                .uriMapper((request) -> request.url().uri().getPath())
                                 .build())
+//                        .addInterceptor(OkHttpObservationInterceptor.builder(observationRegistry, "okhttp.requests")
+//                                .includeHostTag(true)
+//                                .uriMapper((request) -> request.url().uri().getPath())
+//                                .build())
                         .build())
                 .build();
-        return retrofit.create(RetrofitApi.class);
+        return retrofit.create(RetrofitExternalApi.class);
     }
 
-    @Bean
-    public RetrofitApi retrofitApi2() {
+    @Bean(name = "retrofitIOExceptionApi")
+    public RetrofitExternalApi retrofitIOExceptionApi(ObservationRegistry observationRegistry, MeterRegistry registry) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://localhost:8081")
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(new okhttp3.OkHttpClient.Builder()
-                        .eventListener(new RetrofitEventListener())
-                        .addInterceptor(chain -> {
-                            System.out.println("Interceptor.intercept");
-                            return chain.proceed(chain.request());
-                        })
+                .client(new OkHttpClient.Builder()
+                        .eventListener(OkHttpMetricsEventListener.builder(registry, "okhttp.requests")
+                                .includeHostTag(true)
+                                .build())
+                        .addInterceptor(OkHttpObservationInterceptor.builder(observationRegistry, "okhttp.requests")
+                                .includeHostTag(true)
+                                .build())
                         .build())
                 .build();
 
-        return retrofit.create(RetrofitApi.class);
+        return retrofit.create(RetrofitExternalApi.class);
     }
 
 }

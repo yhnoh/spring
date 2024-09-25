@@ -1,6 +1,6 @@
 package org.example.springmetricexternalapi.retrofit;
 
-public interface ExternalApiResponse {
+public interface RetrofitExternalApiCommonResponse {
 
     boolean isSuccess();
 

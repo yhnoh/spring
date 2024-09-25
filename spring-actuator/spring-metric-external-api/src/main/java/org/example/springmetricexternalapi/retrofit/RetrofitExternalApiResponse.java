@@ -3,7 +3,7 @@ package org.example.springmetricexternalapi.retrofit;
 import lombok.Data;
 
 @Data
-public class RetrofitResponse implements ExternalApiResponse {
+public class RetrofitExternalApiResponse implements RetrofitExternalApiCommonResponse {
     private String result;
 
     @Override

@@ -19,9 +19,9 @@ public class ExternalApiAspect {
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
 
 
-        ExternalApiResponse proceed = null;
+        RetrofitExternalApiCommonResponse proceed = null;
         try {
-            proceed = (ExternalApiResponse) joinPoint.proceed();
+            proceed = (RetrofitExternalApiCommonResponse) joinPoint.proceed();
         } finally {
             if (!proceed.isSuccess()) {
                 Gson gson = new Gson();

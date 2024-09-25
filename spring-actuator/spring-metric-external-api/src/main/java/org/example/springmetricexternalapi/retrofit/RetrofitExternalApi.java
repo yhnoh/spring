@@ -3,21 +3,21 @@ package org.example.springmetricexternalapi.retrofit;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
-public interface RetrofitApi {
+public interface RetrofitExternalApi {
 
     @GET("/hello")
     Call<String> hello();
 
     @GET("/status/200")
-    Call<RetrofitResponse> status200();
+    Call<RetrofitExternalApiResponse> status200();
 
     @GET("/status/200/error")
-    Call<RetrofitResponse> status200Error();
+    Call<RetrofitExternalApiResponse> status200Error();
 
     @GET("/status/400")
-    Call<RetrofitResponse> status400();
+    Call<RetrofitExternalApiResponse> status400();
 
     @GET("/status/500")
-    Call<RetrofitResponse> status500();
+    Call<RetrofitExternalApiResponse> status500();
 
 }

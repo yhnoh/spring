@@ -1,39 +1,46 @@
 package org.example.springmetricexternalapi.retrofit;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
-import retrofit2.Response;
-
-import java.io.IOException;
 
 @Component
-@RequiredArgsConstructor
 public class RetrofitApiService {
 
-    private final RetrofitApi retrofitApi;
+    private final RetrofitExternalApiTemplate retrofitExternalApiTemplate;
+    private final RetrofitExternalApi retrofitExternalApi;
+    private final RetrofitExternalApi retrofitIOExceptionApi;
 
-    public RetrofitResponse status200() throws IOException {
-        Call<RetrofitResponse> call = retrofitApi.status200();
-        Response<RetrofitResponse> execute = call.execute();
-        return execute.body();
+    public RetrofitApiService(RetrofitExternalApiTemplate retrofitExternalApiTemplate,
+                              RetrofitExternalApi retrofitExternalApi,
+                              @Qualifier("retrofitIOExceptionApi") RetrofitExternalApi retrofitIOExceptionApi) {
+        this.retrofitExternalApiTemplate = retrofitExternalApiTemplate;
+        this.retrofitExternalApi = retrofitExternalApi;
+        this.retrofitIOExceptionApi = retrofitIOExceptionApi;
     }
 
-    public RetrofitResponse status200Error() throws IOException {
-        Call<RetrofitResponse> call = retrofitApi.status200Error();
-        Response<RetrofitResponse> execute = call.execute();
-        return execute.body();
+    public RetrofitExternalApiResponse status200() {
+        Call<RetrofitExternalApiResponse> call = retrofitExternalApi.status200();
+        return retrofitExternalApiTemplate.handleResponse(call);
     }
 
-    public RetrofitResponse status400() throws IOException {
-        Call<RetrofitResponse> call = retrofitApi.status400();
-        Response<RetrofitResponse> execute = call.execute();
-        return execute.body();
+    public RetrofitExternalApiResponse status200Error() {
+        Call<RetrofitExternalApiResponse> call = retrofitExternalApi.status200Error();
+        return retrofitExternalApiTemplate.handleResponse(call);
     }
 
-    public RetrofitResponse status500() throws IOException {
-        Call<RetrofitResponse> call = retrofitApi.status500();
-        Response<RetrofitResponse> execute = call.execute();
-        return execute.body();
+    public RetrofitExternalApiResponse status400() {
+        Call<RetrofitExternalApiResponse> call = retrofitExternalApi.status400();
+        return retrofitExternalApiTemplate.handleResponse(call);
+    }
+
+    public RetrofitExternalApiResponse status500() {
+        Call<RetrofitExternalApiResponse> call = retrofitExternalApi.status500();
+        return retrofitExternalApiTemplate.handleResponse(call);
+    }
+
+    public RetrofitExternalApiResponse ioException() {
+        Call<RetrofitExternalApiResponse> call = retrofitIOExceptionApi.status200();
+        return retrofitExternalApiTemplate.handleResponse(call);
     }
 }
