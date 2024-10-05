@@ -1,0 +1,9 @@
+###
+GET http://localhost:8080/hello-world
+
+###
+GET http://localhost:8080/hello-world/hello-world
+
+###
+GET http://localhost:8080/hello-world/test
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SP0R2USEDHqPV7mcIK08ZAs4WtPMQ0NdMHuSD8tnWOw

@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: path_route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/hello-world/**
+          filters:
+            - AuthorizationHeaderFilter
+            - RewritePath=/hello-world/(?<segment>.*), /$\{segment}
+
+token:
+  secret: 1234
