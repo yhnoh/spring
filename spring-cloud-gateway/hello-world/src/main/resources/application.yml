@@ -11,4 +11,4 @@ spring:
             - RewritePath=/hello-world/(?<segment>.*), /$\{segment}
 
 token:
-  secret: 1234
+  secret: jwtsigntutorialasdfasdfasdfasdfasdf
