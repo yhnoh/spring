@@ -1,0 +1,8 @@
+server:
+  port: 8082
+
+
+
+jwt:
+  secret: tVRd01VIU4XZJKSKPckYCRQdosRbK3oJYnAxaZriC9RgOFnDuxgPoqgtCQujN8B7
+  access-token-expiration: 86400000

@@ -3,6 +3,7 @@ package org.example.userservice.member;
 import jakarta.persistence.*;
 import lombok.*;
 
+@ToString
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
