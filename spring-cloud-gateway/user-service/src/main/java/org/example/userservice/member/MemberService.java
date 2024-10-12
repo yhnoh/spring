@@ -1,6 +1,5 @@
 package org.example.userservice.member;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,17 +12,6 @@ public class MemberService {
     private final MemberJpaRepository memberJpaRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @PostConstruct
-    public void postConstruct() {
-        MemberJpaEntity memberJpaEntity = MemberJpaEntity.builder()
-                .username("username")
-                .password(passwordEncoder.encode("password"))
-                .build();
-
-        memberJpaRepository.save(memberJpaEntity);
-        System.out.println("memberJpaEntity = " + memberJpaEntity);
-    }
-
 
     @Transactional
     public void signUp(String username, String password, String role) {
@@ -31,8 +19,8 @@ public class MemberService {
         member.signUp(username, passwordEncoder.encode(password), role);
 
         MemberJpaEntity memberJpaEntity = MemberJpaEntity.builder()
-                .username(member.getUsername())
-                .password(member.getPassword())
+                .loginId(member.getLoginId())
+                .loginPassword(member.getLoginPassword())
                 .role(member.getRole())
                 .build();
         memberJpaRepository.save(memberJpaEntity);

@@ -38,8 +38,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(this.memberAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        http.authorizeRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/login").permitAll()
-                .anyRequest().authenticated());
+        http.authorizeHttpRequests(auth -> {
+            auth.requestMatchers(HttpMethod.POST, "/login", "/v1/members/sign-up").permitAll().anyRequest().authenticated();
+        });
 
         return http.build();
     }

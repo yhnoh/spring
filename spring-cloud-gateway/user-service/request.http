@@ -1,3 +1,13 @@
+POST http://localhost:8082/v1/members/sign-up
+content-type: application/json
+
+{
+  "loginId": "username1",
+  "loginPassword": "password1",
+  "role": "USER"
+}
+
+
 ### GET request to example server
 POST http://localhost:8082/login
 content-type: application/json

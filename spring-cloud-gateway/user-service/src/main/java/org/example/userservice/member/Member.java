@@ -10,15 +10,15 @@ import java.time.LocalDateTime;
 public class Member {
 
     private long id;
-    private String username;
-    private String password;
+    private String loginId;
+    private String loginPassword;
     private String role;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
     public void signUp(String username, String password, String role) {
-        this.username = username;
-        this.password = password;
+        this.loginId = username;
+        this.loginPassword = password;
         this.role = role;
         this.createdAt = LocalDateTime.now();
         this.modifiedAt = LocalDateTime.now();

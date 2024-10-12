@@ -21,11 +21,11 @@ public class MemberJpaEntity {
     @Column(name = "id")
     private long id;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "login_id")
+    private String loginId;
 
-    @Column(name = "password")
-    private String password;
+    @Column(name = "login_password")
+    private String loginPassword;
 
     @Column(name = "role")
     private String role;

@@ -14,11 +14,11 @@ public class SecurityUserDetails implements UserDetails {
 
     private String username;
     private String password;
-
+    private List<GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return authorities;
     }
 
     @Override
