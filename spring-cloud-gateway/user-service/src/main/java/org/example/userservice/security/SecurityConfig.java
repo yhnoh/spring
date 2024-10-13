@@ -39,7 +39,9 @@ public class SecurityConfig {
                 .addFilterBefore(this.memberAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers(HttpMethod.POST, "/login", "/v1/members/sign-up").permitAll().anyRequest().authenticated();
+            auth.requestMatchers(HttpMethod.POST, "/login", "/v1/members/sign-up").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/v1/members/{id}").permitAll()
+                    .anyRequest().authenticated();
         });
 
         return http.build();

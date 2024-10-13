@@ -2,9 +2,7 @@ package org.example.userservice.member;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -12,10 +10,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberResponseMapper memberResponseMapper;
 
+    @GetMapping("/{id}")
+    public MemberResponse getMember(@PathVariable long id) {
+        return memberService.getMember(id).map(memberResponseMapper::toMemberResponse)
+                .orElse(null);
+    }
 
     @PostMapping("/sign-up")
-    public void signUp(MemberSignUpRequest memberSignUpRequest) {
+    public void signUp(@RequestBody MemberSignUpRequest memberSignUpRequest) {
         memberService.signUp(memberSignUpRequest.getLoginId(),
                 memberSignUpRequest.getLoginPassword(),
                 memberSignUpRequest.getRole());
