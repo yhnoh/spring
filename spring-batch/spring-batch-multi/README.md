@@ -1,0 +1,1 @@
+> [Spring Batch > Scaling and Parallel Processing](https://docs.spring.io/spring-batch/reference/scalability.html)
