@@ -1,11 +1,28 @@
-### Spring Batch 병렬 처리
+package org.example.springbatchmulti.step;
 
-- 많은 배치 프로세스가 단일 스레드, 단일 프로세스를 통해서 문제를 해결할 수 있지만 데이터 양이 많아질 수록 배치 처리 시간이 길어질 수 있다.
-- 해당 문재를 해결하기 위하여 Spring Batch 프레임워크는 멀티 스레드 및 멀티 프로세스를 이용한 병렬 처리를 지원한다.
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
-### 예제
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-```java
+@Configuration
+@ConditionalOnProperty(name = "job.name", havingValue = "simpleStepsJob")
+@RequiredArgsConstructor
+@Slf4j
 public class SimpleStepsJobConfig {
 
     private final JobRepository jobRepository;
@@ -67,25 +84,3 @@ public class SimpleStepsJobConfig {
     }
 
 }
-```
-
-- simpleStepsJob은 1부터 100사이에서 짝수와 홀수를 구분하여 출력하는 Job이다.
-- step1은 짝수를 출력하고, step2는 홀수를 출력하며 해당 Job은 단일 프로세스, 단일 스레드에서 작동을 하게 된다.
-
-```text
-2024-10-22T22:59:44.377+09:00  INFO 54057 --- [           main] o.e.s.step.SimpleStepsJobConfig          : step1 item = 100
-2024-10-22T22:59:44.379+09:00  INFO 54057 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [step1] executed in 42ms
-2024-10-22T22:59:44.381+09:00  INFO 54057 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step2]
-2024-10-22T22:59:44.382+09:00  INFO 54057 --- [           main] o.e.s.step.SimpleStepsJobConfig          : step2 item = 1
-```
-
-- 위 로그를 확인해보면 step1인 종료된 이후 step2가 실행된 것을 확인할 수 있으며, 둘다 main 스레드에서 실행되었음을 확인할 수 있다.
-- 물론 simpleStepsJob의 처리 속도가 느리지는 않겠지만, 해당 Job의 처리 속도를 올려한다는 니즈가 발생하여 이를 해결하기 위한 업무를 진행한다고 가정해보자.
-
-### Multi-threaded Step
-
-### Parallel Steps
-
-- Parallel Steps은 하나의 Job에 여러 Step을 병렬로 실행켜준다.
-
-> > [Spring Batch > Scaling and Parallel Processing](https://docs.spring.io/spring-batch/reference/scalability.html)
