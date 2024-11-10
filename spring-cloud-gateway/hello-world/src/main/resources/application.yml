@@ -7,8 +7,9 @@ spring:
           predicates:
             - Path=/hello-world/**
           filters:
-            - AuthorizationHeaderFilter
             - RewritePath=/hello-world/(?<segment>.*), /$\{segment}
 
-token:
-  secret: jwtsigntutorialasdfasdfasdfasdfasdf
+management:
+  endpoint:
+    gateway:
+      enabled: true
