@@ -35,7 +35,6 @@ public class FilterUtils {
     }
 
     public ServerWebExchange setCorrelationId(ServerWebExchange exchange, String correlationId) {
-
         return this.setRequestHeader(exchange, CORRELATION_ID, correlationId);
     }
 
