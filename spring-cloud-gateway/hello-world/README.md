@@ -40,4 +40,5 @@
 > https://www.igloo.co.kr/security-information/spring-security-part1-%ec%9d%b8%ec%a6%9d%ea%b3%bc-%ec%9d%b8%ea%b0%80-%ec%95%84%ed%82%a4%ed%85%8d%ec%b2%98%ec%9d%98-%ec%9d%b4%ed%95%b4%ec%99%80-%ec%8b%a4%ec%a0%84-%ed%99%9c%ec%9a%a9/
 > https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway/gatewayfilter-factories/rewritepath-factory.html
 > 스프링 마이크로서비스 코딩 공작 개정 2판 8장 > 스프링 클라우드 게이트웨이를 이용한 서비스 라우팅
-> 
+> https://j-ungry.tistory.com/380 <br/>
+> https://j-ungry.tistory.com/380 <br/>
