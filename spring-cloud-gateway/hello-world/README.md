@@ -31,6 +31,9 @@
     - [Spring Cloud Gateway 특징](#spring-cloud-gateway-특징)
     - [Spring Cloud Gateway 구성요소](#spring-cloud-gateway-구성요소)
 
+> 마이크로서비스, 8장 외부 API 패턴
+> https://github.com/gilbutITbook/007035/tree/master/ftgo-api-gateway
+> https://devocean.sk.com/blog/techBoardDetail.do?ID=165131
 
 - Predicate
 - Filter
