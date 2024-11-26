@@ -18,7 +18,10 @@ public class Security {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((authorization) -> authorization.anyRequest().authenticated());
+                .authorizeHttpRequests(
+//                        (authorization) -> authorization.requestMatchers("/v1/orders/**").permitAll().anyRequest().authenticated()
+                          (authorization) -> authorization.anyRequest().permitAll()
+                );
 
         http
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
