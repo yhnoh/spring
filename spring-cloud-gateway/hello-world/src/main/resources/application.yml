@@ -3,11 +3,14 @@ spring:
     gateway:
       routes:
         - id: path_route
-          uri: http://localhost:8081
+          uri: ${routers.order.url}
           predicates:
             - Path=/hello-world/**
           filters:
             - RewritePath=/hello-world/(?<segment>.*), /$\{segment}
+
+routers:
+  order.url: http://localhost:8081/v1/orders
 
 management:
   endpoint:
