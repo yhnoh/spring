@@ -1,0 +1,8 @@
+### GET request to example server
+GET http://localhost:8080/server
+
+###
+GET http://localhost:8080/client
+
+###
+GET http://localhost:8080/client2
