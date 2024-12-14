@@ -1,8 +1,14 @@
 ### GET request to example server
-GET http://localhost:8080/server
+GET http://localhost:8080/server/1
 
-###
-GET http://localhost:8080/client
+### webclient 단일 요청
+GET http://localhost:8080/webclient/v1
 
-###
-GET http://localhost:8080/client2
+### webclient 다중 요청, 단일처리
+GET http://localhost:8080/webclient/v2
+
+### webclient 다중 요청, 병렬처리
+GET http://localhost:8080/webclient/v3
+
+### webclient 다중 요청, 병렬처리
+GET http://localhost:8080/webclient/v4

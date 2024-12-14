@@ -6,19 +6,30 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class ServerController {
 
 
-    @RequestMapping("/server/{id}")
-    private ServerResponse<String> server(@PathVariable int id) throws InterruptedException {
-        log.info("[서버-{}] 작업 시작", id);
+    @RequestMapping("/v1/server/{id}")
+    private ServerResponse<String> serverV1(@PathVariable int id) throws InterruptedException {
+        log.info("[v1 서버-{}] 작업 시작", id);
         Thread.sleep(1000);
-        ServerResponse<String> response = ServerResponse.success("서버 응답");
-        log.info("[서버-{}] 작업 완료", id);
+        ServerResponse<String> response = ServerResponse.success("data" + id);
+        log.info("[v1 서버-{}] 작업 완료", id);
         return response;
-
     }
+
+    @RequestMapping("/v2/server/{id}")
+    private ServerResponse<List<String>> serverV2(@PathVariable int id) throws InterruptedException {
+        log.info("[v2 서버-{}] 작업 시작", id);
+        Thread.sleep(1000);
+        ServerResponse<List<String>> response = ServerResponse.success(List.of("data" + id));
+        log.info("[v2 서버-{}] 작업 완료", id);
+        return response;
+    }
+
 }
