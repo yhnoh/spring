@@ -6,10 +6,12 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 import java.util.concurrent.TimeUnit;
@@ -17,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
-@RequestMapping("/webclient/timeout")
 public class WebClientTimeoutControllerTest {
 
     private WebClient webClient() {
@@ -34,6 +35,32 @@ public class WebClientTimeoutControllerTest {
                 .baseUrl("http://localhost:8080")
                 .defaultHeaders(header -> header.setContentType(MediaType.APPLICATION_JSON))
                 .build();
+    }
+
+
+    @GetMapping("/v1/client/timeout")
+    public ClientTimeoutResponse clientTimeoutV1() {
+        Mono<ClientTimeoutResponse> mono = this.webClient().get()
+                .uri("/v1/server/timeout")
+                .retrieve()
+                .bodyToMono(ClientTimeoutResponse.class);
+        return mono.block();
+    }
+
+    @GetMapping("/v2/client/timeout")
+    public ClientTimeoutResponse clientTimeoutV2() {
+        ResponseEntity<ClientTimeoutResponse> response = this.webClient().get()
+                .uri("/v1/server/timeout")
+                .exchangeToMono(clientResponse -> {
+                    if (clientResponse.statusCode().is2xxSuccessful()) {
+                        return clientResponse.toEntity(ClientTimeoutResponse.class);
+                    }
+                    return clientResponse.toEntity(ClientTimeoutResponse.class);
+                })
+                .block();
+
+
+        return response.getBody();
     }
 
 }

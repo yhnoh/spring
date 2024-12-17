@@ -32,4 +32,13 @@ public class ServerController {
         return response;
     }
 
+    @RequestMapping("/v1/server/timeout")
+    private ServerResponse<String> serverTimeout() throws InterruptedException {
+        log.info("/v1/server/timeout 작업 시작");
+        Thread.sleep(2000);
+        ServerResponse<String> response = ServerResponse.success("data");
+        log.info("/v1/server/timeout 작업 완료");
+        return response;
+    }
+
 }

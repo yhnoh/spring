@@ -12,3 +12,6 @@ GET http://localhost:8080/webclient/v3
 
 ### webclient 다중 요청, 병렬처리
 GET http://localhost:8080/webclient/v4
+
+### Timeout 테스트
+GET http://localhost:8080/v1/client/timeout
