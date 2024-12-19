@@ -2,6 +2,7 @@ package org.example.client.timeout;
 
 
 import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -56,8 +57,11 @@ public class WebClientTimeoutControllerTest {
                         return clientResponse.toEntity(ClientTimeoutResponse.class);
                     }
                     return clientResponse.toEntity(ClientTimeoutResponse.class);
-                })
-                .block();
+                }).onErrorReturn(ResponseEntity.ok(new ClientTimeoutResponse()))
+                .onErrorResume(ReadTimeoutException.class, e -> {
+                    log.error("ReadTimeoutException 발생: {}", e.getMessage());
+                    return Mono.just(ResponseEntity.ok(new ClientTimeoutResponse()));
+                }).block();
 
 
         return response.getBody();

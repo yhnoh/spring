@@ -1,3 +1,10 @@
+### Collection 데이터 응답
+GET http://localhost:8080/client/response/datas
+
+### 단일 데이터 응답
+GET http://localhost:8080/client/response/datas
+
+
 ### GET request to example server
 GET http://localhost:8080/server/1
 
@@ -15,3 +22,4 @@ GET http://localhost:8080/webclient/v4
 
 ### Timeout 테스트
 GET http://localhost:8080/v1/client/timeout
+
