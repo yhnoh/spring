@@ -4,6 +4,27 @@ GET http://localhost:8080/client/response/datas
 ### 단일 데이터 응답
 GET http://localhost:8080/client/response/datas
 
+### 400 에러 발생시 WebClientResponseException$BadRequest 발생
+GET http://localhost:8080/client/error/400
+
+### 500 에러 발생시 WebClientResponseException$InternalServerError 발생
+GET http://localhost:8080/client/error/500
+
+### timeout 발생시 io.netty.handler.timeout.ReadTimeoutException 발생
+GET http://localhost:8080/client/error/timeout
+
+### onStatus 에러 핸들링
+GET http://localhost:8080/client/error/onStatus
+
+### onErrorResume 에러 핸들링
+GET http://localhost:8080/client/error/onErrorResume
+
+### onErrorMap 에러 핸들링
+GET http://localhost:8080/client/error/onErrorMap
+
+###
+GET http://localhost:8080/client/error/onErrorMap2
+
 
 ### GET request to example server
 GET http://localhost:8080/server/1
