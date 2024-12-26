@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +67,33 @@ public class ClientParallelController {
                         .bodyToMono(ClientParallel.class))
                 .doOnSubscribe(subscription -> log.info("[클라이언트] 서버 요청 시작"))
                 .doOnComplete(() -> log.info("[클라이언트] 서버 요청 완료"));
+
+        List<ClientParallel> response = flux.collectList().block();
+
+        this.stopStopWatch(stopWatch);
+        return response;
+    }
+
+    @GetMapping("/parallel2")
+    public List<ClientParallel> requestParallel2(@RequestParam int startId, @RequestParam int endId) {
+
+        StopWatch stopWatch = this.startStopWatch();
+
+        Flux<ClientParallel> flux = Flux.range(startId, endId + 1)
+                .flatMap(id -> webClient().get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/server/parallel/error/{id}")
+                                .build(id))
+                        .retrieve()
+                        .bodyToMono(ClientParallel.class)
+                        .onErrorResume(WebClientResponseException.class, throwable -> {
+                            log.error("[클라이언트] 서버 에러 발생 id={}", id);
+                            return Mono.empty();
+                        })
+                        .doOnSubscribe(subscription -> log.info("[클라이언트] 서버 요청 id={}", id))
+                        .doOnSuccess(clientParallel -> log.info("[클라이언트] 서버 응답 id={}", id))
+                        .doOnError(throwable -> log.error("[클라이언트] 서버 에러 발생 id={}", id))
+                );
 
         List<ClientParallel> response = flux.collectList().block();
 

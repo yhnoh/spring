@@ -31,6 +31,8 @@ GET http://localhost:8080/client/parallel/sequence?startId=1&endId=10
 ###
 GET http://localhost:8080/client/parallel/parallel?startId=1&endId=10
 
+###
+GET http://localhost:8080/client/parallel/parallel2?startId=1&endId=10
 
 
 ### GET request to example server
