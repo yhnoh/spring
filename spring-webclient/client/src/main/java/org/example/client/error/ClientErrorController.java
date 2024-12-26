@@ -25,7 +25,6 @@ public class ClientErrorController {
         // 1초로 타임아웃 설정
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofMillis(1000));
-
         ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
 
         return WebClient.builder()
