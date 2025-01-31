@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
 
-@Component
+//@Component
 public class RetrofitApiService {
 
     private final RetrofitExternalApiTemplate retrofitExternalApiTemplate;

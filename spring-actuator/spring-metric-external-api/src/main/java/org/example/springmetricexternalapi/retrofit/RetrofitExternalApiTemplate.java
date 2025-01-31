@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -13,7 +12,7 @@ import java.util.List;
 
 
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class RetrofitExternalApiTemplate {
 
@@ -26,6 +25,7 @@ public class RetrofitExternalApiTemplate {
                 RetrofitExternalApiResponse body = response.body();
 
                 if (!body.isSuccess()) {
+
                     log.error("response = " + body);
                     List<Tag> tags = List.of(Tag.of("host", call.request().url().host()));
                     registry.counter("okhttp.requests.fail", tags).increment();

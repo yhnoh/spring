@@ -6,12 +6,11 @@ import io.micrometer.core.instrument.binder.okhttp3.OkHttpObservationInterceptor
 import io.micrometer.observation.ObservationRegistry;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-@Configuration
+//@Configuration
 public class RetrofitConfig {
 
 

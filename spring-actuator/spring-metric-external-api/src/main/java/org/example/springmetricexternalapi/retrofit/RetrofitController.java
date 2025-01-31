@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+//@RestController
 @RequiredArgsConstructor
-@RequestMapping("/retrofit")
+//@RequestMapping("/retrofit")
 public class RetrofitController {
 
     private final RetrofitApiService retrofitApiService;

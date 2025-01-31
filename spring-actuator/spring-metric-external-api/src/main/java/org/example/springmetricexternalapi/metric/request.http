@@ -1,0 +1,26 @@
+###
+GET http://localhost:8080/like
+
+###
+GET http://localhost:8080/cancel
+
+###
+GET http://localhost:8080/count
+
+###
+GET http://localhost:8080/actuator/metrics
+
+###
+< {%
+    request.variables.set("metricName", "like.count")
+    request.variables.set("query", "")
+    // request.variables.set("query", "?tag=method:canceled")
+    // request.variables.set("query", "?tag=method:like")
+%}
+GET http://localhost:8080/actuator/metrics/{{metricName}}{{query}}
+
+###
+< {%
+    request.variables.set("metricName", "like.count")
+%}
+GET http://localhost:8080/actuator/metrics/{{metricName}}
