@@ -1,28 +1,30 @@
 package org.example.springmetricexternalapi.metric;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
 public class LikeServiceConfig {
 
-//    @Bean
-//    public LikeService likeService() {
-//        return new LikeService1();
-//    }
+/*
+    @Bean
+    public LikeService likeService() {
+        return new LikeService1();
+    }
+*/
 
-//    @Bean
-//    public LikeService likeService(MeterRegistry meterRegistry) {
-//        return new LikeService2(meterRegistry);
-//    }
+/*
+    @Bean
+    public LikeService likeService(MeterRegistry meterRegistry) {
+        return new LikeCounterService1(meterRegistry);
+    }
+*/
 
 /*
     @Bean
     public LikeService likeService() {
-        return new LikeService3();
+        return new LikeCounterService2();
     }
 
     @Bean
@@ -31,15 +33,30 @@ public class LikeServiceConfig {
     }
 */
 
-//    @Bean
-//    public LikeService likeService(MeterRegistry meterRegistry) {
-//        return new LikeService4(meterRegistry);
-//    }
-
+/*
     @Bean
     public LikeService likeService(MeterRegistry meterRegistry) {
-        return new LikeService5(meterRegistry);
+        return new LikeGaugeService1(meterRegistry);
+    }
+*/
+
+/*
+    @Bean
+    public LikeService likeService(MeterRegistry meterRegistry) {
+        return new LikeServiceTimer1(meterRegistry);
+    }
+*/
+
+/*
+    @Bean
+    public LikeService likeService(MeterRegistry meterRegistry) {
+        return new LikeServiceTimer2(meterRegistry);
     }
 
+    @Bean
+    public TimedAspect timedAspect(MeterRegistry registry) {
+        return new TimedAspect(registry);
+    }
+*/
 
 }

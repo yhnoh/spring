@@ -8,12 +8,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Slf4j
-public class LikeService2 implements LikeService {
+public class LikeCounterService1 implements LikeService {
 
     private final AtomicInteger count = new AtomicInteger(100);
     private final MeterRegistry meterRegistry;
 
-    public LikeService2(MeterRegistry meterRegistry) {
+    public LikeCounterService1(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
     }
 
@@ -38,7 +38,7 @@ public class LikeService2 implements LikeService {
         Counter.builder("like.count")
                 .description("좋아요 개수")
                 .tag("class", this.getClass().getName())
-                .tags("method", "cancle")
+                .tags("method", "cancel")
                 .register(meterRegistry)
                 .increment();
     }

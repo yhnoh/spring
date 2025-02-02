@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Slf4j
-public class LikeService3 implements LikeService {
+public class LikeCounterService2 implements LikeService {
 
     private final AtomicInteger count = new AtomicInteger(100);
 
