@@ -1,6 +1,5 @@
 package org.example.springmetricexternalapi.metric;
 
-import io.micrometer.core.aop.CountedAspect;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +19,7 @@ public class LikeServiceConfig {
 //        return new LikeService2(meterRegistry);
 //    }
 
+/*
     @Bean
     public LikeService likeService() {
         return new LikeService3();
@@ -29,4 +29,17 @@ public class LikeServiceConfig {
     public CountedAspect countedAspect(MeterRegistry meterRegistry) {
         return new CountedAspect(meterRegistry);
     }
+*/
+
+//    @Bean
+//    public LikeService likeService(MeterRegistry meterRegistry) {
+//        return new LikeService4(meterRegistry);
+//    }
+
+    @Bean
+    public LikeService likeService(MeterRegistry meterRegistry) {
+        return new LikeService5(meterRegistry);
+    }
+
+
 }

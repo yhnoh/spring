@@ -1,10 +1,9 @@
 package org.example.springmetricexternalapi.metric;
 
-import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.management.timer.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -20,28 +19,42 @@ public class LikeService5 implements LikeService {
 
     @Override
     public void like() {
-        log.info("좋아요");
-        count.incrementAndGet();
 
-        Timer.builder("like.count")
-                .description("좋아요 개수")
+        Timer timer = Timer.builder("like.count")
+                .description("좋아요")
                 .tag("class", this.getClass().getName())
-                .tags("method", "like")
-                .register(meterRegistry)
-                .increment();
+                .tag("method", "like")
+                .register(meterRegistry);
+
+        timer.record(() -> {
+            log.info("좋아요");
+            count.incrementAndGet();
+            sleep(1000);
+        });
     }
 
     @Override
     public void cancel() {
-        log.info("좋아요 취소");
-        count.decrementAndGet();
 
-        Counter.builder("like.count")
-                .description("좋아요 개수")
+        Timer timer = Timer.builder("like.count")
+                .description("좋아요")
                 .tag("class", this.getClass().getName())
-                .tags("method", "cancle")
-                .register(meterRegistry)
-                .increment();
+                .tag("method", "canceled")
+                .register(meterRegistry);
+
+        timer.record(() -> {
+            log.info("좋아요 취소");
+            count.decrementAndGet();
+            sleep(500);
+        });
+    }
+
+    private static void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
