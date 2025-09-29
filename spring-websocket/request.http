@@ -1,1 +1,28 @@
 WEBSOCKET ws://localhost:8080/gs-guide-websocket
+
+###
+POST localhost:8080/member/sign-up
+Content-Type: application/json
+
+{
+  "email": "email2",
+  "nickname": "nickname2"
+}
+
+###
+POST localhost:8080/channels
+Content-Type: application/json
+
+{
+  "memberId": "1",
+  "channelName": "채널명1"
+}
+
+###
+POST localhost:8080/channel-participants
+Content-Type: application/json
+
+{
+  "channelId": "1",
+  "memberId": "2"
+}
