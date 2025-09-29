@@ -3,11 +3,9 @@ package org.example.springwebsocket;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.BoundZSetOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.messaging.core.AbstractMessageSendingTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -16,7 +14,7 @@ import java.time.ZoneId;
 
 @Controller
 @RequiredArgsConstructor
-public class GreetingController {
+public class ChatMessageController {
 
     private final StringRedisTemplate stringRedisTemplate;
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -31,13 +29,4 @@ public class GreetingController {
     }
 
 
-    @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
-    public Greeting greeting(HelloMessage message) throws InterruptedException {
-
-
-        Thread.sleep(1000);
-
-        return new Greeting("Hello " + message.getName() + "!");
-    }
 }
